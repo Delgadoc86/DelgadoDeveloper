@@ -1,0 +1,68 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0b0c0e;
+  --background-subtle: #18191d;
+  --foreground: #f4f4f5;
+  --foreground-muted: #a8a8b3;
+  --border: #2b2c31;
+  --accent: #7c6ff0;
+  /* Lighter tint of --accent for small text/icons sitting on tinted surfaces
+     (badges, eyebrows on --background-subtle): --accent alone drops under the
+     4.5:1 WCAG AA contrast ratio there. Use --accent for fills/borders/rings,
+     --accent-bright for accent-colored text or icons. */
+  --accent-bright: #9c93f7;
+  --accent-foreground: #ffffff;
+  --accent-muted: rgba(124, 111, 240, 0.14);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-background-subtle: var(--background-subtle);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-bright: var(--accent-bright);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-muted: var(--accent-muted);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --container-content: 80rem;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--background);
+  background-image:
+    linear-gradient(to right, rgba(244, 244, 245, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(244, 244, 245, 0.05) 1px, transparent 1px);
+  background-size: 64px 64px;
+  color: var(--foreground);
+}
+
+/* Fallback focus ring for interactive elements without an explicit focus-visible style. */
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
