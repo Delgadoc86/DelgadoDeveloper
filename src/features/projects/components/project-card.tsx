@@ -9,12 +9,14 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
+  const ctaLabel = project.links.download ? "Conocé más y descargá" : "Ver proyecto";
+
   return (
     <Link
       href={`/proyectos/${project.slug}`}
-      className="group border-border bg-background-subtle hover:border-foreground-muted block overflow-hidden rounded-2xl border transition-colors active:scale-[0.99]"
+      className="group border-border bg-background-subtle hover:border-foreground-muted flex h-full flex-col overflow-hidden rounded-2xl border transition-colors active:scale-[0.99]"
     >
-      <div className="p-6">
+      <div className="shrink-0 p-6">
         <span className="bg-accent-muted text-accent-bright mb-3 inline-block rounded-full px-2.5 py-1 font-mono text-[11px]">
           {project.category}
         </span>
@@ -29,7 +31,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       </div>
 
       {project.platform === "mobile" ? (
-        <div className="bg-background flex h-56 items-center justify-center sm:h-64">
+        <div className="bg-background flex min-h-56 flex-1 items-center justify-center sm:min-h-64">
           <div className="border-border relative aspect-9/19 h-44 overflow-hidden rounded-[1.75rem] border-4 sm:h-52">
             <Image
               src={project.coverImage.src}
@@ -41,7 +43,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
         </div>
       ) : (
-        <div className="flex h-56 flex-col sm:h-64">
+        <div className="flex min-h-56 flex-1 flex-col sm:min-h-64">
           <div className="border-border flex shrink-0 items-center gap-1.5 border-t px-4 py-3">
             <span className="bg-border size-2.5 rounded-full" />
             <span className="bg-border size-2.5 rounded-full" />
@@ -60,8 +62,8 @@ export function ProjectCard({ project }: ProjectCardProps) {
         </div>
       )}
 
-      <div className="border-border text-accent-bright flex items-center gap-1.5 border-t px-6 py-3.5 text-sm font-medium">
-        Ver proyecto
+      <div className="border-border text-accent-bright flex shrink-0 items-center gap-1.5 border-t px-6 py-3.5 text-sm font-medium">
+        {ctaLabel}
         <ArrowUpRight
           className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           aria-hidden

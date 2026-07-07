@@ -1,11 +1,15 @@
 export interface ProjectImage {
   src: string;
   alt: string;
+  /** Texto corto para mostrar debajo de la miniatura en la galería (ej. "Iniciá sesión"). */
+  caption?: string;
 }
 
 export interface ProjectLinks {
   demo?: string;
   repo?: string;
+  /** Enlace directo de descarga (ej. instalador APK alojado en Google Drive). */
+  download?: string;
 }
 
 /** Texto libre. Sugerido: "En producción" | "En desarrollo" | "Pausado". */
@@ -51,4 +55,6 @@ export interface Project {
   coverImage: ProjectImage;
   gallery?: ProjectImage[];
   links: ProjectLinks;
+  /** Ruta a los Términos de descarga y prueba específicos del producto, si aplica. */
+  legalTermsUrl?: string;
 }

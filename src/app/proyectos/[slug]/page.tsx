@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ArrowUpRight,
   ChevronRight,
+  Images,
   Lightbulb,
   ListChecks,
   ListTodo,
@@ -23,6 +24,7 @@ import { Button } from "@/components/ui/button";
 import { GithubIcon } from "@/components/ui/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
+import { DownloadButton } from "@/features/projects/components/download-button";
 import { projects } from "@/features/projects/data/projects";
 import { buildBreadcrumbJsonLd, buildProjectJsonLd } from "@/lib/seo";
 import { siteConfig } from "@/config/site.config";
@@ -123,10 +125,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               ))}
             </div>
 
-            {(project.links.demo ?? project.links.repo) ? (
+            {(project.links.download ?? project.links.demo ?? project.links.repo) ? (
               <div className="mt-8 flex flex-wrap gap-4">
+                {project.links.download ? (
+                  <DownloadButton
+                    href={project.links.download}
+                    projectSlug={project.slug}
+                  />
+                ) : null}
                 {project.links.demo ? (
-                  <Button href={project.links.demo}>
+                  <Button
+                    href={project.links.demo}
+                    variant={project.links.download ? "secondary" : "primary"}
+                  >
                     Ver demo
                     <ArrowUpRight className="size-4" aria-hidden />
                   </Button>
@@ -138,6 +149,19 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </Button>
                 ) : null}
               </div>
+            ) : null}
+
+            {project.links.download && project.legalTermsUrl ? (
+              <p className="text-foreground-muted mt-4 text-xs">
+                Al descargar, aceptás los{" "}
+                <Link
+                  href={project.legalTermsUrl}
+                  className="text-accent-bright underline underline-offset-2"
+                >
+                  Términos de descarga y prueba
+                </Link>{" "}
+                de {project.name}.
+              </p>
             ) : null}
           </FadeIn>
         </Container>
@@ -174,6 +198,59 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </FadeIn>
         </Container>
       </section>
+
+      {project.gallery && project.gallery.length > 0 ? (
+        <section className="border-border/60 border-t py-12 sm:py-16">
+          <Container>
+            <FadeIn>
+              <div className="flex items-center gap-2">
+                <Images className="text-accent-bright size-4" aria-hidden />
+                <h2 className="text-foreground text-sm font-semibold">Capturas</h2>
+              </div>
+
+              <div className="mt-6 flex gap-6 overflow-x-auto pb-2">
+                {project.gallery.map((image, index) => (
+                  <div
+                    key={image.src}
+                    className="flex w-40 shrink-0 flex-col items-center gap-3 sm:w-48"
+                  >
+                    {project.platform === "mobile" ? (
+                      <div className="border-border bg-background-subtle relative aspect-9/19 w-full overflow-hidden rounded-[1.5rem] border-4">
+                        <Image
+                          src={image.src}
+                          alt={image.alt}
+                          fill
+                          sizes="192px"
+                          className="object-cover object-top"
+                        />
+                      </div>
+                    ) : (
+                      <div className="border-border bg-background-subtle relative aspect-16/10 w-72 overflow-hidden rounded-xl border sm:w-80">
+                        <Image
+                          src={image.src}
+                          alt={image.alt}
+                          fill
+                          sizes="320px"
+                          className="object-cover object-top"
+                        />
+                      </div>
+                    )}
+
+                    {image.caption ? (
+                      <p className="text-foreground-muted flex items-center gap-1.5 text-center text-xs">
+                        <span className="text-accent-bright font-mono">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        {image.caption}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </FadeIn>
+          </Container>
+        </section>
+      ) : null}
 
       <section className="border-border/60 border-t py-12 sm:py-20">
         <Container>

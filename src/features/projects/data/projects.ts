@@ -58,20 +58,41 @@ export const projects: Project[] = [
     pendingWork:
       "Mejorar capturas y presentación visual del producto. Pulir detalles de PDF con muchos ítems. Terminar Google Sign-In. Consolidar panel admin. Mejorar gestión de planes demo/pro. Preparar publicación en Google Play. Conseguir más feedback de usuarios reales.",
     screenshotsNeeded: [
-      "[PENDIENTE: agregar screenshot real — pantalla de inicio / login]",
-      "[PENDIENTE: agregar screenshot real — home principal]",
-      "[PENDIENTE: agregar screenshot real — crear presupuesto]",
       "[PENDIENTE: agregar screenshot real — vista de ítems]",
-      "[PENDIENTE: agregar screenshot real — PDF generado]",
-      "[PENDIENTE: agregar screenshot real — historial]",
       "[PENDIENTE: agregar screenshot real — datos del negocio]",
       "[PENDIENTE: agregar screenshot real — pantalla de plan demo/pro, si está disponible]",
     ],
     coverImage: {
-      src: "/assets/projects/PresuFacil.webp",
-      alt: "Vista previa de la app PresuFácil",
+      src: "/assets/projects/presu/home.webp",
+      alt: "Home principal de PresuFácil con accesos rápidos y resumen del mes",
     },
-    links: {},
+    gallery: [
+      {
+        src: "/assets/projects/presu/login.webp",
+        alt: "Pantalla de inicio de sesión de PresuFácil",
+        caption: "Iniciá sesión",
+      },
+      {
+        src: "/assets/projects/presu/crear.webp",
+        alt: "Creación de un nuevo presupuesto en PresuFácil",
+        caption: "Armá el presupuesto",
+      },
+      {
+        src: "/assets/projects/presu/historial.webp",
+        alt: "Historial de presupuestos enviados en PresuFácil",
+        caption: "Seguí el historial",
+      },
+      {
+        src: "/assets/projects/presu/pdf.webp",
+        alt: "PDF de presupuesto generado por PresuFácil",
+        caption: "Compartilo en PDF",
+      },
+    ],
+    links: {
+      download:
+        "https://drive.google.com/file/d/1GCdU4HOD5Fay8loJ3v8gx7bbVKvYl0zC/view?usp=drivesdk",
+    },
+    legalTermsUrl: "/legal/presufacil/terminos-descarga",
   },
   {
     slug: "mi-almacen",
@@ -125,25 +146,50 @@ export const projects: Project[] = [
     pendingWork:
       "Implementar módulo de caja diaria. Mejorar flujo multiusuario o registro de operador. Conseguir más feedback de comercios reales. Preparar capturas profesionales. Pulir onboarding. Evaluar modo offline básico. Preparar APK de prueba.",
     screenshotsNeeded: [
-      "[PENDIENTE: agregar screenshot real — login / inicio]",
-      "[PENDIENTE: agregar screenshot real — home principal]",
-      "[PENDIENTE: agregar screenshot real — lista de productos]",
       "[PENDIENTE: agregar screenshot real — alta o edición de producto]",
       "[PENDIENTE: agregar screenshot real — categorías]",
-      "[PENDIENTE: agregar screenshot real — lista de clientes fiados]",
       "[PENDIENTE: agregar screenshot real — detalle de cliente fiado]",
       "[PENDIENTE: agregar screenshot real — registro de fiado]",
       "[PENDIENTE: agregar screenshot real — registro de pago]",
       "[PENDIENTE: agregar screenshot real — historial de movimientos]",
-      "[PENDIENTE: agregar screenshot real — PDF de lista de precios]",
       "[PENDIENTE: agregar screenshot real — configuración del comercio]",
-      "[PENDIENTE: agregar screenshot real — futuro módulo de caja diaria]",
     ],
     coverImage: {
-      src: "/assets/projects/MiAlmacen.webp",
-      alt: "Vista previa de la app Mi Almacén",
+      src: "/assets/projects/almacen/home.webp",
+      alt: "Home principal de Mi Almacén con caja, fiados e inventario",
     },
-    links: {},
+    gallery: [
+      {
+        src: "/assets/projects/almacen/login.webp",
+        alt: "Pantalla de inicio de sesión de Mi Almacén",
+        caption: "Iniciá sesión",
+      },
+      {
+        src: "/assets/projects/almacen/productos.webp",
+        alt: "Lista de productos con precios y márgenes en Mi Almacén",
+        caption: "Gestioná tus productos",
+      },
+      {
+        src: "/assets/projects/almacen/fiado.webp",
+        alt: "Lista de clientes fiados en Mi Almacén",
+        caption: "Controlá los fiados",
+      },
+      {
+        src: "/assets/projects/almacen/caja.webp",
+        alt: "Pantalla de caja diaria de Mi Almacén",
+        caption: "Cerrá la caja",
+      },
+      {
+        src: "/assets/projects/almacen/pdf.webp",
+        alt: "PDF de lista de precios generado por Mi Almacén",
+        caption: "Compartí la lista de precios",
+      },
+    ],
+    links: {
+      download:
+        "https://drive.google.com/file/d/1fIEMQ90uYRGi26GqBnAhDPHm8IFcUypq/view?usp=drivesdk",
+    },
+    legalTermsUrl: "/legal/mi-almacen/terminos-descarga",
   },
   {
     slug: "catalogo-autos",
