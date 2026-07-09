@@ -90,7 +90,7 @@ export const projects: Project[] = [
     ],
     links: {
       download:
-        "https://drive.google.com/file/d/1GCdU4HOD5Fay8loJ3v8gx7bbVKvYl0zC/view?usp=drivesdk",
+        "https://drive.google.com/file/d/1JMrznPZRBAImpsgQYKSMFdR8enGl-I3P/view?usp=drivesdk",
     },
     legalTermsUrl: "/legal/presufacil/terminos-descarga",
   },
@@ -187,7 +187,7 @@ export const projects: Project[] = [
     ],
     links: {
       download:
-        "https://drive.google.com/file/d/1fIEMQ90uYRGi26GqBnAhDPHm8IFcUypq/view?usp=drivesdk",
+        "https://drive.google.com/file/d/1Q-NzhjPgXHGOtKr2KkYUPXMFsCtLW4XD/view?usp=drivesdk",
     },
     legalTermsUrl: "/legal/mi-almacen/terminos-descarga",
   },
