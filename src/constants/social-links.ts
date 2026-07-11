@@ -7,4 +7,6 @@ export const socialLinks = {
   github: "https://github.com/Delgadoc86",
   instagram: "https://www.instagram.com/delgadodevs/",
   tiktok: "https://www.tiktok.com/@delgadodev",
+  /** Repo de este mismo portfolio — enlazado como evidencia técnica en el footer. */
+  portfolioRepo: "https://github.com/Delgadoc86/DelgadoDeveloper",
 } as const;

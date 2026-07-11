@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { CvButton } from "@/components/ui/cv-button";
 import { MobileNav } from "@/components/layout/mobile-nav";
 import { mainNav } from "@/constants/nav";
 import { siteConfig } from "@/config/site.config";
+import { cvAvailable, cvUrl } from "@/lib/cv";
 
 export function Header() {
   return (
@@ -38,10 +40,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <MobileNav />
+          {cvAvailable ? (
+            <CvButton variant="secondary" size="sm" className="hidden sm:inline-flex" />
+          ) : null}
+
+          <MobileNav cvAvailable={cvAvailable} cvUrl={cvUrl} />
 
           <Button href="/#contacto" size="sm">
-            Hablemos
+            Contactarme
           </Button>
         </div>
       </Container>

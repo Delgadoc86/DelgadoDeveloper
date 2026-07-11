@@ -91,6 +91,7 @@ export const projects: Project[] = [
     links: {
       download:
         "https://drive.google.com/file/d/1JMrznPZRBAImpsgQYKSMFdR8enGl-I3P/view?usp=drivesdk",
+      repo: "https://github.com/Delgadoc86/presupuestoapp",
     },
     legalTermsUrl: "/legal/presufacil/terminos-descarga",
   },
@@ -188,6 +189,7 @@ export const projects: Project[] = [
     links: {
       download:
         "https://drive.google.com/file/d/1Q-NzhjPgXHGOtKr2KkYUPXMFsCtLW4XD/view?usp=drivesdk",
+      repo: "https://github.com/Delgadoc86/Mi-Almacen",
     },
     legalTermsUrl: "/legal/mi-almacen/terminos-descarga",
   },
@@ -251,6 +253,7 @@ export const projects: Project[] = [
     },
     links: {
       demo: "https://autosmendoza.vercel.app",
+      repo: "https://github.com/Delgadoc86/AgenciaAutos",
     },
   },
 ];

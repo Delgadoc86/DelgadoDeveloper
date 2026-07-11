@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "DelgadoDev",
   title: "DelgadoDev | Desarrollador Frontend & Mobile en Mendoza, Argentina",
   description:
-    "Cristian Delgado, desarrollador Frontend & Mobile en Mendoza, Argentina. Aplicaciones web con React y Next.js, y apps mobile con React Native, para resolver problemas reales de oficios, comercios y pequeños negocios.",
+    "Cristian Delgado, Frontend & Mobile Developer disponible para oportunidades React. Desarrolló aplicaciones Android descargables, sitios web en producción y plataformas con panel administrativo usando React, Next.js, React Native y Firebase.",
   url: "https://www.delgadodev.com.ar",
   locale: "es_AR",
   author: {

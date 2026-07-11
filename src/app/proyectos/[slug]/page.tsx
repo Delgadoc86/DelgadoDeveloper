@@ -54,7 +54,21 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     alternates: {
       canonical: `/proyectos/${project.slug}`,
     },
+    // Next.js no mezcla `openGraph`/`twitter` en profundidad entre layout y
+    // page: si el objeto se define acá, reemplaza al del root layout entero
+    // en vez de combinarse campo a campo. Por eso se repiten `type`, `locale`
+    // y `siteName` en vez de heredarlos.
     openGraph: {
+      type: "website",
+      locale: siteConfig.locale,
+      siteName: siteConfig.name,
+      url: `${siteConfig.url}/proyectos/${project.slug}`,
+      title: seoTitle,
+      description: project.description,
+      images: [project.coverImage.src],
+    },
+    twitter: {
+      card: "summary_large_image",
       title: seoTitle,
       description: project.description,
       images: [project.coverImage.src],

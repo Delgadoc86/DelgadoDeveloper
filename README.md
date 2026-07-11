@@ -28,15 +28,19 @@ src/
                          # /privacidad, /cookies, /legal/[producto]/terminos-descarga,
                          # sitemap, robots, manifest, iconos, OG image
   components/
-    ui/                 # Componentes genéricos sin lógica de negocio (Button, Badge, TechIcon...)
+    ui/                 # Componentes genéricos sin lógica de negocio (Button, Badge, TechIcon, CvButton...)
     layout/             # Header, Footer, MobileNav
     motion/             # Wrappers de animación (FadeIn)
     analytics/          # Google Analytics + banner de consentimiento de cookies
   features/             # Piezas con conocimiento de dominio (hero, proyectos, stack, about, contacto)
-    projects/components/ # ProjectCard, DownloadButton (tracking de clic por producto)
+    projects/data/        # projects.ts (3 casos de estudio) + other-projects.ts (sitios de
+                           # cliente sin caso de estudio, repos privados)
+    projects/components/  # ProjectCard, DownloadButton (tracking de clic por producto),
+                           # OtherProjectsSection
   config/               # site.config.ts — fuente única de verdad (nombre, url, autor)
   constants/            # Nav y links sociales
-  lib/                  # utils (cn) y helpers de SEO/JSON-LD/GA (trackPageview, trackEvent)
+  lib/                  # utils (cn), helpers de SEO/JSON-LD/GA (trackPageview, trackEvent) y
+                         # cv.ts (detecta si /public/Cristian-Delgado-CV.pdf existe, server-only)
   types/                # Tipos compartidos
 public/
   assets/               # Screenshots de proyectos e íconos de marca
@@ -83,14 +87,34 @@ El proyecto se despliega en Vercel, que detecta Next.js automáticamente por `ne
 
 ## Estado del proyecto
 
-Sitio completo y funcional: home, `/sobre-mi`, case studies de los 3 proyectos (`PresuFácil`, `Mi Almacén`, `Catálogo Autos`), páginas legales del sitio (`/privacidad`, `/cookies`) y páginas legales por producto (`/legal/mi-almacen/terminos-descarga`, `/legal/presufacil/terminos-descarga`), con SEO técnico (sitemap, robots, JSON-LD, Open Graph), accesibilidad (navegación por teclado, focus visible, `prefers-reduced-motion`), performance optimizada (imágenes, fuentes self-hosted, sin dependencias innecesarias) y Google Analytics detrás de un banner de consentimiento de cookies (Ley 25.326 / buenas prácticas RGPD).
+Sitio completo y funcional: home, `/sobre-mi`, case studies de los 3 proyectos propios más
+completos (`PresúFácil`, `Mi Almacén`, `Catálogo Autos` — con repo público linkeado en cada
+uno), una sección más liviana con otros dos sitios reales para clientes (`Date un Gusto`,
+`Silverio Foodtruck` — sin caso de estudio, repos privados por ser de terceros), páginas
+legales del sitio (`/privacidad`, `/cookies`) y páginas legales por producto
+(`/legal/mi-almacen/terminos-descarga`, `/legal/presufacil/terminos-descarga`), con SEO
+técnico (sitemap, robots, JSON-LD con `knowsAbout` derivado del stack, Open Graph y Twitter
+Card propios por página de proyecto), accesibilidad (navegación por teclado, focus visible,
+`prefers-reduced-motion`), performance optimizada (imágenes, fuentes self-hosted, sin
+dependencias innecesarias) y Google Analytics detrás de un banner de consentimiento de
+cookies (Ley 25.326 / buenas prácticas RGPD).
+
+El home está pensado primero para reclutadores (indicador de disponibilidad laboral en el
+hero, botón "Ver GitHub" al perfil público, CV descargable cuando existe el archivo) y en
+segundo lugar para clientes freelance — ambos objetivos conviven sin secciones separadas.
 
 Mi Almacén y PresuFácil se distribuyen como APK fuera de Google Play: cada uno tiene un
 botón "Descargar APK" en su página (enlace a Google Drive) y un evento de Google
 Analytics propio por clic (`download_click_mi_almacen` / `download_click_presufacil`).
 
+**CV**: el botón "Descargar CV" (hero, header, contacto y menú móvil) es condicional —
+`src/lib/cv.ts` chequea con `fs.existsSync` si existe `/public/Cristian-Delgado-CV.pdf`.
+Sin el archivo no se renderiza ningún botón (no queda un enlace roto); apenas se agregue el
+PDF con ese nombre exacto, los botones aparecen solos, sin tocar código.
+
 **Pendiente:**
 
+- Agregar el PDF real en `/public/Cristian-Delgado-CV.pdf` para activar los botones de descarga de CV (ver arriba).
 - Galería de screenshots adicionales por proyecto (más allá de la portada) — marcados como `[PENDIENTE: ...]` en `src/features/projects/data/projects.ts`.
 - Aclarar en `src/features/projects/data/projects.ts` (Mi Almacén) si el módulo de caja
   diaria ya está terminado — el copy actual (`status`, `pendingWork`) dice que está

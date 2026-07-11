@@ -12,8 +12,11 @@ export function AboutSummary() {
           <SectionHeading
             eyebrow="Sobre mí"
             title="No hago solo páginas web: diseño y desarrollo productos digitales completos"
-            description="Soy Cristian Delgado, Frontend & Mobile Developer en Mendoza, Argentina. Construyo aplicaciones web y mobile simples, claras y funcionales para resolver problemas reales de trabajadores independientes, oficios y pequeños comercios."
+            description="Soy Cristian Delgado, Frontend & Mobile Developer de Mendoza, Argentina. Desarrollo aplicaciones con React, Next.js, React Native y Firebase, desde la idea hasta un MVP funcional. Busco incorporarme a un equipo donde pueda aportar, seguir creciendo y trabajar en productos reales."
           />
+          <p className="text-foreground-muted mt-3 max-w-2xl text-sm">
+            También tomo proyectos freelance de forma independiente.
+          </p>
 
           <Button href="/sobre-mi" variant="secondary" className="mt-6">
             Conocé más

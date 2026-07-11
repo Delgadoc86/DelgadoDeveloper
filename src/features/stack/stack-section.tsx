@@ -6,7 +6,10 @@ import { stackGroups } from "@/features/stack/data/stack";
 
 export function StackSection() {
   return (
-    <section className="border-border/60 bg-background-subtle border-t py-16 sm:py-20">
+    <section
+      id="tecnologias"
+      className="border-border/60 bg-background-subtle scroll-mt-24 border-t py-16 sm:py-20"
+    >
       <Container>
         <SectionHeading eyebrow="Stack" title="Con qué trabajo" />
 

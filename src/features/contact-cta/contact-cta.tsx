@@ -1,6 +1,7 @@
 import { Mail, MessageCircle } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { CvButton } from "@/components/ui/cv-button";
 import {
   GithubIcon,
   InstagramIcon,
@@ -9,6 +10,7 @@ import {
 } from "@/components/ui/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { socialLinks } from "@/constants/social-links";
+import { cvAvailable } from "@/lib/cv";
 
 const contactChannels = [
   { label: "Email", href: socialLinks.email, icon: Mail },
@@ -35,10 +37,11 @@ export function ContactCta() {
 
             <p className="text-accent-bright mb-4 font-mono text-sm">Contacto</p>
             <h2 className="text-foreground mx-auto max-w-2xl text-3xl font-semibold text-balance sm:text-4xl">
-              ¿Tenés un proyecto en mente? Hablemos.
+              ¿Buscás sumar un desarrollador al equipo o necesitás crear un proyecto?
             </h2>
             <p className="text-foreground-muted mx-auto mt-4 max-w-md text-base">
-              Respondo personalmente cada mensaje. Elegí el canal que más te sirva.
+              Estoy disponible para oportunidades Frontend / React y también para
+              proyectos freelance. Respondo personalmente cada mensaje.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
@@ -48,6 +51,7 @@ export function ContactCta() {
                   {label}
                 </Button>
               ))}
+              {cvAvailable ? <CvButton variant="secondary" /> : null}
             </div>
           </div>
         </FadeIn>

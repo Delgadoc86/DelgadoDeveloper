@@ -121,6 +121,15 @@ export function Footer() {
             © {new Date().getFullYear()} {siteConfig.name} — {siteConfig.author.location}.
           </p>
           <div className="flex items-center gap-4">
+            <a
+              href={socialLinks.portfolioRepo}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-foreground-muted hover:text-foreground text-xs transition-colors"
+            >
+              Código de este sitio
+              <span className="sr-only"> (se abre en una nueva pestaña)</span>
+            </a>
             <Link
               href="/privacidad"
               className="text-foreground-muted hover:text-foreground text-xs transition-colors"

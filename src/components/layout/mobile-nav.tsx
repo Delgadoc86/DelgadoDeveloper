@@ -27,7 +27,12 @@ const socialChannels = [
 
 const emptySubscribe = () => () => {};
 
-export function MobileNav() {
+interface MobileNavProps {
+  cvAvailable: boolean;
+  cvUrl: string;
+}
+
+export function MobileNav({ cvAvailable, cvUrl }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   // Portals need `document`, which doesn't exist during SSR. useSyncExternalStore
   // returns the server snapshot (false) on first render and flips to true after
@@ -142,6 +147,28 @@ export function MobileNav() {
               </Link>
             </motion.li>
           ))}
+
+          {cvAvailable ? (
+            <motion.li
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 + mainNav.length * 0.05 }}
+            >
+              <a
+                href={cvUrl}
+                download
+                onClick={close}
+                className="group flex items-baseline gap-3 py-3"
+              >
+                <span className="text-accent-bright font-mono text-sm">
+                  {String(mainNav.length + 1).padStart(2, "0")}
+                </span>
+                <span className="text-foreground group-hover:text-accent-bright text-3xl font-semibold transition-colors">
+                  CV
+                </span>
+              </a>
+            </motion.li>
+          ) : null}
         </ul>
 
         <motion.div

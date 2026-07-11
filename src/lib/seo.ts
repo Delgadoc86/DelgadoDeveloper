@@ -1,5 +1,6 @@
 import { siteConfig } from "@/config/site.config";
 import { socialLinks } from "@/constants/social-links";
+import { stackGroups } from "@/features/stack/data/stack";
 import type { Project } from "@/types/project";
 
 export function buildPersonJsonLd() {
@@ -14,6 +15,9 @@ export function buildPersonJsonLd() {
       addressLocality: "Mendoza",
       addressCountry: "AR",
     },
+    // Reutiliza la misma fuente que la sección "Stack" en vez de mantener una
+    // segunda lista de tecnologías a mano.
+    knowsAbout: stackGroups.flatMap((group) => group.items),
     sameAs: [
       socialLinks.linkedin,
       socialLinks.github,

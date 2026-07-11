@@ -34,7 +34,7 @@ export default function OpengraphImage() {
         </span>
       </div>
       <span style={{ fontSize: 64, fontWeight: 700, lineHeight: 1.2, maxWidth: 900 }}>
-        Construyo productos web que generan resultados reales.
+        Aplicaciones web y móviles orientadas a problemas reales.
       </span>
     </div>,
     { ...size },
