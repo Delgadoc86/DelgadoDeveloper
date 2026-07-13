@@ -2,6 +2,7 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { CvButton } from "@/components/ui/cv-button";
 import { FadeIn } from "@/components/motion/fade-in";
+import { HeroConstellation } from "@/components/motion/hero-constellation";
 import { cvAvailable } from "@/lib/cv";
 import { socialLinks } from "@/constants/social-links";
 
@@ -34,6 +35,7 @@ export function Hero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 -z-10 [background:radial-gradient(700px_circle_at_20%_0%,var(--color-accent-muted),transparent_70%)]"
       />
+      <HeroConstellation />
 
       <Container className="grid gap-8 lg:grid-cols-[1fr_300px] lg:items-start">
         <div>
