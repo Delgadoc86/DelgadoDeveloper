@@ -37,6 +37,8 @@ src/
                            # cliente sin caso de estudio, repos privados)
     projects/components/  # ProjectCard, DownloadButton (tracking de clic por producto),
                            # OtherProjectsSection
+    about/data/            # education.ts — certificaciones, formación complementaria y
+                           # aprendizaje autodidacta aplicado, mostrados en /sobre-mi
   config/               # site.config.ts — fuente única de verdad (nombre, url, autor)
   constants/            # Nav y links sociales
   lib/                  # utils (cn), helpers de SEO/JSON-LD/GA (trackPageview, trackEvent) y
@@ -100,8 +102,12 @@ dependencias innecesarias) y Google Analytics detrás de un banner de consentimi
 cookies (Ley 25.326 / buenas prácticas RGPD).
 
 El home está pensado primero para reclutadores (indicador de disponibilidad laboral en el
-hero, botón "Ver GitHub" al perfil público, CV descargable cuando existe el archivo) y en
-segundo lugar para clientes freelance — ambos objetivos conviven sin secciones separadas.
+hero, botón "Ver GitHub" al perfil público, CV descargable) y en segundo lugar para
+clientes freelance — ambos objetivos conviven sin secciones separadas. La sección
+"Formación" de `/sobre-mi` distingue tres niveles: certificaciones formales (Coderhouse,
+Educación IT), formación complementaria de menor jerarquía visual, y un bloque de
+aprendizaje autodidacta aplicado (Next.js, React Native, Firebase...) respaldado por
+evidencia real de proyectos, no solo enunciado.
 
 Mi Almacén y PresuFácil se distribuyen como APK fuera de Google Play: cada uno tiene un
 botón "Descargar APK" en su página (enlace a Google Drive) y un evento de Google
@@ -109,16 +115,12 @@ Analytics propio por clic (`download_click_mi_almacen` / `download_click_presufa
 
 **CV**: el botón "Descargar CV" (hero, header, contacto y menú móvil) es condicional —
 `src/lib/cv.ts` chequea con `fs.existsSync` si existe `/public/Cristian-Delgado-CV.pdf`.
-Sin el archivo no se renderiza ningún botón (no queda un enlace roto); apenas se agregue el
-PDF con ese nombre exacto, los botones aparecen solos, sin tocar código.
+Sin el archivo no se renderiza ningún botón (no queda un enlace roto); el PDF ya está
+publicado con ese nombre exacto, así que los botones están activos en todas las páginas.
 
 **Pendiente:**
 
-- Agregar el PDF real en `/public/Cristian-Delgado-CV.pdf` para activar los botones de descarga de CV (ver arriba).
 - Galería de screenshots adicionales por proyecto (más allá de la portada) — marcados como `[PENDIENTE: ...]` en `src/features/projects/data/projects.ts`.
-- Aclarar en `src/features/projects/data/projects.ts` (Mi Almacén) si el módulo de caja
-  diaria ya está terminado — el copy actual (`status`, `pendingWork`) dice que está
-  planificado, pero ya hay una captura real (`caja.webp`) mostrándolo funcionando.
 
 ## Camino a Google Play (cuando termine la etapa de prueba)
 

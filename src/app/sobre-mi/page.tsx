@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import {
-  Braces,
   Briefcase,
-  Code,
   Compass,
   Route,
   Rocket,
@@ -15,17 +13,44 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { ReactIcon } from "@/components/ui/icons";
+import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
 import { PersonalCard } from "@/features/about/personal-card";
+import { siteConfig } from "@/config/site.config";
+import {
+  complementaryCredentials,
+  educationIntro,
+  mainCredentials,
+  selfTaughtAreas,
+  selfTaughtIntro,
+} from "@/features/about/data/education";
+
+const title = "Sobre mí — Desarrollador Frontend & Mobile en Mendoza";
+const description =
+  "Cristian Delgado, desarrollador Frontend & Mobile en Mendoza, Argentina. Trabajo con React, Next.js, React Native y Firebase para construir productos digitales para oficios, comercios y pequeños negocios.";
 
 export const metadata: Metadata = {
-  title: "Sobre mí — Desarrollador Frontend & Mobile en Mendoza",
-  description:
-    "Cristian Delgado, desarrollador Frontend & Mobile en Mendoza, Argentina. Trabajo con React, Next.js, React Native y Firebase para construir productos digitales para oficios, comercios y pequeños negocios.",
+  title,
+  description,
   alternates: {
     canonical: "/sobre-mi",
+  },
+  // Next.js no mezcla `openGraph`/`twitter` en profundidad entre layout y
+  // page: si no se redefinen acá, esta página hereda title/description/url
+  // del root layout (los del home) en vez de los propios.
+  openGraph: {
+    type: "website",
+    locale: siteConfig.locale,
+    siteName: siteConfig.name,
+    url: `${siteConfig.url}/sobre-mi`,
+    title,
+    description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
   },
 };
 
@@ -70,12 +95,6 @@ const audience = [
   { icon: Smartphone, label: "Usuarios que necesitan resolver rápido desde el celular" },
 ];
 
-const education = [
-  { icon: Code, label: "Desarrollo Web" },
-  { icon: Braces, label: "JavaScript" },
-  { icon: ReactIcon, label: "React" },
-];
-
 export default function SobreMiPage() {
   return (
     <>
@@ -89,10 +108,14 @@ export default function SobreMiPage() {
               Cristian Delgado — Frontend &amp; Mobile Developer
             </h1>
             <p className="text-foreground-muted mt-6 max-w-xl text-lg">
-              Construyo aplicaciones web y mobile simples, claras y funcionales para
-              resolver problemas reales de pequeños negocios, oficios y comercios. No
-              busco solo &quot;hacer páginas web&quot;: diseño y desarrollo productos
-              digitales completos, de punta a punta.
+              Desarrollo aplicaciones web y mobile con React, Next.js, React Native y
+              Firebase. Construí productos funcionales, aplicaciones Android descargables
+              y sitios actualmente online: no son ejercicios ni maquetas. Busco
+              incorporarme a un equipo donde pueda aportar esta experiencia, seguir
+              creciendo y trabajar sobre productos reales.
+            </p>
+            <p className="text-foreground-muted mt-3 max-w-xl text-sm">
+              También tomo proyectos freelance de forma independiente.
             </p>
           </FadeIn>
 
@@ -130,13 +153,13 @@ export default function SobreMiPage() {
       </section>
 
       <section className="border-border/60 border-t py-16 sm:py-24">
-        <Container className="grid gap-12 lg:grid-cols-2">
+        <Container>
           <FadeIn>
             <SectionHeading
               eyebrow="Para quién diseño"
               title="Usuarios que resuelven desde el celular"
             />
-            <ul className="mt-6 space-y-2">
+            <ul className="mt-6 grid gap-2 sm:grid-cols-2">
               {audience.map(({ icon: Icon, label }) => (
                 <li
                   key={label}
@@ -150,42 +173,88 @@ export default function SobreMiPage() {
               ))}
             </ul>
           </FadeIn>
+        </Container>
+      </section>
 
-          <FadeIn delay={0.05}>
-            <SectionHeading eyebrow="Formación" title="En constante aprendizaje" />
-            <ol className="border-border relative mt-8 list-none space-y-6 border-l pl-6">
-              {education.map(({ icon: Icon, label }) => (
-                <li key={label} className="relative">
-                  <span
-                    aria-hidden
-                    className="bg-border ring-background absolute top-1 -left-[29px] size-2.5 rounded-full ring-4"
-                  />
-                  <div className="flex items-center gap-2">
-                    <span className="text-foreground-muted flex size-4 shrink-0 items-center justify-center">
-                      <Icon className="size-4" aria-hidden />
+      <section className="border-border/60 border-t py-16 sm:py-24">
+        <Container>
+          <FadeIn>
+            <SectionHeading
+              eyebrow="Formación"
+              title="Formación y aprendizaje continuo"
+              description={educationIntro}
+            />
+          </FadeIn>
+
+          <div className="mt-10 grid gap-5 sm:grid-cols-3">
+            {mainCredentials.map((credential, index) => (
+              <FadeIn key={credential.name} delay={index * 0.05}>
+                <div className="border-border h-full rounded-xl border p-5">
+                  <p className="text-foreground text-sm font-semibold">
+                    {credential.name}
+                  </p>
+                  <p className="text-foreground-muted mt-1 text-xs">
+                    {credential.institution}
+                  </p>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Badge>{credential.status}</Badge>
+                    <span className="text-foreground-muted font-mono text-xs">
+                      {credential.period}
                     </span>
-                    <p className="text-foreground text-sm font-medium">{label}</p>
                   </div>
-                </li>
-              ))}
-              <li className="relative">
-                <span
-                  aria-hidden
-                  className="bg-accent ring-background absolute top-1 -left-[29px] size-2.5 rounded-full ring-4"
-                />
-                <div className="flex items-center gap-2">
-                  <span className="text-accent-bright flex size-4 shrink-0 items-center justify-center">
-                    <Smartphone className="size-4" aria-hidden />
-                  </span>
-                  <p className="text-foreground text-sm font-medium">
-                    React Native / Expo
+                  <p className="text-foreground-muted mt-3 text-xs">
+                    {credential.description}
                   </p>
                 </div>
-                <span className="text-accent-bright mt-1 ml-6 inline-block font-mono text-xs">
-                  En curso — aplicado en productos propios
-                </span>
-              </li>
-            </ol>
+              </FadeIn>
+            ))}
+          </div>
+
+          <FadeIn delay={0.1}>
+            <div className="mt-14">
+              <h3 className="text-foreground text-lg font-semibold">
+                Aprendizaje autodidacta aplicado
+              </h3>
+              <p className="text-foreground-muted mt-2 max-w-2xl text-sm">
+                {selfTaughtIntro}
+              </p>
+
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                {selfTaughtAreas.map((area) => (
+                  <div
+                    key={area.title}
+                    className="border-border bg-background-subtle rounded-xl border p-5"
+                  >
+                    <p className="text-foreground text-sm font-semibold">{area.title}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {area.items.map((item) => (
+                        <Badge key={item}>{item}</Badge>
+                      ))}
+                    </div>
+                    {area.evidence ? (
+                      <p className="text-foreground-muted mt-3 text-xs">
+                        Evidencia: {area.evidence.join(", ")}
+                      </p>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.15}>
+            <div className="mt-14">
+              <h3 className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
+                Formación complementaria
+              </h3>
+              <ul className="mt-4 space-y-1.5">
+                {complementaryCredentials.map((credential) => (
+                  <li key={credential.name} className="text-foreground-muted text-sm">
+                    {credential.name} — {credential.institution} — {credential.period}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </FadeIn>
         </Container>
       </section>

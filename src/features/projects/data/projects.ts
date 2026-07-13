@@ -135,17 +135,17 @@ export const projects: Project[] = [
       "Historial de movimientos",
       "Generación de PDF de lista de precios",
       "Preferencias del negocio",
-      "Base preparada para módulo de caja diaria",
+      "Caja diaria",
+      "Registro de último inicio de sesión",
     ],
     uxDecisions:
-      "Interfaz mobile-first, con textos simples y directos, botones grandes y flujos cortos. Se evitan términos técnicos y se prioriza la rapidez sobre la cantidad de opciones. Pensada para personas mayores o con poca experiencia tecnológica, con un diseño orientado a reemplazar el cuaderno, no a competir con sistemas empresariales complejos.",
+      "Interfaz mobile-first, con textos simples y directos, botones grandes y flujos cortos. Se evitan términos técnicos y se prioriza la rapidez sobre la cantidad de opciones. Pensada para personas mayores o con poca experiencia tecnológica, con un diseño orientado a reemplazar el cuaderno, no a competir con sistemas empresariales complejos. Por esa misma razón no se sumó un sistema de multiusuario u operadores: en su lugar se registra el último inicio de sesión, priorizando que el comercio adopte la app sin fricción por sobre agregar complejidad.",
     status:
-      "MVP funcional en desarrollo avanzado. Ya cuenta con módulos de productos, categorías, fiados, movimientos, configuración y generación de PDF. El módulo de caja diaria está planificado como siguiente mejora importante.",
-    statusTag: "MVP",
+      "Aplicación funcional con APK disponible para descargar e instalar. Ya cuenta con módulos de productos, categorías, fiados, movimientos, caja diaria, configuración y generación de PDF.",
+    statusTag: "APK disponible",
     results:
-      "La validación con pequeños comercios mostró que muchos usuarios prefieren seguir usando cuaderno porque lo sienten más confiable. Eso confirmó que la app debe sentirse simple, segura y muy fácil de entender. También surgió la importancia de registrar quién hizo cada movimiento cuando hay más de una persona atendiendo.",
-    pendingWork:
-      "Implementar módulo de caja diaria. Mejorar flujo multiusuario o registro de operador. Conseguir más feedback de comercios reales. Preparar capturas profesionales. Pulir onboarding. Evaluar modo offline básico. Preparar APK de prueba.",
+      "La validación con pequeños comercios mostró que muchos usuarios prefieren seguir usando cuaderno porque lo sienten más confiable. Eso confirmó que la app debe sentirse simple, segura y muy fácil de entender. También surgió la necesidad de trazabilidad cuando hay más de una persona atendiendo, que se resolvió con el registro de último inicio de sesión en vez de sumar un sistema completo de multiusuario, priorizando siempre lo más simple para que el comercio asimile la app y su uso.",
+    pendingWork: "Conseguir más feedback de comerciantes reales.",
     screenshotsNeeded: [
       "[PENDIENTE: agregar screenshot real — alta o edición de producto]",
       "[PENDIENTE: agregar screenshot real — categorías]",

@@ -12,11 +12,14 @@ import { FadeIn } from "@/components/motion/fade-in";
 import { socialLinks } from "@/constants/social-links";
 import { cvAvailable } from "@/lib/cv";
 
+// Orden por prioridad para reclutadores: LinkedIn y Email primero (el CV, si
+// existe, se antepone a todos desde el render), después GitHub y WhatsApp, y
+// por último las redes que aportan menos a una oportunidad laboral.
 const contactChannels = [
-  { label: "Email", href: socialLinks.email, icon: Mail },
-  { label: "WhatsApp", href: socialLinks.whatsapp, icon: MessageCircle },
   { label: "LinkedIn", href: socialLinks.linkedin, icon: LinkedinIcon },
+  { label: "Email", href: socialLinks.email, icon: Mail },
   { label: "GitHub", href: socialLinks.github, icon: GithubIcon },
+  { label: "WhatsApp", href: socialLinks.whatsapp, icon: MessageCircle },
   { label: "Instagram", href: socialLinks.instagram, icon: InstagramIcon },
   { label: "TikTok", href: socialLinks.tiktok, icon: TiktokIcon },
 ];
@@ -45,13 +48,13 @@ export function ContactCta() {
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              {cvAvailable ? <CvButton variant="secondary" /> : null}
               {contactChannels.map(({ label, href, icon: Icon }) => (
                 <Button key={label} href={href} variant="secondary">
                   <Icon className="size-4" strokeWidth={1.75} aria-hidden />
                   {label}
                 </Button>
               ))}
-              {cvAvailable ? <CvButton variant="secondary" /> : null}
             </div>
           </div>
         </FadeIn>

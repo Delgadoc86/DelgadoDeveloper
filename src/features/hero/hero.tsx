@@ -54,7 +54,7 @@ export function Hero() {
 
           <FadeIn delay={0.05}>
             <h1 className="text-foreground max-w-2xl text-3xl font-semibold text-balance sm:text-4xl lg:text-5xl">
-              Construí aplicaciones Android y sitios web que hoy están listos para usarse.
+              Diseño y desarrollo productos digitales completos, de la idea a producción.
             </h1>
           </FadeIn>
 
