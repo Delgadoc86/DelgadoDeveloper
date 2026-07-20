@@ -188,7 +188,7 @@ export const projects: Project[] = [
     ],
     links: {
       download:
-        "https://drive.google.com/file/d/1Q-NzhjPgXHGOtKr2KkYUPXMFsCtLW4XD/view?usp=drivesdk",
+        "https://drive.google.com/file/d/1xGlwewK_XvNLvtqCH5nfiC5CWEHgRt4R/view?usp=drivesdk",
       repo: "https://github.com/Delgadoc86/Mi-Almacen",
     },
     legalTermsUrl: "/legal/mi-almacen/terminos-descarga",
