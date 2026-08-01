@@ -256,27 +256,39 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ### Clientes
 
-- [ ] Crear colección `customers`
-- [ ] Definir cliente recurrente
-- [ ] Definir cliente ocasional
-- [ ] Crear alta, edición, búsqueda y desactivación
-- [ ] Campos básicos: nombre, negocio, teléfono, correo, CUIT/DNI opcional, tipo, estado, notas, fechas de creación y actualización
-- [ ] Normalizar teléfonos para WhatsApp
-- [ ] No borrar clientes con movimientos vinculados
+- [x] Crear colección `customers`
+- [x] Definir cliente recurrente
+- [x] Definir cliente ocasional
+      **Verificación**: `type: "recurrente" | "ocasional"` en `src/types/customer.ts`.
+- [x] Crear alta, edición, búsqueda y desactivación
+      **Verificación**: `/admin/customers` — alta y edición vía `POST`/`PATCH` a `/api/admin/customers`; búsqueda client-side por nombre/negocio/teléfono; desactivación = cambiar `status` a `"inactivo"` (nunca delete).
+- [x] Campos básicos: nombre, negocio, teléfono, correo, CUIT/DNI opcional, tipo, estado, notas, fechas de creación y actualización
+      **Verificación**: `src/types/customer.ts`. También se agregó `productIds` (servicios contratados, del pedido original) para poder vincular cliente↔producto ya en esta etapa.
+- [x] Normalizar teléfonos para WhatsApp
+      **Verificación**: `src/lib/phone.ts` (`normalizePhoneForWhatsapp`) — best-effort (Argentina no tiene largo fijo de código de área), documentado como tal. Probado con `"011 15-1234-5678"` → `"5491112345678"`. Se guarda también `phoneRaw` (tal cual se escribió) para poder corregir a mano si la heurística falla.
+- [x] No borrar clientes con movimientos vinculados
+      **Verificación**: no existe ningún endpoint ni botón de eliminar clientes en todo el panel — la única baja posible es desactivar (`status: "inactivo"`), por diseño.
 
 ### Productos y servicios
 
-- [ ] Crear colección `products`
-- [ ] Cargar: PresuFácil, Mi Almacén, Catálogo web, Desarrollo web, Mantenimiento, Otros
-- [ ] Configurar precio sugerido
-- [ ] Configurar frecuencia sugerida
-- [ ] Permitir activar o desactivar productos
+- [x] Crear colección `products`
+- [x] Cargar: PresuFácil, Mi Almacén, Catálogo web, Desarrollo web, Mantenimiento, Otros
+      **Verificación**: 6 documentos sembrados vía Admin SDK (`presufacil`, `mi-almacen`, `catalogo-web`, `desarrollo-web`, `mantenimiento`, `otros`).
+- [x] Configurar precio sugerido
+- [x] Configurar frecuencia sugerida
+- [x] Permitir activar o desactivar productos
+      **Verificación**: `/admin/products`, checkbox "Activo" en cada formulario de edición.
 
 **Criterio de cierre**:
 
-- [ ] Se pueden registrar clientes recurrentes y ocasionales
-- [ ] Se puede vincular un cliente con un producto
-- [ ] Las búsquedas funcionan por nombre, negocio y teléfono
+- [x] Se pueden registrar clientes recurrentes y ocasionales
+      **Verificación**: probado con un cliente de prueba real (`type: "ocasional"`) creado y luego eliminado vía Admin SDK al finalizar.
+- [x] Se puede vincular un cliente con un producto
+      **Verificación**: `productIds` en el formulario de cliente (checkboxes contra el catálogo de productos activos).
+- [x] Las búsquedas funcionan por nombre, negocio y teléfono
+      **Verificación**: filtro client-side en `customers-panel.tsx` sobre los tres campos.
+
+**Nota técnica**: `/admin/customers` originalmente combinaba `where("active", "==", true)` + `orderBy("name")` sobre `products`, lo que Firestore rechazó en la prueba real con `FAILED_PRECONDITION` (pide un índice compuesto). Se resolvió trayendo todo el catálogo ordenado y filtrando `active` en código — el volumen de productos es chico y no vale la pena depender de un índice para esto.
 
 ---
 
@@ -461,13 +473,14 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                                   | Responsable       |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ----------------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                    | Claude            |
-| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`               | Claude            |
-| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10        | Claude + Cristian |
-| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron        | Claude            |
-| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                              | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado | Claude            |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                                       | Responsable       |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ----------------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                        | Claude            |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                   | Claude            |
+| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10            | Claude + Cristian |
+| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron            | Claude            |
+| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                              | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado     | Claude            |
+| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                      | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore | Claude            |
 
 ## Decisiones pendientes
 

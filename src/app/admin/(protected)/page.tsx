@@ -14,6 +14,12 @@ export default async function AdminHomePage() {
       <Link href="/admin/apps" className="text-sm underline">
         Aplicaciones
       </Link>
+      <Link href="/admin/customers" className="text-sm underline">
+        Clientes
+      </Link>
+      <Link href="/admin/products" className="text-sm underline">
+        Productos y servicios
+      </Link>
       <LogoutButton />
     </div>
   );
