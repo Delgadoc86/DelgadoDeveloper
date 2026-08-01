@@ -19,11 +19,18 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Todo lo demás queda cerrado por defecto. Cada colección (apps,
-    // customers, products, subscriptions, payments, counters, receipts,
-    // auditLogs, settings) recibe sus propias reglas explícitas en la etapa
-    // del roadmap en la que se construye, en vez de abrir un acceso genérico
-    // para colecciones que todavía no existen.
+    // Solo el admin lee/escribe. El público nunca toca esta colección desde
+    // el cliente: /descargar/[slug] la consulta server-side con Admin SDK
+    // (que ignora estas reglas), así que no hace falta ningún acceso público.
+    match /apps/{slug} {
+      allow read, write: if isAdmin();
+    }
+
+    // Todo lo demás queda cerrado por defecto. Cada colección (customers,
+    // products, subscriptions, payments, counters, receipts, auditLogs,
+    // settings) recibe sus propias reglas explícitas en la etapa del roadmap
+    // en la que se construye, en vez de abrir un acceso genérico para
+    // colecciones que todavía no existen.
     match /{document=**} {
       allow read, write: if false;
     }

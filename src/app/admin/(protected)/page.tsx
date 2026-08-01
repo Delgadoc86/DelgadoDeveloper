@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getSessionAdmin } from "@/lib/auth/session";
 import { LogoutButton } from "./logout-button";
 
@@ -10,6 +11,9 @@ export default async function AdminHomePage() {
       <p className="text-sm">
         Sesión iniciada como <strong>{admin.email}</strong> ({admin.role}).
       </p>
+      <Link href="/admin/apps" className="text-sm underline">
+        Aplicaciones
+      </Link>
       <LogoutButton />
     </div>
   );

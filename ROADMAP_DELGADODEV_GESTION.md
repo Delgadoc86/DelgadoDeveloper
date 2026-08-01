@@ -184,53 +184,71 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ### Modelo `apps/{slug}`
 
-- [ ] Definir campos: `name`, `slug`, `version`, `downloadUrl`, `status`, `platform`, `updatedAt`, `updatedBy`
-- [ ] Estados permitidos: `draft`, `published`, `paused`
-- [ ] Crear documentos iniciales: `apps/presufacil`, `apps/mi-almacen`
+- [x] Definir campos: `name`, `slug`, `version`, `downloadUrl`, `status`, `platform`, `updatedAt`, `updatedBy`
+      **Verificación**: `src/types/app.ts`.
+- [x] Estados permitidos: `draft`, `published`, `paused`
+- [x] Crear documentos iniciales: `apps/presufacil`, `apps/mi-almacen`
+      **Verificación**: creados vía Admin SDK con los enlaces reales de Drive ya existentes (`status: "published"`, `version: "1.0.0"` como placeholder inicial — editable desde el panel).
 
 ### Panel
 
-- [ ] Crear `/admin/apps`
-- [ ] Listar aplicaciones
-- [ ] Crear formulario de edición
-  - [ ] Validar que el enlace sea HTTPS
-  - [ ] Editar nombre
-  - [ ] Editar versión
-  - [ ] Editar enlace de descarga
-  - [ ] Cambiar estado
-  - [ ] Probar enlace en una pestaña nueva
-- [ ] Guardar mediante Route Handler privado
-  - [ ] Registrar `updatedAt`
-  - [ ] Registrar `updatedBy`
-- [ ] Mostrar confirmación y errores
+- [x] Crear `/admin/apps`
+      **Verificación**: `src/app/admin/(protected)/apps/page.tsx`, Server Component, lee Firestore directo con Admin SDK (protegido por el layout de la Etapa 2).
+- [x] Listar aplicaciones
+- [x] Crear formulario de edición
+  - [x] Validar que el enlace sea HTTPS
+        **Verificación**: validado en cliente (`pattern="https://.*"`) y de forma autoritativa en el Route Handler (`downloadUrl.startsWith("https://")`).
+  - [x] Editar nombre
+  - [x] Editar versión
+  - [x] Editar enlace de descarga
+  - [x] Cambiar estado
+  - [x] Probar enlace en una pestaña nueva
+        **Verificación**: link "Probar" (`target="_blank"`) junto al campo de enlace.
+- [x] Guardar mediante Route Handler privado
+      **Verificación**: `PATCH /api/admin/apps/[slug]`, protegido con `requireSessionAdmin()`.
+  - [x] Registrar `updatedAt`
+  - [x] Registrar `updatedBy`
+- [x] Mostrar confirmación y errores
 
 ### Descarga pública
 
-- [ ] Crear `/descargar/[slug]`
-- [ ] Consultar Firestore desde el servidor con Firebase Admin
-- [ ] Rechazar aplicaciones inexistentes
-- [ ] Rechazar aplicaciones pausadas o no publicadas
-- [ ] Redirigir temporalmente al enlace actual
-- [ ] Evitar cache permanente
-- [ ] Mantener Analytics en los botones actuales
-- [ ] Cambiar PresuFácil para usar `/descargar/presufacil`
-- [ ] Cambiar Mi Almacén para usar `/descargar/mi-almacen`
-- [ ] Confirmar que cambiar Firestore no requiere redeploy
+- [x] Crear `/descargar/[slug]`
+- [x] Consultar Firestore desde el servidor con Firebase Admin
+- [x] Rechazar aplicaciones inexistentes
+- [x] Rechazar aplicaciones pausadas o no publicadas
+      **Verificación**: mismo 404 genérico para inexistente y no-publicada (no revela cuál es el motivo).
+- [x] Redirigir temporalmente al enlace actual
+      **Verificación**: `NextResponse.redirect(downloadUrl, { status: 302 })`.
+- [x] Evitar cache permanente
+      **Verificación**: `Cache-Control: no-store` + `export const dynamic = "force-dynamic"`.
+- [x] Mantener Analytics en los botones actuales
+      **Verificación**: `DownloadButton` no cambió, sigue disparando `trackEvent` antes de la navegación; solo cambió el `href` que recibe.
+- [x] Cambiar PresuFácil para usar `/descargar/presufacil`
+- [x] Cambiar Mi Almacén para usar `/descargar/mi-almacen`
+- [x] Confirmar que cambiar Firestore no requiere redeploy
+      **Verificación**: probado en vivo contra `pnpm dev` — se cambió el `downloadUrl` vía `PATCH`, y sin reiniciar el servidor `/descargar/presufacil` ya redirigía al nuevo enlace.
 
 ### Pruebas obligatorias
 
-- [ ] Un enlace publicado descarga correctamente
-- [ ] Cambiar el enlace en `/admin/apps` cambia el destino público
-- [ ] Una aplicación pausada no descarga
-- [ ] Un slug inexistente muestra error controlado
-- [ ] No se expone el listado privado de aplicaciones
+- [x] Un enlace publicado descarga correctamente
+      **Verificación**: `GET /descargar/presufacil` → 302 al enlace real de Drive.
+- [x] Cambiar el enlace en `/admin/apps` cambia el destino público
+      **Verificación**: ver arriba (confirmado sin redeploy).
+- [x] Una aplicación pausada no descarga
+      **Verificación**: `status: "paused"` → `GET /descargar/presufacil` → 404.
+- [x] Un slug inexistente muestra error controlado
+      **Verificación**: `GET /descargar/no-existe-esta-app` → 404 (JSON controlado, no error 500 ni stack trace).
+- [x] No se expone el listado privado de aplicaciones
+      **Verificación**: `GET /admin/apps` sin sesión → redirect 307 a login; `PATCH /api/admin/apps/[slug]` sin sesión → 401.
 - [ ] El funcionamiento móvil y de escritorio es correcto
+      **Pendiente**: el formulario usa clases Tailwind responsive estándar del proyecto, pero no se probó visualmente en un dispositivo/viewport móvil real — pendiente de que Cristian lo revise en el navegador.
 
 **Criterio de cierre**:
 
-- [ ] Cristian puede cambiar APK sin editar código
-- [ ] PresuFácil y Mi Almacén usan rutas estables
-- [ ] La primera función real del panel está operativa
+- [x] Cristian puede cambiar APK sin editar código
+- [x] PresuFácil y Mi Almacén usan rutas estables
+- [x] La primera función real del panel está operativa
+      **Verificación**: suite de 9 pruebas contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron. El documento `apps/presufacil` se restauró a su estado original al final de las pruebas.
 
 ---
 
@@ -443,12 +461,13 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                            | Responsable       |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | ----------------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                             | Claude            |
-| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`        | Claude            |
-| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10 | Claude + Cristian |
-| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron | Claude            |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                                   | Responsable       |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ----------------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                    | Claude            |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`               | Claude            |
+| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10        | Claude + Cristian |
+| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron        | Claude            |
+| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                              | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado | Claude            |
 
 ## Decisiones pendientes
 
