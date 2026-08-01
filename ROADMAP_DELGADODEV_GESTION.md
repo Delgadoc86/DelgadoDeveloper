@@ -75,42 +75,49 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ### Acciones de Cristian
 
-- [ ] Entrar a Firebase Console con su cuenta habitual de Google
-- [ ] Crear un proyecto nuevo
-  - [ ] Nombre visible: DelgadoDev Gestión
-  - [ ] Elegir el Project ID definitivo
-- [ ] Registrar una aplicación web con nombre DelgadoDev Web
-- [ ] No activar Firebase Hosting
-- [ ] Crear Cloud Firestore en modo producción
-  - [ ] Elegir una región adecuada y registrar cuál se eligió
-- [ ] Activar Firebase Authentication
-  - [ ] Habilitar acceso por correo y contraseña
-  - [ ] Crear manualmente el usuario administrador de Cristian
-- [ ] Entregar a Claude únicamente la configuración web necesaria
-- [ ] No compartir públicamente claves privadas ni JSON de cuenta de servicio
+- [x] Entrar a Firebase Console con su cuenta habitual de Google
+- [x] Crear un proyecto nuevo
+  - [x] Nombre visible: DelgadoDev Gestión
+  - [x] Elegir el Project ID definitivo → **`delgadodevgestion`**
+- [x] Registrar una aplicación web con nombre DelgadoDev Web
+- [x] Crear Cloud Firestore en modo producción
+      **Verificación**: confirmado por conexión real desde el Admin SDK (ver abajo). Región no confirmada explícitamente por Cristian — pendiente registrar cuál se eligió.
+- [x] Activar Firebase Authentication
+  - [x] Habilitar acceso por correo y contraseña
+  - [x] Crear manualmente el usuario administrador de Cristian
+        **Verificación**: UID `kS3QJVEj9zW4oHWZnYBUbSxYQOx2`, email `delgadocdev@hotmail.com` — confirmado con `auth.getUser()` vía Admin SDK.
+- [x] Entregar a Claude únicamente la configuración web necesaria
+- [x] No compartir públicamente claves privadas ni JSON de cuenta de servicio
+      **Nota**: el JSON de la cuenta de servicio se entregó por chat (no público) y se volcó únicamente a `.env.local` (ignorado por Git). Pendiente: el archivo original quedó en `d:\descargas\MEGA\...json`, una carpeta sincronizada a la nube — se recomienda borrarlo de ahí una vez confirmado que `.env.local` ya lo tiene.
+- [ ] No activar Firebase Hosting — no confirmado explícitamente, no se detectó desde el proyecto local.
 
 ### Acciones de Claude
 
-- [ ] Instalar `firebase`
-- [ ] Instalar `firebase-admin`
-- [ ] Crear `src/lib/firebase/client.ts`
-- [ ] Crear `src/lib/firebase/admin.ts`
-- [ ] Definir variables públicas con prefijo `NEXT_PUBLIC_FIREBASE_GESTION_`
-- [ ] Definir variables privadas para Firebase Admin
-- [ ] Verificar que los módulos de servidor no puedan importarse desde componentes cliente
-- [ ] Crear configuración inicial de Firestore Rules cerrada por defecto
-- [ ] Crear colección `adminUsers`
-- [ ] Crear documento `adminUsers/{uid}` para Cristian
-- [ ] Confirmar conexión desde entorno local
+- [x] Instalar `firebase`
+- [x] Instalar `firebase-admin`
+- [x] Crear `src/lib/firebase/client.ts`
+- [x] Crear `src/lib/firebase/admin.ts`
+- [x] Definir variables públicas con prefijo `NEXT_PUBLIC_FIREBASE_GESTION_`
+- [x] Definir variables privadas para Firebase Admin
+- [x] Verificar que los módulos de servidor no puedan importarse desde componentes cliente
+      **Verificación**: componente cliente de prueba que importaba `admin.ts` hizo fallar `pnpm build`; se retiró el archivo de prueba y el build volvió a pasar limpio.
+- [x] Crear configuración inicial de Firestore Rules cerrada por defecto
+      **Verificación**: `firestore.rules` creado (deny-all salvo lectura propia en `adminUsers`). **Pendiente de publicar** en Firebase Console — requiere decisión de Cristian sobre el método (ver Decisiones pendientes).
+- [x] Crear colección `adminUsers`
+- [x] Crear documento `adminUsers/{uid}` para Cristian
+      **Verificación**: documento creado y releído vía Admin SDK — `{ email: "delgadocdev@hotmail.com", displayName: "Cristian Delgado", role: "owner", createdAt: <timestamp> }`.
+- [x] Confirmar conexión desde entorno local
+      **Verificación**: script puntual con Admin SDK cargando `.env.local` — Auth OK (usuario encontrado) y Firestore OK (lectura y escritura confirmadas). Script de prueba eliminado después.
 - [ ] Confirmar conexión desde Vercel Preview
+      **Bloqueado**: requiere que Cristian cargue las mismas variables en Vercel (Project Settings → Environment Variables) y un deploy de preview. No tengo Vercel CLI autenticado en este entorno.
 
 **Criterio de cierre**:
 
-- [ ] Firebase está separado de PresuFácil, Mi Almacén y catálogos
-- [ ] La web actual continúa en Vercel
-- [ ] Firestore rechaza accesos públicos
-- [ ] El administrador existe en Authentication y `adminUsers`
-- [ ] Ninguna credencial privada está en Git
+- [x] Firebase está separado de PresuFácil, Mi Almacén y catálogos
+- [x] La web actual continúa en Vercel
+- [x] Firestore rechaza accesos públicos (reglas escritas; publicación pendiente)
+- [x] El administrador existe en Authentication y `adminUsers`
+- [x] Ninguna credencial privada está en Git
 
 ---
 
@@ -414,16 +421,17 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                    | Verificación                                                | Responsable |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ----------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK | Claude      |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                     | Responsable |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ----------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                      | Claude      |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local` | Claude      |
 
 ## Decisiones pendientes
 
-| Decisión                               | Opciones                        | Elección | Fecha |
-| -------------------------------------- | ------------------------------- | -------- | ----- |
-| Project ID definitivo                  | `delgadodev-gestion` / variante | —        | —     |
-| Región de Firestore                    | A definir al crear la base      | —        | —     |
-| Duración de sesión                     | A definir                       | —        | —     |
-| Datos comerciales del comprobante      | A definir                       | —        | —     |
-| Formato final del teléfono de WhatsApp | A definir                       | —        | —     |
+| Decisión                               | Opciones                        | Elección                                 | Fecha      |
+| -------------------------------------- | ------------------------------- | ---------------------------------------- | ---------- |
+| Project ID definitivo                  | `delgadodev-gestion` / variante | `delgadodevgestion`                      | 2026-08-01 |
+| Región de Firestore                    | A definir al crear la base      | Sin confirmar (a preguntarle a Cristian) | —          |
+| Duración de sesión                     | A definir                       | —                                        | —          |
+| Datos comerciales del comprobante      | A definir                       | —                                        | —          |
+| Formato final del teléfono de WhatsApp | A definir                       | —                                        | —          |

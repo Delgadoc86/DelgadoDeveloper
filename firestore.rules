@@ -1,0 +1,31 @@
+rules_version = "2";
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    // Un admin puede leer su propio documento (para chequeos desde cliente).
+    // Los documentos de adminUsers solo se crean/editan manualmente desde
+    // Firebase Console o vía Admin SDK (Route Handlers) — nunca desde cliente.
+    match /adminUsers/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Todo lo demás queda cerrado por defecto. Cada colección (apps,
+    // customers, products, subscriptions, payments, counters, receipts,
+    // auditLogs, settings) recibe sus propias reglas explícitas en la etapa
+    // del roadmap en la que se construye, en vez de abrir un acceso genérico
+    // para colecciones que todavía no existen.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
