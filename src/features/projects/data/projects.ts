@@ -90,7 +90,7 @@ export const projects: Project[] = [
     ],
     links: {
       download:
-        "https://drive.google.com/file/d/1u9Z6S5X5PXzPb1YullFMfVshaP_nnUOj/view?usp=drivesdk",
+        "https://drive.google.com/file/d/1ktv93-0xB7UaNFH9aaLSx045xvKzC2Km/view?usp=drivesdk",
       repo: "https://github.com/Delgadoc86/presupuestoapp",
     },
     legalTermsUrl: "/legal/presufacil/terminos-descarga",
