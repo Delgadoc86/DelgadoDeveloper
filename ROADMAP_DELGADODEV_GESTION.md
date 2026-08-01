@@ -124,38 +124,59 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 2 — Autenticación privada de /admin
 
-- [ ] Crear `/admin/login`
-- [ ] Crear formulario de correo y contraseña
-- [ ] Obtener Firebase ID Token después del login
-- [ ] Crear `POST /api/auth/session`
-  - [ ] Generar cookie de sesión segura y httpOnly
-  - [ ] Configurar `secure` en producción
-  - [ ] Configurar `sameSite`
-  - [ ] Definir duración de la sesión
-- [ ] Crear `POST /api/auth/logout`
-  - [ ] Revocar o eliminar cookie al cerrar sesión
-- [ ] Crear helper de servidor para validar sesión
-  - [ ] Verificar existencia del UID en `adminUsers`
-- [ ] Crear `src/proxy.ts` para redirecciones tempranas
-- [ ] Proteger también el layout de `/admin`
-- [ ] Proteger cada Route Handler privado
-- [ ] Evitar formulario de registro público
-- [ ] Mostrar errores de acceso sin revelar información sensible
+- [x] Crear `/admin/login`
+      **Verificación**: `src/app/admin/login/page.tsx` (Server Component, redirige a `/admin` si ya hay sesión) + `login-form.tsx` (Client Component).
+- [x] Crear formulario de correo y contraseña
+- [x] Obtener Firebase ID Token después del login
+      **Verificación**: `signInWithEmailAndPassword` (cliente) + `credential.user.getIdToken()`.
+- [x] Crear `POST /api/auth/session`
+  - [x] Generar cookie de sesión segura y httpOnly
+  - [x] Configurar `secure` en producción
+        **Verificación**: `secure: process.env.NODE_ENV === "production"`.
+  - [x] Configurar `sameSite`
+        **Verificación**: `sameSite: "lax"`.
+  - [x] Definir duración de la sesión
+        **Verificación**: 5 días (`SESSION_MAX_AGE_MS` en `session-constants.ts`) — elegido por Claude como default razonable para panel de un solo admin; ajustable, ver Decisiones pendientes.
+- [x] Crear `POST /api/auth/logout`
+  - [x] Revocar o eliminar cookie al cerrar sesión
+        **Verificación**: `revokeRefreshTokens(uid)` + cookie con `maxAge: 0`.
+- [x] Crear helper de servidor para validar sesión
+  - [x] Verificar existencia del UID en `adminUsers`
+        **Verificación**: `src/lib/auth/session.ts` (`getSessionAdmin`), envuelto en `cache()`.
+- [x] Crear `src/proxy.ts` para redirecciones tempranas
+      **Verificación**: build muestra "ƒ Proxy (Middleware)"; solo chequea presencia de cookie (Edge no puede correr Admin SDK).
+- [x] Proteger también el layout de `/admin`
+      **Verificación**: `src/app/admin/(protected)/layout.tsx`, verificación real vía `getSessionAdmin()`.
+- [x] Proteger cada Route Handler privado
+      **Nota**: patrón establecido con `getSessionAdmin()`; se reutiliza en cada Route Handler de las próximas etapas.
+- [x] Evitar formulario de registro público
+      **Verificación**: no existe ningún endpoint ni formulario de alta de usuarios; el único admin se crea manualmente (Etapa 1).
+- [x] Mostrar errores de acceso sin revelar información sensible
+      **Verificación**: `/api/auth/session` devuelve el mismo mensaje ("Credenciales inválidas") tanto si el ID token es inválido como si el usuario no está en `adminUsers`.
 
 ### Pruebas obligatorias
 
-- [ ] Usuario sin sesión no accede a `/admin`
-- [ ] Cookie inventada no funciona
-- [ ] Usuario de Authentication sin documento en `adminUsers` no accede
-- [ ] Cierre de sesión invalida el acceso
-- [ ] Recargar una página privada mantiene una sesión válida
-- [ ] Las APIs privadas devuelven 401 o 403 correctamente
+- [x] Usuario sin sesión no accede a `/admin`
+      **Verificación**: `GET /admin` sin cookie → redirect 307 a `/admin/login`.
+- [x] Cookie inventada no funciona
+      **Verificación**: `GET /admin` con `admin_session=esto-no-es-una-cookie-valida` → redirect 307 (pasa el chequeo naive de `proxy.ts` pero el layout la rechaza).
+- [x] Usuario de Authentication sin documento en `adminUsers` no accede
+      **Verificación**: usuario temporal real creado con Admin SDK, custom token intercambiado por ID token real vía Identity Toolkit REST, `POST /api/auth/session` → 403. Usuario temporal eliminado después.
+- [x] Cierre de sesión invalida el acceso
+      **Verificación**: `POST /api/auth/logout` + reintento de `GET /admin` con la misma cookie → redirect 307. (Nota: Firebase revoca por segundo — con <1s entre login y logout el chequeo puede no alcanzar a reflejarse; con un margen realista funciona correctamente, verificado.)
+- [x] Recargar una página privada mantiene una sesión válida
+      **Verificación**: dos `GET /admin` consecutivos con la misma cookie → 200 ambas veces.
+- [x] Las APIs privadas devuelven 401 o 403 correctamente
+      **Verificación**: `POST /api/auth/session` sin `idToken` → 400; con `idToken` inválido → 401; con `idToken` real de usuario no-admin → 403.
 
 **Criterio de cierre**:
 
-- [ ] La autenticación está probada localmente
-- [ ] La autenticación está probada en Vercel Preview
-- [ ] No se depende solamente de `proxy.ts`
+- [x] La autenticación está probada localmente
+      **Verificación**: suite de 11 pruebas contra `pnpm dev` (servidor real, Firebase real, sin mocks) — todas pasaron.
+- [!] La autenticación está probada en Vercel Preview
+  **Diferido junto con la verificación de Preview de la Etapa 1** (ver nota ahí) — se retoma antes de la Etapa 10.
+- [x] No se depende solamente de `proxy.ts`
+      **Verificación**: probado explícitamente con la prueba de "cookie inventada" — `proxy.ts` la deja pasar (solo mira presencia), el layout la rechaza.
 
 ---
 
@@ -427,6 +448,7 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 | 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                             | Claude            |
 | 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`        | Claude            |
 | 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10 | Claude + Cristian |
+| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron | Claude            |
 
 ## Decisiones pendientes
 
@@ -434,6 +456,6 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 | -------------------------------------- | ------------------------------- | ---------------------------------------- | ---------- |
 | Project ID definitivo                  | `delgadodev-gestion` / variante | `delgadodevgestion`                      | 2026-08-01 |
 | Región de Firestore                    | A definir al crear la base      | Sin confirmar (a preguntarle a Cristian) | —          |
-| Duración de sesión                     | A definir                       | —                                        | —          |
+| Duración de sesión                     | A definir                       | 5 días (elegido por Claude, ajustable)   | 2026-08-01 |
 | Datos comerciales del comprobante      | A definir                       | —                                        | —          |
 | Formato final del teléfono de WhatsApp | A definir                       | —                                        | —          |
