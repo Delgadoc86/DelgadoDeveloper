@@ -89,7 +89,8 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 - [x] Entregar a Claude únicamente la configuración web necesaria
 - [x] No compartir públicamente claves privadas ni JSON de cuenta de servicio
       **Nota**: el JSON de la cuenta de servicio se entregó por chat (no público) y se volcó únicamente a `.env.local` (ignorado por Git). Pendiente: el archivo original quedó en `d:\descargas\MEGA\...json`, una carpeta sincronizada a la nube — se recomienda borrarlo de ahí una vez confirmado que `.env.local` ya lo tiene.
-- [ ] No activar Firebase Hosting — no confirmado explícitamente, no se detectó desde el proyecto local.
+- [x] No activar Firebase Hosting
+      **Verificación**: confirmado por Cristian.
 
 ### Acciones de Claude
 
@@ -102,20 +103,20 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 - [x] Verificar que los módulos de servidor no puedan importarse desde componentes cliente
       **Verificación**: componente cliente de prueba que importaba `admin.ts` hizo fallar `pnpm build`; se retiró el archivo de prueba y el build volvió a pasar limpio.
 - [x] Crear configuración inicial de Firestore Rules cerrada por defecto
-      **Verificación**: `firestore.rules` creado (deny-all salvo lectura propia en `adminUsers`). **Pendiente de publicar** en Firebase Console — requiere decisión de Cristian sobre el método (ver Decisiones pendientes).
+      **Verificación**: `firestore.rules` creado (deny-all salvo lectura propia en `adminUsers`) y **publicado por Cristian** en Firebase Console, contenido idéntico al del repo.
 - [x] Crear colección `adminUsers`
 - [x] Crear documento `adminUsers/{uid}` para Cristian
       **Verificación**: documento creado y releído vía Admin SDK — `{ email: "delgadocdev@hotmail.com", displayName: "Cristian Delgado", role: "owner", createdAt: <timestamp> }`.
 - [x] Confirmar conexión desde entorno local
       **Verificación**: script puntual con Admin SDK cargando `.env.local` — Auth OK (usuario encontrado) y Firestore OK (lectura y escritura confirmadas). Script de prueba eliminado después.
-- [ ] Confirmar conexión desde Vercel Preview
-      **Bloqueado**: requiere que Cristian cargue las mismas variables en Vercel (Project Settings → Environment Variables) y un deploy de preview. No tengo Vercel CLI autenticado en este entorno.
+- [!] Confirmar conexión desde Vercel Preview
+  **Diferido**: Cristian ya cargó las 9 variables en Vercel (Production + Preview + Development). El primer build de Preview falló por inicialización eager de Firebase Admin en tiempo de build (ver commit `fix: inicializa Firebase Admin de forma perezosa`); ya corregido y pusheado. No se pudo ubicar la URL exacta del deployment de Preview desde la UI de Vercel/GitHub en esta sesión. Se retoma como verificación puntual (hit a `/api/debug-firebase-check`) antes de fusionar la rama a `main` (Etapa 10), no bloquea seguir con Etapa 2 en local (`pnpm dev`).
 
 **Criterio de cierre**:
 
 - [x] Firebase está separado de PresuFácil, Mi Almacén y catálogos
 - [x] La web actual continúa en Vercel
-- [x] Firestore rechaza accesos públicos (reglas escritas; publicación pendiente)
+- [x] Firestore rechaza accesos públicos (reglas publicadas)
 - [x] El administrador existe en Authentication y `adminUsers`
 - [x] Ninguna credencial privada está en Git
 
@@ -421,10 +422,11 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                     | Responsable |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ----------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                      | Claude      |
-| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local` | Claude      |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                            | Responsable       |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------- | ----------------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                             | Claude            |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`        | Claude            |
+| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10 | Claude + Cristian |
 
 ## Decisiones pendientes
 
