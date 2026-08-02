@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { APP_PLATFORMS, APP_STATUSES } from "@/types/app";
 
 export async function PATCH(
@@ -54,6 +55,14 @@ export async function PATCH(
     platform,
     updatedAt: FieldValue.serverTimestamp(),
     updatedBy: result.admin.uid,
+  });
+
+  await logAuditEvent(getAdminDb(), {
+    actorUid: result.admin.uid,
+    action: "app.update",
+    targetCollection: "apps",
+    targetId: slug,
+    details: { status, downloadUrl },
   });
 
   return NextResponse.json({ ok: true });

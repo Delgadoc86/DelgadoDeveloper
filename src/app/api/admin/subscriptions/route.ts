@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { SUBSCRIPTION_FREQUENCIES, SUBSCRIPTION_STATUSES } from "@/types/subscription";
 
 export async function POST(request: NextRequest) {
@@ -60,6 +61,14 @@ export async function POST(request: NextRequest) {
     updatedAt: FieldValue.serverTimestamp(),
     createdBy: result.admin.uid,
     updatedBy: result.admin.uid,
+  });
+
+  await logAuditEvent(db, {
+    actorUid: result.admin.uid,
+    action: "subscription.create",
+    targetCollection: "subscriptions",
+    targetId: docRef.id,
+    details: { customerId, productId, amount },
   });
 
   return NextResponse.json({ ok: true, id: docRef.id });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { PRODUCT_TYPES, PRODUCT_FREQUENCIES } from "@/types/product";
 
 export async function PATCH(
@@ -51,6 +52,14 @@ export async function PATCH(
     suggestedFrequency,
     active,
     updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  await logAuditEvent(getAdminDb(), {
+    actorUid: result.admin.uid,
+    action: "product.update",
+    targetCollection: "products",
+    targetId: id,
+    details: { active, type },
   });
 
   return NextResponse.json({ ok: true });

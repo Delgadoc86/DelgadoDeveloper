@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { normalizePhoneForWhatsapp } from "@/lib/phone";
 import { CUSTOMER_STATUSES, CUSTOMER_TYPES } from "@/types/customer";
 
@@ -60,6 +61,14 @@ export async function PATCH(
     productIds,
     updatedAt: FieldValue.serverTimestamp(),
     updatedBy: result.admin.uid,
+  });
+
+  await logAuditEvent(getAdminDb(), {
+    actorUid: result.admin.uid,
+    action: "customer.update",
+    targetCollection: "customers",
+    targetId: id,
+    details: { status, type },
   });
 
   return NextResponse.json({ ok: true });

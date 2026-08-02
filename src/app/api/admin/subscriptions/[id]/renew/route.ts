@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { calculateNextDueDate } from "@/lib/subscriptions";
 
 // Marca el pago del período actual y avanza el vencimiento, calculado acá
@@ -39,6 +40,14 @@ export async function POST(
     status: "activa",
     updatedAt: FieldValue.serverTimestamp(),
     updatedBy: result.admin.uid,
+  });
+
+  await logAuditEvent(getAdminDb(), {
+    actorUid: result.admin.uid,
+    action: "subscription.renew",
+    targetCollection: "subscriptions",
+    targetId: id,
+    details: { nextDueDate: nextDueDate.toISOString().slice(0, 10) },
   });
 
   return NextResponse.json({

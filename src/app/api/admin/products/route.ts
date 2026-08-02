@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { PRODUCT_TYPES, PRODUCT_FREQUENCIES } from "@/types/product";
 
 function slugify(name: string): string {
@@ -61,6 +62,14 @@ export async function POST(request: NextRequest) {
     active: true,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  await logAuditEvent(getAdminDb(), {
+    actorUid: result.admin.uid,
+    action: "product.create",
+    targetCollection: "products",
+    targetId: id,
+    details: { name, type },
   });
 
   return NextResponse.json({ ok: true, id });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireSessionAdmin } from "@/lib/auth/require-admin";
+import { logAuditEvent } from "@/lib/audit-log";
 import { SUBSCRIPTION_FREQUENCIES, SUBSCRIPTION_STATUSES } from "@/types/subscription";
 
 export async function PATCH(
@@ -45,6 +46,14 @@ export async function PATCH(
     status,
     updatedAt: FieldValue.serverTimestamp(),
     updatedBy: result.admin.uid,
+  });
+
+  await logAuditEvent(getAdminDb(), {
+    actorUid: result.admin.uid,
+    action: "subscription.update",
+    targetCollection: "subscriptions",
+    targetId: id,
+    details: { status, amount },
   });
 
   return NextResponse.json({ ok: true });
