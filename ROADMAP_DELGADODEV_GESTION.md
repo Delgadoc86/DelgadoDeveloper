@@ -532,20 +532,29 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 10 — Deploy y documentación
 
-- [ ] Fusionar rama solamente después de aprobación
-- [ ] Configurar variables definitivas en Vercel Production
-- [ ] Desplegar
-- [ ] Probar producción
-- [ ] Actualizar README
-- [ ] Documentar recuperación de acceso
-- [ ] Documentar cambio de APK
-- [ ] Documentar alta de cliente
-- [ ] Documentar registro de pago
-- [ ] Documentar anulación
-- [ ] Registrar estructura final de Firestore
-- [ ] Registrar índices
-- [ ] Registrar reglas desplegadas
-- [ ] Crear plan de mantenimiento y backups
+- [!] Fusionar rama solamente después de aprobación
+  **Bloqueado — requiere aprobación explícita de Cristian**, es la propia regla del roadmap. No se hace sin confirmación separada.
+- [!] Configurar variables definitivas en Vercel Production
+  **Nota**: ya cargadas desde la Etapa 1 (Cristian confirmó). Pendiente una revisión final antes del merge (ver Etapa 9).
+- [!] Desplegar
+  **Bloqueado**: depende del merge a `main` (Vercel despliega producción automáticamente desde ahí).
+- [!] Probar producción
+  **Bloqueado**: depende del deploy.
+- [x] Actualizar README
+      **Verificación**: `README.md` ya no dice "sin base de datos" (afirmación desactualizada) — ahora aclara que el sitio público sigue sin CMS/DB pero el panel privado sí tiene Firestore propio, con la estructura de carpetas actualizada (`(marketing)`, `admin/`, `api/admin`, `api/auth`, `descargar/[slug]`) y referencias a `PANEL_ADMIN.md`.
+- [x] Documentar recuperación de acceso
+- [x] Documentar cambio de APK
+- [x] Documentar alta de cliente
+- [x] Documentar registro de pago
+- [x] Documentar anulación
+      **Verificación de estos 5**: nuevo [`PANEL_ADMIN.md`](PANEL_ADMIN.md) — guías de uso reales basadas en lo que efectivamente se construyó (rutas, campos, comportamiento), no genéricas.
+- [x] Registrar estructura final de Firestore
+- [x] Registrar índices
+      **Verificación**: documentado en `PANEL_ADMIN.md` — ninguna consulta necesita índice compuesto, a propósito (mismo patrón desde la Etapa 4).
+- [x] Registrar reglas desplegadas
+      **Verificación**: `PANEL_ADMIN.md` referencia directo a `firestore.rules`, aclarando que hay que republicarlo a mano si cambia.
+- [x] Crear plan de mantenimiento y backups
+      **Verificación**: sección dedicada en `PANEL_ADMIN.md` (cuándo correr `scripts/export-firestore-backup.mjs`, qué revisar si cambian las reglas o las env vars).
 
 ### Funciones que se dejan para una etapa futura
 
@@ -576,6 +585,7 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 | 2026-08-01 | 7     | Botón "Enviar por WhatsApp" en cada comprobante: mensaje automático + PDF (Web Share API en mobile, descarga + wa.me en escritorio)                                                                         | Solo `pnpm build` + `pnpm lint` — no toca datos financieros. Prueba real en Android/WhatsApp Web queda pendiente                             | Claude            |
 | 2026-08-01 | 8     | Dashboard tipo "power BI" (KPIs, filtros, accesos rápidos, vencimientos); se encontró y corrigió que `/admin` heredaba el shell público y usaba clases de color que no existen en el sitio (siempre oscuro) | Verificado con capturas reales (Playwright headless temporal) en mobile y desktop, antes/después del fix                                     | Claude            |
 | 2026-08-01 | 9     | CSRF (Origin check en proxy.ts), auditLogs extendido a todas las mutaciones, endpoint de debug eliminado, script de backup de Firestore, App Check wireado (opcional)                                       | 9 pruebas de seguridad en vivo + Lighthouse en producción (88/96/100/100) + capturas mobile/desktop/home pública                             | Claude            |
+| 2026-08-01 | 10    | Documentación final: `PANEL_ADMIN.md` (guías de uso, estructura de Firestore, seguridad, mantenimiento) + `README.md` actualizado                                                                           | Build/lint OK. Merge a `main` y deploy quedan pendientes de aprobación explícita de Cristian                                                 | Claude            |
 
 ## Decisiones pendientes
 
