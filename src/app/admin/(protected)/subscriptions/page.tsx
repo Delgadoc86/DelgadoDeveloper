@@ -4,6 +4,7 @@ import type { SubscriptionRecord } from "@/types/subscription";
 import type { CustomerRecord } from "@/types/customer";
 import type { ProductRecord } from "@/types/product";
 import { SubscriptionsPanel } from "./subscriptions-panel";
+import { ThemeToggle } from "../../theme-toggle";
 
 export default async function AdminSubscriptionsPage() {
   const db = getAdminDb();
@@ -70,9 +71,12 @@ export default async function AdminSubscriptionsPage() {
     <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Suscripciones y vencimientos</h1>
-        <Link href="/admin" className="text-sm underline">
-          Volver
-        </Link>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Link href="/admin" className="text-sm underline">
+            Volver
+          </Link>
+        </div>
       </div>
 
       <SubscriptionsPanel

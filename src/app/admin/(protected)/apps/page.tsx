@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { AppRecord } from "@/types/app";
 import { AppEditForm } from "./app-edit-form";
+import { ThemeToggle } from "../../theme-toggle";
 
 export default async function AdminAppsPage() {
   const snapshot = await getAdminDb().collection("apps").orderBy("name").get();
@@ -24,9 +25,12 @@ export default async function AdminAppsPage() {
     <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Aplicaciones</h1>
-        <Link href="/admin" className="text-sm underline">
-          Volver
-        </Link>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <Link href="/admin" className="text-sm underline">
+            Volver
+          </Link>
+        </div>
       </div>
 
       {apps.map((app) => (

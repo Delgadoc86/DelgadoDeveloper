@@ -37,6 +37,22 @@ html {
   color-scheme: dark;
 }
 
+/* Modo claro, acotado al panel /admin (ver src/app/admin/theme-shell.tsx).
+   El resto del sitio sigue siendo dark-only a proposito. */
+[data-theme="light"] {
+  --background: #eef0f4;
+  --background-subtle: #ffffff;
+  --foreground: #16171b;
+  --foreground-muted: #6b6f76;
+  --border: #e1e3e8;
+  --accent: #7c6ff0;
+  --accent-bright: #6152d9;
+  --accent-foreground: #ffffff;
+  --accent-muted: rgba(124, 111, 240, 0.12);
+  color-scheme: light;
+  background-image: none;
+}
+
 body {
   background: var(--background);
   background-image:

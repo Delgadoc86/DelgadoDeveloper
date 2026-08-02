@@ -2,7 +2,10 @@ import Link from "next/link";
 import {
   AlertCircle,
   AlertTriangle,
+  ArrowDown,
+  ArrowUp,
   DollarSign,
+  Package,
   Receipt,
   Repeat,
   Smartphone,
@@ -24,6 +27,7 @@ import type { SubscriptionRecord } from "@/types/subscription";
 import { StatTile } from "./stat-tile";
 import { DashboardFilters } from "./dashboard-filters";
 import { LogoutButton } from "./logout-button";
+import { ThemeToggle } from "../theme-toggle";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("es-AR", {
@@ -181,16 +185,27 @@ export default async function AdminDashboardPage({
   const customerName = (id: string) => customers.find((c) => c.id === id)?.name ?? id;
   const productName = (id: string) => products.find((p) => p.id === id)?.name ?? id;
 
+  const ingresosDelta = percentDelta(ingresos, ingresosPrev);
+  const ingresosDeltaUp = ingresosDelta >= 0;
+
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-8 pb-16">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-foreground text-lg font-semibold">DelgadoDev Gestión</h1>
-          <p className="text-foreground-muted text-xs">
-            {admin.email} · {admin.role}
-          </p>
+        <div className="flex items-center gap-3">
+          <span className="bg-accent text-accent-foreground flex size-9 items-center justify-center rounded-full text-sm font-semibold">
+            D
+          </span>
+          <div>
+            <h1 className="text-foreground text-lg font-semibold">DelgadoDev Gestión</h1>
+            <p className="text-foreground-muted text-xs">
+              {admin.email} · {admin.role}
+            </p>
+          </div>
         </div>
-        <LogoutButton />
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <LogoutButton />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
@@ -216,40 +231,71 @@ export default async function AdminDashboardPage({
 
       <DashboardFilters period={period} productId={productId} products={products} />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-        <StatTile
-          icon={<DollarSign className="size-4" />}
-          label="Ingresos del mes"
-          value={formatCurrency(ingresos)}
-          delta={{ value: percentDelta(ingresos, ingresosPrev), goodDirection: "up" }}
-        />
-        <StatTile
-          icon={<Receipt className="size-4" />}
-          label="Cantidad de pagos"
-          value={String(cantidadPagos)}
-          delta={{
-            value: percentDelta(cantidadPagos, cantidadPagosPrev),
-            goodDirection: "up",
-          }}
-        />
-        <StatTile
-          icon={<Users className="size-4" />}
-          label="Clientes activos"
-          value={String(clientesActivos)}
-          status="good"
-        />
-        <StatTile
-          icon={<Repeat className="size-4" />}
-          label="Suscripciones activas"
-          value={String(suscripcionesActivas)}
-          status="good"
-        />
-        <StatTile
-          icon={<AlertTriangle className="size-4" />}
-          label="Próximos vencimientos"
-          value={String(proximosVencimientos.length)}
-          status="warning"
-        />
+      <div className="flex flex-col gap-3">
+        <p className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
+          Resumen del mes
+        </p>
+
+        <div className="border-border bg-background-subtle border-l-accent relative flex flex-col gap-1 rounded-xl border border-l-4 p-4 shadow-sm">
+          <div className="flex items-center justify-between">
+            <span className="text-foreground-muted flex items-center gap-2 text-sm">
+              <DollarSign className="size-4" /> Ingresos del mes
+            </span>
+            {Number.isFinite(ingresosDelta) && (
+              <span
+                className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                  ingresosDeltaUp
+                    ? "bg-[#0ca30c]/10 text-[#0ca30c]"
+                    : "bg-[#d03b3b]/10 text-[#d03b3b]"
+                }`}
+              >
+                {ingresosDeltaUp ? (
+                  <ArrowUp className="size-3" />
+                ) : (
+                  <ArrowDown className="size-3" />
+                )}
+                {Math.abs(ingresosDelta).toFixed(0)}%
+              </span>
+            )}
+          </div>
+          <span className="text-foreground text-3xl font-bold tracking-tight md:text-4xl">
+            {formatCurrency(ingresos)}
+          </span>
+          <span className="text-foreground-muted text-xs">
+            vs. {formatCurrency(ingresosPrev)} el mes anterior
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <StatTile
+            icon={<Receipt className="size-4" />}
+            label="Cantidad de pagos"
+            value={String(cantidadPagos)}
+            delta={{
+              value: percentDelta(cantidadPagos, cantidadPagosPrev),
+              goodDirection: "up",
+            }}
+          />
+          <StatTile
+            icon={<Users className="size-4" />}
+            label="Clientes activos"
+            value={String(clientesActivos)}
+            status="good"
+          />
+          <StatTile
+            icon={<Repeat className="size-4" />}
+            label="Suscripciones activas"
+            value={String(suscripcionesActivas)}
+            status="good"
+          />
+          <StatTile
+            icon={<AlertTriangle className="size-4" />}
+            label="Próximos vencimientos"
+            value={String(proximosVencimientos.length)}
+            status="warning"
+          />
+        </div>
+
         <StatTile
           icon={<AlertCircle className="size-4" />}
           label="Pagos vencidos"
@@ -306,13 +352,43 @@ export default async function AdminDashboardPage({
         </section>
       </div>
 
-      <nav className="flex flex-wrap gap-3 text-sm underline">
-        <Link href="/admin/customers">Clientes</Link>
-        <Link href="/admin/products">Productos y servicios</Link>
-        <Link href="/admin/subscriptions">Suscripciones y vencimientos</Link>
-        <Link href="/admin/payments">Pagos y comprobantes</Link>
-        <Link href="/admin/apps">Aplicaciones</Link>
-      </nav>
+      <div className="flex flex-col gap-3">
+        <p className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
+          Accesos rápidos
+        </p>
+        <nav className="grid grid-cols-2 gap-3 text-sm">
+          <Link
+            href="/admin/customers"
+            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
+          >
+            <Users className="size-4" /> Clientes
+          </Link>
+          <Link
+            href="/admin/products"
+            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
+          >
+            <Package className="size-4" /> Productos
+          </Link>
+          <Link
+            href="/admin/subscriptions"
+            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
+          >
+            <Repeat className="size-4" /> Suscripciones
+          </Link>
+          <Link
+            href="/admin/payments"
+            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
+          >
+            <Receipt className="size-4" /> Pagos
+          </Link>
+          <Link
+            href="/admin/apps"
+            className="border-border bg-background-subtle col-span-2 flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
+          >
+            <Smartphone className="size-4" /> Apps
+          </Link>
+        </nav>
+      </div>
     </div>
   );
 }
