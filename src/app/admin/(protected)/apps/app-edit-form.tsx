@@ -43,7 +43,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+      className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
     >
       <h2 className="font-semibold">{app.slug}</h2>
 
@@ -53,7 +53,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -63,7 +63,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
           value={version}
           onChange={(event) => setVersion(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -77,13 +77,13 @@ export function AppEditForm({ app }: { app: AppRecord }) {
             required
             pattern="https://.*"
             title="Debe empezar con https://"
-            className="flex-1 rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+            className="border-border bg-background-subtle flex-1 rounded border px-3 py-2"
           />
           <a
             href={downloadUrl}
             target="_blank"
             rel="noreferrer noopener"
-            className="rounded border border-neutral-300 px-3 py-2 text-sm whitespace-nowrap dark:border-neutral-700"
+            className="border-border bg-background-subtle rounded border px-3 py-2 text-sm whitespace-nowrap"
           >
             Probar
           </a>
@@ -97,7 +97,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
           onChange={(event) =>
             setStatus(event.target.value as (typeof APP_STATUSES)[number])
           }
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {APP_STATUSES.map((value) => (
             <option key={value} value={value}>
@@ -114,7 +114,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
           onChange={(event) =>
             setPlatform(event.target.value as (typeof APP_PLATFORMS)[number])
           }
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {APP_PLATFORMS.map((value) => (
             <option key={value} value={value}>
@@ -128,9 +128,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
         <p
           role="alert"
           className={
-            feedback.type === "ok"
-              ? "text-sm text-green-600 dark:text-green-400"
-              : "text-sm text-red-600 dark:text-red-400"
+            feedback.type === "ok" ? "text-sm text-[#0ca30c]" : "text-sm text-[#d03b3b]"
           }
         >
           {feedback.text}
@@ -140,7 +138,7 @@ export function AppEditForm({ app }: { app: AppRecord }) {
       <button
         type="submit"
         disabled={saving}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
       >
         {saving ? "Guardando..." : "Guardar cambios"}
       </button>

@@ -14,12 +14,12 @@ function badgeFor(
   if (subscription.status === "cancelada" || subscription.status === "pausada")
     return null;
   if (subscription.nextDueDate < today) {
-    return { label: "Vencida", className: "text-red-600 dark:text-red-400" };
+    return { label: "Vencida", className: "text-[#d03b3b]" };
   }
   const in7Days = new Date();
   in7Days.setDate(in7Days.getDate() + 7);
   if (subscription.nextDueDate <= in7Days.toISOString().slice(0, 10)) {
-    return { label: "Próxima a vencer", className: "text-amber-600 dark:text-amber-400" };
+    return { label: "Próxima a vencer", className: "text-[#fab219]" };
   }
   return null;
 }
@@ -43,7 +43,7 @@ export function SubscriptionsPanel({
       <button
         type="button"
         onClick={() => setShowNewForm((value) => !value)}
-        className="self-start rounded border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
+        className="border-border bg-background-subtle self-start rounded border px-3 py-2 text-sm"
       >
         {showNewForm ? "Cancelar" : "Nueva suscripción"}
       </button>
@@ -57,7 +57,9 @@ export function SubscriptionsPanel({
       )}
 
       {subscriptions.length === 0 && (
-        <p className="text-sm text-neutral-500">Todavía no hay suscripciones cargadas.</p>
+        <p className="text-foreground-muted text-sm">
+          Todavía no hay suscripciones cargadas.
+        </p>
       )}
 
       {subscriptions.map((subscription) => {
@@ -65,7 +67,7 @@ export function SubscriptionsPanel({
         return (
           <div
             key={subscription.id}
-            className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+            className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
           >
             <div className="flex items-center justify-between">
               <p className="text-sm">

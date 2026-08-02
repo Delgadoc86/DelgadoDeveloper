@@ -93,7 +93,7 @@ export function CustomerForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+      className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
     >
       <h2 className="font-semibold">{isEditing ? customer!.name : "Nuevo cliente"}</h2>
 
@@ -103,7 +103,7 @@ export function CustomerForm({
           value={name}
           onChange={(event) => setName(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -112,7 +112,7 @@ export function CustomerForm({
         <input
           value={businessName}
           onChange={(event) => setBusinessName(event.target.value)}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -123,7 +123,7 @@ export function CustomerForm({
           onChange={(event) => setPhoneRaw(event.target.value)}
           required
           placeholder="011 15-1234-5678"
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -133,7 +133,7 @@ export function CustomerForm({
           type="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -142,7 +142,7 @@ export function CustomerForm({
         <input
           value={taxId}
           onChange={(event) => setTaxId(event.target.value)}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -151,7 +151,7 @@ export function CustomerForm({
         <select
           value={type}
           onChange={(event) => setType(event.target.value as CustomerType)}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {CUSTOMER_TYPES.map((value) => (
             <option key={value} value={value}>
@@ -167,7 +167,7 @@ export function CustomerForm({
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value as CustomerStatus)}
-            className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+            className="border-border bg-background-subtle rounded border px-3 py-2"
           >
             {CUSTOMER_STATUSES.map((value) => (
               <option key={value} value={value}>
@@ -198,7 +198,7 @@ export function CustomerForm({
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           rows={3}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -206,9 +206,7 @@ export function CustomerForm({
         <p
           role="alert"
           className={
-            feedback.type === "ok"
-              ? "text-sm text-green-600 dark:text-green-400"
-              : "text-sm text-red-600 dark:text-red-400"
+            feedback.type === "ok" ? "text-sm text-[#0ca30c]" : "text-sm text-[#d03b3b]"
           }
         >
           {feedback.text}
@@ -218,7 +216,7 @@ export function CustomerForm({
       <button
         type="submit"
         disabled={saving}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
       >
         {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Crear cliente"}
       </button>

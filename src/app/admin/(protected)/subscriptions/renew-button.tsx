@@ -40,11 +40,11 @@ export function RenewButton({
         type="button"
         onClick={handleClick}
         disabled={disabled || loading}
-        className="rounded border border-neutral-300 px-3 py-1.5 text-sm disabled:opacity-50 dark:border-neutral-700"
+        className="border-border bg-background-subtle rounded border px-3 py-1.5 text-sm disabled:opacity-50"
       >
         {loading ? "Registrando..." : "Registrar pago (avanza vencimiento)"}
       </button>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-[#d03b3b]">{error}</p>}
     </div>
   );
 }

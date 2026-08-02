@@ -439,24 +439,44 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 8 — Dashboard
 
-- [ ] Ingresos del mes
-- [ ] Cantidad de pagos
-- [ ] Clientes activos
-- [ ] Suscripciones activas
-- [ ] Próximos vencimientos
-- [ ] Pagos vencidos
-- [ ] Últimos pagos
-- [ ] Acceso rápido a registrar pago
-- [ ] Acceso rápido a nuevo cliente
-- [ ] Acceso rápido a aplicaciones
-- [ ] Filtros por período y producto
-- [ ] Validar zona horaria de Argentina
+> Cristian pidió explícitamente una vista "power BI profesional", pensada mobile-first (uso principal) y prolija en PC. Se usó la skill de dataviz del proyecto (stat tiles + paleta de estado validada) y se verificó visualmente con capturas reales (Playwright headless, instalado temporalmente solo para esto y desinstalado al terminar — no queda como dependencia).
+
+- [x] Ingresos del mes
+      **Verificación**: suma de `payments` con `status: "emitido"` del período seleccionado, con delta % vs el mes anterior.
+- [x] Cantidad de pagos
+      **Verificación**: mismo criterio, con delta vs mes anterior.
+- [x] Clientes activos
+- [x] Suscripciones activas
+- [x] Próximos vencimientos
+      **Verificación**: suscripciones con `nextDueDate` dentro de los próximos 7 días (excluye pausadas/canceladas).
+- [x] Pagos vencidos
+      **Verificación**: suscripciones con `nextDueDate` ya pasado (excluye pausadas/canceladas).
+- [x] Últimos pagos
+      **Verificación**: últimos 5 pagos por fecha.
+- [x] Acceso rápido a registrar pago
+      **Verificación**: botón "Registrar pago" → `/admin/payments?new=1`, que abre el formulario de alta automáticamente (probado con captura real).
+- [x] Acceso rápido a nuevo cliente
+      **Verificación**: mismo patrón, `/admin/customers?new=1` (probado con captura real).
+- [x] Acceso rápido a aplicaciones
+- [x] Filtros por período y producto
+      **Verificación**: `DashboardFilters` (client) actualiza la URL (`?period=&productId=`), el Server Component recalcula con esos parámetros.
+- [x] Validar zona horaria de Argentina
+      **Verificación**: `src/lib/timezone.ts` resuelve "hoy" y "período actual" vía `Intl.DateTimeFormat` con `timeZone: "America/Argentina/Buenos_Aires"` en vez de usar la hora del servidor (Vercel corre en UTC) — evita que el mes/día calculado esté desfasado cerca de la medianoche.
 
 **Criterio de cierre**:
 
-- [ ] Los totales coinciden con los registros
-- [ ] El dashboard no depende de datos duplicados
-- [ ] Las consultas tienen índices adecuados
+- [x] Los totales coinciden con los registros
+      **Nota**: cálculo en memoria sobre los mismos documentos que ya muestran `/admin/payments`, `/admin/customers`, etc. — no hay una fuente de datos paralela que pueda desincronizarse.
+- [x] El dashboard no depende de datos duplicados
+- [x] Las consultas tienen índices adecuados
+      **Verificación**: sin `where` combinado con `orderBy` en ninguna consulta del dashboard — se trae cada colección completa (`.get()` simple) y se filtra/agrupa en código, mismo patrón que ya se adoptó en la Etapa 4 para evitar índices compuestos.
+
+### Hallazgos y arreglos durante la verificación visual (no estaban en el checklist original)
+
+- **[!] → [x] `/admin` heredaba el header, footer y banner de cookies del sitio público.** El layout raíz envolvía todo el sitio (incluido `/admin`) con `<Header/>`/`<Footer/>`/`<CookieConsent/>`. Se separó moviendo las páginas públicas a un route group `src/app/(marketing)/` con su propio layout, dejando el layout raíz mínimo. Verificado que las páginas públicas siguen siendo estáticas (`○`/`●` en el build) — el fix no afectó el rendimiento del sitio público.
+- **[!] → [x] Todo el panel usaba clases de Tailwind genéricas (`neutral-*`, `dark:`) que no existen en el sistema de diseño real del sitio.** El sitio es **siempre oscuro** (`html { color-scheme: dark }`, un único set de variables en `globals.css`, sin modo claro) con tokens propios (`bg-background`, `bg-background-subtle`, `text-foreground`, `text-foreground-muted`, `border-border`, `bg-accent`, `text-accent-foreground`). Esto hacía que títulos y botones primarios casi no se vieran (texto oscuro sobre fondo oscuro). Se reemplazaron sistemáticamente en los 18 archivos del panel — confirmado con captura antes/después.
+- **[x] `/admin` ahora tiene su propio `<title>` ("Panel") y `robots: noindex`**, en vez de heredar el título y la indexabilidad del sitio público (`src/app/admin/layout.tsx`, nuevo).
+- **[x] `not-found.tsx` ahora renderiza Header/Footer directamente**, ya que dejó de heredarlos del layout raíz (antes sí lo hacía).
 
 ---
 
@@ -523,17 +543,18 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                                                                          | Verificación                                                                                                                                 | Responsable       |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                       | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                                                                  | Claude            |
-| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada  | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                                                             | Claude            |
-| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview      | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10                                                      | Claude + Cristian |
-| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                               | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron                                                      | Claude            |
-| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                               | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado                                               | Claude            |
-| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                       | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore                                           | Claude            |
-| 2026-08-01 | 5     | `/admin/subscriptions`: alta, edición, badges de vencimiento, renovación manual con cálculo de próximo vencimiento server-side                                            | Solo `pnpm build` + `pnpm lint` (sin test en vivo, por pedido de Cristian) — verificación funcional diferida al pase final                   | Claude            |
-| 2026-08-01 | 6     | `/admin/payments`: pagos, transacción crítica de emisión de comprobante (numeración `DD-AAAA-0001`, snapshot, auditoría, avance de suscripción), anulación, PDF con jsPDF | 14 pruebas en vivo enfocadas en la transacción crítica — incluye concurrencia real con `Promise.all`. Datos de prueba y contador restaurados | Claude            |
-| 2026-08-01 | 7     | Botón "Enviar por WhatsApp" en cada comprobante: mensaje automático + PDF (Web Share API en mobile, descarga + wa.me en escritorio)                                       | Solo `pnpm build` + `pnpm lint` — no toca datos financieros. Prueba real en Android/WhatsApp Web queda pendiente                             | Claude            |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                                                            | Verificación                                                                                                                                 | Responsable       |
+| ---------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                                                         | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                                                                  | Claude            |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada                                    | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                                                             | Claude            |
+| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview                                        | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10                                                      | Claude + Cristian |
+| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                                                                 | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron                                                      | Claude            |
+| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                                                                 | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado                                               | Claude            |
+| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                                                         | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore                                           | Claude            |
+| 2026-08-01 | 5     | `/admin/subscriptions`: alta, edición, badges de vencimiento, renovación manual con cálculo de próximo vencimiento server-side                                                                              | Solo `pnpm build` + `pnpm lint` (sin test en vivo, por pedido de Cristian) — verificación funcional diferida al pase final                   | Claude            |
+| 2026-08-01 | 6     | `/admin/payments`: pagos, transacción crítica de emisión de comprobante (numeración `DD-AAAA-0001`, snapshot, auditoría, avance de suscripción), anulación, PDF con jsPDF                                   | 14 pruebas en vivo enfocadas en la transacción crítica — incluye concurrencia real con `Promise.all`. Datos de prueba y contador restaurados | Claude            |
+| 2026-08-01 | 7     | Botón "Enviar por WhatsApp" en cada comprobante: mensaje automático + PDF (Web Share API en mobile, descarga + wa.me en escritorio)                                                                         | Solo `pnpm build` + `pnpm lint` — no toca datos financieros. Prueba real en Android/WhatsApp Web queda pendiente                             | Claude            |
+| 2026-08-01 | 8     | Dashboard tipo "power BI" (KPIs, filtros, accesos rápidos, vencimientos); se encontró y corrigió que `/admin` heredaba el shell público y usaba clases de color que no existen en el sitio (siempre oscuro) | Verificado con capturas reales (Playwright headless temporal) en mobile y desktop, antes/después del fix                                     | Claude            |
 
 ## Decisiones pendientes
 

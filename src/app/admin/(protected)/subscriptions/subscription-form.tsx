@@ -89,7 +89,7 @@ export function SubscriptionForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+      className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
     >
       <h2 className="font-semibold">
         {isEditing
@@ -107,7 +107,7 @@ export function SubscriptionForm({
               value={customerId}
               onChange={(event) => setCustomerId(event.target.value)}
               required
-              className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+              className="border-border bg-background-subtle rounded border px-3 py-2"
             >
               {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
@@ -123,7 +123,7 @@ export function SubscriptionForm({
               value={productId}
               onChange={(event) => setProductId(event.target.value)}
               required
-              className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+              className="border-border bg-background-subtle rounded border px-3 py-2"
             >
               {products.map((product) => (
                 <option key={product.id} value={product.id}>
@@ -144,7 +144,7 @@ export function SubscriptionForm({
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -155,7 +155,7 @@ export function SubscriptionForm({
           onChange={(event) =>
             setFrequency(event.target.value as (typeof SUBSCRIPTION_FREQUENCIES)[number])
           }
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {SUBSCRIPTION_FREQUENCIES.map((value) => (
             <option key={value} value={value}>
@@ -172,7 +172,7 @@ export function SubscriptionForm({
           value={nextDueDate}
           onChange={(event) => setNextDueDate(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -182,7 +182,7 @@ export function SubscriptionForm({
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value as SubscriptionStatus)}
-            className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+            className="border-border bg-background-subtle rounded border px-3 py-2"
           >
             {SUBSCRIPTION_STATUSES.map((value) => (
               <option key={value} value={value}>
@@ -197,9 +197,7 @@ export function SubscriptionForm({
         <p
           role="alert"
           className={
-            feedback.type === "ok"
-              ? "text-sm text-green-600 dark:text-green-400"
-              : "text-sm text-red-600 dark:text-red-400"
+            feedback.type === "ok" ? "text-sm text-[#0ca30c]" : "text-sm text-[#d03b3b]"
           }
         >
           {feedback.text}
@@ -209,7 +207,7 @@ export function SubscriptionForm({
       <button
         type="submit"
         disabled={saving}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
       >
         {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Crear suscripción"}
       </button>

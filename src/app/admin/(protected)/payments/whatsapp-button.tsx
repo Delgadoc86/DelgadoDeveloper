@@ -12,7 +12,7 @@ export function WhatsappButton({ receipt }: { receipt: ReceiptRecord }) {
 
   if (!hasUsablePhone(phone)) {
     return (
-      <span className="text-xs text-neutral-500">
+      <span className="text-foreground-muted text-xs">
         Sin teléfono válido para enviar por WhatsApp — editá el cliente primero.
       </span>
     );
@@ -62,11 +62,11 @@ export function WhatsappButton({ receipt }: { receipt: ReceiptRecord }) {
         type="button"
         onClick={handleClick}
         disabled={sending}
-        className="rounded border border-green-600 px-3 py-1.5 text-sm text-green-700 disabled:opacity-60 dark:border-green-500 dark:text-green-400"
+        className="rounded border border-[#0ca30c]/50 px-3 py-1.5 text-sm text-[#0ca30c] disabled:opacity-60"
       >
         {sending ? "Preparando..." : "Enviar por WhatsApp"}
       </button>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-[#d03b3b]">{error}</p>}
     </div>
   );
 }

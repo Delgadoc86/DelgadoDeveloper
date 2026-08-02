@@ -41,7 +41,7 @@ export function VoidReceiptButton({ receiptId }: { receiptId: string }) {
       <button
         type="button"
         onClick={() => setShowReason(true)}
-        className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-600 dark:border-red-800 dark:text-red-400"
+        className="rounded border border-[#d03b3b]/40 px-3 py-1.5 text-sm text-[#d03b3b]"
       >
         Anular comprobante
       </button>
@@ -49,27 +49,27 @@ export function VoidReceiptButton({ receiptId }: { receiptId: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-2 rounded border border-red-300 p-3 dark:border-red-800">
+    <div className="flex flex-col gap-2 rounded border border-[#d03b3b]/40 p-3">
       <input
         value={reason}
         onChange={(event) => setReason(event.target.value)}
         placeholder="Motivo de la anulación"
-        className="rounded border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
+        className="border-border bg-background-subtle rounded border px-3 py-2 text-sm"
       />
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-[#d03b3b]">{error}</p>}
       <div className="flex gap-2">
         <button
           type="button"
           onClick={handleConfirm}
           disabled={loading}
-          className="rounded bg-red-600 px-3 py-1.5 text-sm text-white disabled:opacity-60"
+          className="rounded bg-[#d03b3b] px-3 py-1.5 text-sm text-white hover:bg-[#b83232] disabled:opacity-60"
         >
           {loading ? "Anulando..." : "Confirmar anulación"}
         </button>
         <button
           type="button"
           onClick={() => setShowReason(false)}
-          className="rounded border border-neutral-300 px-3 py-1.5 text-sm dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-1.5 text-sm"
         >
           Cancelar
         </button>

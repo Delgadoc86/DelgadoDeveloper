@@ -7,7 +7,12 @@ import type { ProductRecord } from "@/types/product";
 import type { SubscriptionRecord } from "@/types/subscription";
 import { PaymentsPanel } from "./payments-panel";
 
-export default async function AdminPaymentsPage() {
+export default async function AdminPaymentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ new?: string }>;
+}) {
+  const { new: newParam } = await searchParams;
   const db = getAdminDb();
   const [
     paymentsSnapshot,
@@ -138,6 +143,7 @@ export default async function AdminPaymentsPage() {
         customers={customers}
         products={products}
         subscriptions={subscriptions}
+        initialShowForm={newParam === "1"}
       />
     </div>
   );

@@ -144,7 +144,7 @@ export function PaymentForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-lg border border-neutral-200 p-4 dark:border-neutral-800"
+      className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
     >
       <h2 className="font-semibold">Nuevo pago</h2>
 
@@ -157,7 +157,7 @@ export function PaymentForm({
             setSubscriptionId("");
           }}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {customerList.map((customer) => (
             <option key={customer.id} value={customer.id}>
@@ -176,27 +176,25 @@ export function PaymentForm({
       </button>
 
       {showQuickCustomer && (
-        <div className="flex flex-col gap-2 rounded border border-dashed border-neutral-300 p-3 dark:border-neutral-700">
+        <div className="border-border flex flex-col gap-2 rounded border border-dashed p-3">
           <input
             value={quickName}
             onChange={(event) => setQuickName(event.target.value)}
             placeholder="Nombre"
-            className="rounded border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
+            className="border-border bg-background-subtle rounded border px-3 py-2 text-sm"
           />
           <input
             value={quickPhone}
             onChange={(event) => setQuickPhone(event.target.value)}
             placeholder="Teléfono"
-            className="rounded border border-neutral-300 px-3 py-2 text-sm dark:border-neutral-700"
+            className="border-border bg-background-subtle rounded border px-3 py-2 text-sm"
           />
-          {quickError && (
-            <p className="text-xs text-red-600 dark:text-red-400">{quickError}</p>
-          )}
+          {quickError && <p className="text-xs text-[#d03b3b]">{quickError}</p>}
           <button
             type="button"
             onClick={handleQuickCreateCustomer}
             disabled={creatingCustomer}
-            className="self-start rounded border border-neutral-300 px-3 py-1.5 text-xs dark:border-neutral-700"
+            className="border-border text-foreground self-start rounded border px-3 py-1.5 text-xs"
           >
             {creatingCustomer ? "Creando..." : "Crear y usar este cliente"}
           </button>
@@ -209,7 +207,7 @@ export function PaymentForm({
           value={productId}
           onChange={(event) => setProductId(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {products.map((product) => (
             <option key={product.id} value={product.id}>
@@ -224,7 +222,7 @@ export function PaymentForm({
         <select
           value={subscriptionId}
           onChange={(event) => setSubscriptionId(event.target.value)}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           <option value="">Ninguna (pago suelto)</option>
           {customerSubscriptions.map((subscription) => (
@@ -244,7 +242,7 @@ export function PaymentForm({
           value={amount}
           onChange={(event) => setAmount(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -254,7 +252,7 @@ export function PaymentForm({
           value={concept}
           onChange={(event) => setConcept(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -265,7 +263,7 @@ export function PaymentForm({
           value={period}
           onChange={(event) => setPeriod(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -276,7 +274,7 @@ export function PaymentForm({
           onChange={(event) =>
             setMethod(event.target.value as (typeof PAYMENT_METHODS)[number])
           }
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         >
           {PAYMENT_METHODS.map((value) => (
             <option key={value} value={value}>
@@ -293,7 +291,7 @@ export function PaymentForm({
           value={date}
           onChange={(event) => setDate(event.target.value)}
           required
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -302,7 +300,7 @@ export function PaymentForm({
         <input
           value={transferReference}
           onChange={(event) => setTransferReference(event.target.value)}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -312,7 +310,7 @@ export function PaymentForm({
           value={notes}
           onChange={(event) => setNotes(event.target.value)}
           rows={2}
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -320,9 +318,7 @@ export function PaymentForm({
         <p
           role="alert"
           className={
-            feedback.type === "ok"
-              ? "text-sm text-green-600 dark:text-green-400"
-              : "text-sm text-red-600 dark:text-red-400"
+            feedback.type === "ok" ? "text-sm text-[#0ca30c]" : "text-sm text-[#d03b3b]"
           }
         >
           {feedback.text}
@@ -332,7 +328,7 @@ export function PaymentForm({
       <button
         type="submit"
         disabled={saving}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
       >
         {saving ? "Guardando..." : "Registrar pago"}
       </button>

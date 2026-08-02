@@ -44,7 +44,7 @@ export function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="mx-auto mt-24 flex w-full max-w-sm flex-col gap-4 rounded-lg border border-neutral-200 p-6 dark:border-neutral-800"
+      className="border-border bg-background-subtle mx-auto mt-24 flex w-full max-w-sm flex-col gap-4 rounded-lg border p-6"
     >
       <h1 className="text-lg font-semibold">DelgadoDev Gestión</h1>
 
@@ -56,7 +56,7 @@ export function LoginForm() {
           onChange={(event) => setEmail(event.target.value)}
           required
           autoComplete="username"
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
@@ -68,12 +68,12 @@ export function LoginForm() {
           onChange={(event) => setPassword(event.target.value)}
           required
           autoComplete="current-password"
-          className="rounded border border-neutral-300 px-3 py-2 dark:border-neutral-700"
+          className="border-border bg-background-subtle rounded border px-3 py-2"
         />
       </label>
 
       {error && (
-        <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+        <p role="alert" className="text-sm text-[#d03b3b]">
           {error}
         </p>
       )}
@@ -81,7 +81,7 @@ export function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
       >
         {loading ? "Ingresando..." : "Ingresar"}
       </button>

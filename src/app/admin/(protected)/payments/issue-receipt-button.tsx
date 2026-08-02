@@ -34,11 +34,11 @@ export function IssueReceiptButton({ paymentId }: { paymentId: string }) {
         type="button"
         onClick={handleClick}
         disabled={loading}
-        className="rounded bg-neutral-900 px-3 py-1.5 text-sm text-white disabled:opacity-60 dark:bg-white dark:text-neutral-900"
+        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-3 py-1.5 text-sm disabled:opacity-60"
       >
         {loading ? "Emitiendo..." : "Emitir comprobante"}
       </button>
-      {error && <p className="text-xs text-red-600 dark:text-red-400">{error}</p>}
+      {error && <p className="text-xs text-[#d03b3b]">{error}</p>}
     </div>
   );
 }

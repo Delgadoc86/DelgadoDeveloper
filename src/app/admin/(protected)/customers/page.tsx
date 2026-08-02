@@ -4,7 +4,12 @@ import type { CustomerRecord } from "@/types/customer";
 import type { ProductRecord } from "@/types/product";
 import { CustomersPanel } from "./customers-panel";
 
-export default async function AdminCustomersPage() {
+export default async function AdminCustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ new?: string }>;
+}) {
+  const { new: newParam } = await searchParams;
   const db = getAdminDb();
   // Sin `where` combinado con `orderBy` a propósito: el catálogo de productos
   // es chico (unos pocos documentos), así que se trae todo ordenado y se
@@ -60,7 +65,11 @@ export default async function AdminCustomersPage() {
         </Link>
       </div>
 
-      <CustomersPanel customers={customers} products={products} />
+      <CustomersPanel
+        customers={customers}
+        products={products}
+        initialShowForm={newParam === "1"}
+      />
     </div>
   );
 }
