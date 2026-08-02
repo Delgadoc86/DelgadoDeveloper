@@ -1,0 +1,72 @@
+rules_version = "2";
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/adminUsers/$(request.auth.uid));
+    }
+
+    // Un admin puede leer su propio documento (para chequeos desde cliente).
+    // Los documentos de adminUsers solo se crean/editan manualmente desde
+    // Firebase Console o vía Admin SDK (Route Handlers) — nunca desde cliente.
+    match /adminUsers/{uid} {
+      allow read: if isSignedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Solo el admin lee/escribe. El público nunca toca esta colección desde
+    // el cliente: /descargar/[slug] la consulta server-side con Admin SDK
+    // (que ignora estas reglas), así que no hace falta ningún acceso público.
+    match /apps/{slug} {
+      allow read, write: if isAdmin();
+    }
+
+    // Clientes y catálogo de productos: datos internos, solo el admin.
+    match /customers/{customerId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /products/{productId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /subscriptions/{subscriptionId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /payments/{paymentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Inmutables desde cliente: solo se crean/anulan vía Admin SDK dentro
+    // de la transacción crítica de emisión/anulación (que ignora estas
+    // reglas). El admin puede leerlos, nunca escribirlos directamente.
+    match /receipts/{receiptId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // counters/{year} queda deliberadamente fuera de toda regla explícita
+    // (cae en el catch-all de abajo, cerrado por completo): solo la
+    // transacción crítica del servidor debe poder incrementarlo, ni
+    // siquiera el admin desde un cliente Firestore.
+
+    // Todo lo demás queda cerrado por defecto. Cada colección nueva
+    // (settings, etc.) recibe sus propias reglas explícitas en la etapa del
+    // roadmap en la que se construye, en vez de abrir un acceso genérico
+    // para colecciones que todavía no existen.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

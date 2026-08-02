@@ -89,8 +89,7 @@ export const projects: Project[] = [
       },
     ],
     links: {
-      download:
-        "https://drive.google.com/file/d/1ktv93-0xB7UaNFH9aaLSx045xvKzC2Km/view?usp=drivesdk",
+      download: "/descargar/presufacil",
       repo: "https://github.com/Delgadoc86/presupuestoapp",
     },
     legalTermsUrl: "/legal/presufacil/terminos-descarga",
@@ -187,8 +186,7 @@ export const projects: Project[] = [
       },
     ],
     links: {
-      download:
-        "https://drive.google.com/file/d/1Uf_xjucfxybX5FOdD6KQWPCZS8on56Cz/view?usp=drivesdk",
+      download: "/descargar/mi-almacen",
       repo: "https://github.com/Delgadoc86/Mi-Almacen",
     },
     legalTermsUrl: "/legal/mi-almacen/terminos-descarga",

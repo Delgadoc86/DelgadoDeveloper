@@ -8,25 +8,38 @@ Construido desde cero con Next.js 16, enfocado en performance, accesibilidad y S
 
 ## Stack
 
-| Categoría | Tecnología                                                                                                           |
-| --------- | -------------------------------------------------------------------------------------------------------------------- |
-| Framework | [Next.js 16](https://nextjs.org) (App Router, TypeScript estricto)                                                   |
-| Estilos   | [Tailwind CSS v4](https://tailwindcss.com)                                                                           |
-| Animación | [Motion](https://motion.dev) (`motion/react`), respeta `prefers-reduced-motion`                                      |
-| Íconos    | [lucide-react](https://lucide.dev) + SVGs propios para marcas sin ícono (GitHub, LinkedIn, Instagram, TikTok, React) |
-| Analítica | Google Analytics 4, cargado solo si el visitante acepta el aviso de cookies                                          |
-| Deploy    | [Vercel](https://vercel.com)                                                                                         |
-| Paquetes  | [pnpm](https://pnpm.io)                                                                                              |
+| Categoría     | Tecnología                                                                                                           |
+| ------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Framework     | [Next.js 16](https://nextjs.org) (App Router, TypeScript estricto)                                                   |
+| Estilos       | [Tailwind CSS v4](https://tailwindcss.com)                                                                           |
+| Animación     | [Motion](https://motion.dev) (`motion/react`), respeta `prefers-reduced-motion`                                      |
+| Íconos        | [lucide-react](https://lucide.dev) + SVGs propios para marcas sin ícono (GitHub, LinkedIn, Instagram, TikTok, React) |
+| Analítica     | Google Analytics 4, cargado solo si el visitante acepta el aviso de cookies                                          |
+| Deploy        | [Vercel](https://vercel.com)                                                                                         |
+| Paquetes      | [pnpm](https://pnpm.io)                                                                                              |
+| Panel privado | Firebase (Auth + Firestore, proyecto separado) — ver [`PANEL_ADMIN.md`](PANEL_ADMIN.md)                              |
 
-Sin CMS, sin base de datos: el contenido (proyectos, stack, bio) vive tipado en `src/features/*/data`, versionado junto con el código.
+El sitio público (`(marketing)`) sigue sin CMS: el contenido (proyectos, stack, bio) vive
+tipado en `src/features/*/data`, versionado junto con el código. El panel privado en
+`/admin` sí tiene base de datos propia (Firestore, en un Firebase separado del resto del
+sitio) — ver [`PANEL_ADMIN.md`](PANEL_ADMIN.md) para su documentación completa.
 
 ## Estructura
 
 ```
 src/
-  app/                  # Rutas (App Router): home, /sobre-mi, /proyectos/[slug],
-                         # /privacidad, /cookies, /legal/[producto]/terminos-descarga,
-                         # sitemap, robots, manifest, iconos, OG image
+  app/
+    (marketing)/          # Sitio público: home, /sobre-mi, /proyectos/[slug],
+                           # /privacidad, /cookies, /legal/[producto]/terminos-descarga
+                           # (route group — no aparece en la URL, solo agrupa el layout
+                           # con Header/Footer/CookieConsent)
+    admin/                 # Panel privado (login + /admin protegido por sesión)
+    api/admin/              # Route Handlers del panel (apps, customers, products,
+                            # subscriptions, payments, receipts) — todos exigen sesión
+    api/auth/               # /session (login) y /logout
+    descargar/[slug]/      # Redirect público y estable a la descarga de cada app,
+                            # resuelto contra Firestore (ver PANEL_ADMIN.md)
+                         # sitemap, robots, manifest, iconos, OG image quedan a nivel raíz
   components/
     ui/                 # Componentes genéricos sin lógica de negocio (Button, Badge, TechIcon, CvButton...)
     layout/             # Header, Footer, MobileNav
@@ -81,7 +94,10 @@ Abrí [http://localhost:3000](http://localhost:3000).
 | ------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------- |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | No        | ID de Google Analytics 4 (`G-XXXXXXXXXX`). Sin ella, GA simplemente no se carga — el sitio funciona igual. |
 
-Ver [`.env.example`](.env.example). En local va en `.env.local` (ignorado por git); en producción se configura en **Vercel → Project Settings → Environment Variables**.
+El panel privado (`/admin`) necesita además las variables de Firebase — ver
+[`.env.example`](.env.example) y [`PANEL_ADMIN.md`](PANEL_ADMIN.md).
+
+En local van en `.env.local` (ignorado por git); en producción se configuran en **Vercel → Project Settings → Environment Variables**.
 
 ## Deploy
 

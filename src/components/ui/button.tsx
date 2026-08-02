@@ -41,7 +41,10 @@ export function Button({
   // mailto: opens the OS mail client, not a browser tab, so it's excluded from
   // target="_blank"/rel and the "opens in a new tab" a11y hint below.
   const isMailto = href.startsWith("mailto:");
-  const isExternal = href.startsWith("http") || isMailto;
+  // /descargar/[slug] is a redirect-only Route Handler, never a navigable
+  // page, so it gets the same plain-<a> treatment as an external link.
+  const isExternal =
+    href.startsWith("http") || href.startsWith("/descargar/") || isMailto;
 
   if (isExternal) {
     return (

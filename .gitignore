@@ -37,6 +37,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# backups de Firestore (datos reales de clientes y pagos, nunca en Git)
+/backups
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
