@@ -23,6 +23,9 @@ export default async function AdminHomePage() {
       <Link href="/admin/subscriptions" className="text-sm underline">
         Suscripciones y vencimientos
       </Link>
+      <Link href="/admin/payments" className="text-sm underline">
+        Pagos y comprobantes
+      </Link>
       <LogoutButton />
     </div>
   );

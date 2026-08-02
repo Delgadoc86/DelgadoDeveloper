@@ -39,10 +39,32 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Todo lo demás queda cerrado por defecto. Cada colección (payments,
-    // counters, receipts, auditLogs, settings) recibe sus propias reglas
-    // explícitas en la etapa del roadmap en la que se construye, en vez de
-    // abrir un acceso genérico para colecciones que todavía no existen.
+    match /payments/{paymentId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Inmutables desde cliente: solo se crean/anulan vía Admin SDK dentro
+    // de la transacción crítica de emisión/anulación (que ignora estas
+    // reglas). El admin puede leerlos, nunca escribirlos directamente.
+    match /receipts/{receiptId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    match /auditLogs/{logId} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+
+    // counters/{year} queda deliberadamente fuera de toda regla explícita
+    // (cae en el catch-all de abajo, cerrado por completo): solo la
+    // transacción crítica del servidor debe poder incrementarlo, ni
+    // siquiera el admin desde un cliente Firestore.
+
+    // Todo lo demás queda cerrado por defecto. Cada colección nueva
+    // (settings, etc.) recibe sus propias reglas explícitas en la etapa del
+    // roadmap en la que se construye, en vez de abrir un acceso genérico
+    // para colecciones que todavía no existen.
     match /{document=**} {
       allow read, write: if false;
     }

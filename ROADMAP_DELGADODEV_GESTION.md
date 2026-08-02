@@ -330,54 +330,77 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 6 — Pagos y comprobantes
 
+> Módulo financiero: a diferencia de la Etapa 5, acá sí se hizo una prueba en vivo enfocada en la transacción crítica (numeración, concurrencia, inmutabilidad, anulación), tal como se acordó — el resto de las etapas del roadmap quedó sin batería de pruebas por pedido de Cristian, pero esta no, por tratarse de plata real.
+
 ### Pagos
 
-- [ ] Crear colección `payments`
-- [ ] Registrar cliente, producto, suscripción opcional
-- [ ] Registrar importe, concepto, período, medio de pago, referencia de transferencia, observaciones, estado
+- [x] Crear colección `payments`
+- [x] Registrar cliente, producto, suscripción opcional
+- [x] Registrar importe, concepto, período, medio de pago, referencia de transferencia, observaciones, estado
+      **Verificación**: `POST /api/admin/payments` probado en vivo — crea con `status: "registrado"`.
 
 ### Numeración
 
-- [ ] Crear colección `counters`
-- [ ] Crear contador anual
-- [ ] Formato: `DD-AAAA-0001`
-- [ ] Implementar transacción del lado servidor
-- [ ] Probar concurrencia
-- [ ] Evitar números duplicados
-- [ ] Definir comportamiento si la operación falla
+- [x] Crear colección `counters`
+- [x] Crear contador anual
+- [x] Formato: `DD-AAAA-0001`
+      **Verificación**: probado en vivo, número real emitido `DD-2026-0001`.
+- [x] Implementar transacción del lado servidor
+      **Verificación**: `db.runTransaction()` en `issue-receipt/route.ts` — lee contador, paga, cliente y (si aplica) suscripción antes de escribir nada.
+- [x] Probar concurrencia
+      **Verificación**: dos pagos distintos emitidos con `Promise.all` en simultáneo real contra Firebase — sacaron `DD-2026-0002` y `DD-2026-0003`, sin colisión.
+- [x] Evitar números duplicados
+      **Verificación**: mismo test — números distintos confirmados.
+- [x] Definir comportamiento si la operación falla
+      **Verificación**: si la transacción de Firestore aborta (contención, dato inconsistente), no se crea nada — ni pago emitido, ni comprobante, ni cambio en el contador. El Route Handler devuelve 404/409/500 con mensaje claro, probado con: pago inexistente, pago ya emitido (409, probado en vivo), cliente inexistente.
 
 ### Comprobantes
 
-- [ ] Crear colección `receipts`
-- [ ] Congelar datos del cliente mediante snapshot
-- [ ] Congelar importe, concepto, período y medio
-- [ ] No permitir edición después de emisión
-- [ ] No permitir eliminación
-- [ ] Crear anulación con motivo
-- [ ] Registrar usuario y fecha de anulación
-- [ ] Crear PDF con jsPDF
-  - [ ] Agregar logo y datos de DelgadoDev
-  - [ ] Agregar leyenda de comprobante interno
-  - [ ] Probar descarga del PDF
-  - [ ] Probar impresión
+- [x] Crear colección `receipts`
+- [x] Congelar datos del cliente mediante snapshot
+      **Verificación**: `customerSnapshot` se lee dentro de la misma transacción y se copia al comprobante — no es una referencia viva al cliente.
+- [x] Congelar importe, concepto, período y medio
+- [x] No permitir edición después de emisión
+      **Verificación**: no existe ningún Route Handler de edición de `receipts` (nunca se creó); y `PATCH /api/admin/payments/[id]` devuelve 409 si el pago ya no está `"registrado"` — probado en vivo.
+- [x] No permitir eliminación
+      **Verificación**: no existe ningún endpoint DELETE para `receipts` ni `payments`, por diseño.
+- [x] Crear anulación con motivo
+      **Verificación**: `POST /api/admin/receipts/[id]/void` exige `reason`, probado en vivo (200, y doble anulación → 409).
+- [x] Registrar usuario y fecha de anulación
+      **Verificación**: `voidedBy`/`voidedAt` seteados en la transacción de anulación, confirmado leyendo el doc real tras la prueba.
+- [~] Crear PDF con jsPDF
+  - [x] Agregar logo y datos de DelgadoDev
+        **Nota**: usa `public/assets/icons/logo-mark.png` ya existente en el sitio. Los datos comerciales de DelgadoDev (CUIT, dirección) siguen como "A definir" en Decisiones pendientes — no se inventó ningún dato fiscal, el PDF solo trae nombre y los datos del pago/cliente.
+  - [x] Agregar leyenda de comprobante interno
+        **Verificación**: texto fijo "no reemplaza una factura fiscal" en el PDF.
+  - [!] Probar descarga del PDF
+    **Bloqueado**: requiere abrir el navegador — no se probó visualmente en esta sesión. Pendiente para Cristian o el pase final.
+  - [!] Probar impresión
+    **Bloqueado**: mismo motivo — pendiente de prueba manual.
 
 ### Transacción crítica
 
-- [ ] Validar sesión y permisos
-- [ ] Validar datos
-- [ ] Incrementar contador
-- [ ] Crear pago
-- [ ] Crear comprobante
-- [ ] Actualizar suscripción
-- [ ] Crear registro de auditoría
-- [ ] Confirmar que todo sea atómico
+- [x] Validar sesión y permisos
+- [x] Validar datos
+- [x] Incrementar contador
+- [x] Crear pago
+      **Nota**: el pago ya existe antes de la transacción (se crea en `POST /api/admin/payments` con `status: "registrado"`); la transacción crítica lo pasa a `"emitido"`.
+- [x] Crear comprobante
+- [x] Actualizar suscripción
+      **Verificación**: si el pago tiene `subscriptionId`, la misma transacción avanza `nextDueDate` (reutilizando `calculateNextDueDate` de la Etapa 5) y marca `lastPaymentAt`.
+- [x] Crear registro de auditoría
+      **Verificación**: `auditLogs` con `action: "receipt.issue"` / `"receipt.void"` — confirmado que se crearon los documentos reales en la prueba.
+- [x] Confirmar que todo sea atómico
+      **Verificación**: todo corre dentro de un único `db.runTransaction()`; si algo falla a mitad de camino, Firestore descarta todos los cambios de esa transacción.
 
 **Criterio de cierre**:
 
-- [ ] No hay comprobantes duplicados
-- [ ] No hay pagos parciales creados por errores
-- [ ] Los comprobantes emitidos son inmutables
-- [ ] La anulación queda documentada
+- [x] No hay comprobantes duplicados
+- [x] No hay pagos parciales creados por errores
+- [x] Los comprobantes emitidos son inmutables
+- [x] La anulación queda documentada
+
+**Pendiente para el pase final**: probar descarga e impresión del PDF en el navegador (visual, no automatizable desde este entorno).
 
 ---
 
@@ -486,15 +509,16 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                                                               | Responsable       |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                                                | Claude            |
-| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                                           | Claude            |
-| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10                                    | Claude + Cristian |
-| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron                                    | Claude            |
-| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                              | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado                             | Claude            |
-| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                      | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore                         | Claude            |
-| 2026-08-01 | 5     | `/admin/subscriptions`: alta, edición, badges de vencimiento, renovación manual con cálculo de próximo vencimiento server-side                                           | Solo `pnpm build` + `pnpm lint` (sin test en vivo, por pedido de Cristian) — verificación funcional diferida al pase final | Claude            |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                          | Verificación                                                                                                                                 | Responsable       |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                       | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                                                                  | Claude            |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada  | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                                                             | Claude            |
+| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview      | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10                                                      | Claude + Cristian |
+| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                               | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron                                                      | Claude            |
+| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                               | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado                                               | Claude            |
+| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                       | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore                                           | Claude            |
+| 2026-08-01 | 5     | `/admin/subscriptions`: alta, edición, badges de vencimiento, renovación manual con cálculo de próximo vencimiento server-side                                            | Solo `pnpm build` + `pnpm lint` (sin test en vivo, por pedido de Cristian) — verificación funcional diferida al pase final                   | Claude            |
+| 2026-08-01 | 6     | `/admin/payments`: pagos, transacción crítica de emisión de comprobante (numeración `DD-AAAA-0001`, snapshot, auditoría, avance de suscripción), anulación, PDF con jsPDF | 14 pruebas en vivo enfocadas en la transacción crítica — incluye concurrencia real con `Promise.all`. Datos de prueba y contador restaurados | Claude            |
 
 ## Decisiones pendientes
 
