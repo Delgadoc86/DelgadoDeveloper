@@ -10,6 +10,7 @@ import { PaymentForm } from "./payment-form";
 import { IssueReceiptButton } from "./issue-receipt-button";
 import { VoidReceiptButton } from "./void-receipt-button";
 import { ReceiptPdfButton } from "./receipt-pdf-button";
+import { WhatsappButton } from "./whatsapp-button";
 
 export function PaymentsPanel({
   payments,
@@ -81,6 +82,7 @@ export function PaymentsPanel({
                   Comprobante {receipt.number}
                 </span>
                 <ReceiptPdfButton receipt={receipt} />
+                <WhatsappButton receipt={receipt} />
                 <VoidReceiptButton receiptId={receipt.id} />
               </div>
             )}

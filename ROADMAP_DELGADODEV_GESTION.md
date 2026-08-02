@@ -406,20 +406,34 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 7 — Envío rápido por WhatsApp
 
-- [ ] Normalizar número argentino
-- [ ] Crear mensaje automático (cliente, concepto, importe, período, número de comprobante)
-- [ ] Crear botón para abrir WhatsApp
-- [ ] Descargar o compartir PDF antes de abrir WhatsApp
-- [ ] Probar flujo en Android
-- [ ] Probar flujo en escritorio con WhatsApp Web
-- [ ] Definir comportamiento cuando falta teléfono
-- [ ] No integrar todavía API oficial automática
+> Sin batería de pruebas en vivo (no toca datos financieros ni transacciones — solo arma un mensaje y un PDF ya generado en la Etapa 6). Lo que sí queda pendiente es probar la interacción real en un navegador/teléfono, que no se puede automatizar desde acá.
+
+- [x] Normalizar número argentino
+      **Nota**: reutiliza `normalizePhoneForWhatsapp` de la Etapa 4 — el teléfono ya queda normalizado en `receipt.customerSnapshot.phone` desde que se emite el comprobante.
+- [x] Crear mensaje automático (cliente, concepto, importe, período, número de comprobante)
+      **Verificación**: `src/lib/whatsapp.ts` (`buildWhatsappMessage`) — incluye los 5 datos pedidos.
+- [x] Crear botón para abrir WhatsApp
+- [x] Descargar o compartir PDF antes de abrir WhatsApp
+      **Nota**: usa Web Share API con archivos cuando está disponible (Android/Chrome mobile — comparte PDF + texto en un solo paso, directo al picker con WhatsApp); si no está disponible (escritorio), descarga el PDF y abre `wa.me` con el mensaje, para adjuntar a mano en el chat.
+- [!] Probar flujo en Android
+  **Bloqueado**: necesita un teléfono real, no se puede probar desde este entorno.
+- [!] Probar flujo en escritorio con WhatsApp Web
+  **Bloqueado**: necesita un navegador real con sesión de WhatsApp Web, no se puede probar desde acá.
+- [x] Definir comportamiento cuando falta teléfono
+      **Verificación**: `hasUsablePhone()` — si el teléfono del comprobante no tiene el formato `549...` esperado, el botón ni siquiera se muestra, aparece un aviso de que hay que editar el cliente primero.
+- [x] No integrar todavía API oficial automática
+      **Verificación**: solo se usa el link público `wa.me`, ningún SDK ni API de WhatsApp Business.
 
 **Criterio de cierre**:
 
-- [ ] Cristian puede generar y enviar un comprobante en pocos pasos
-- [ ] El mensaje utiliza el número correcto
-- [ ] El PDF corresponde al pago seleccionado
+- [~] Cristian puede generar y enviar un comprobante en pocos pasos
+  **Nota**: mecanismo construido (un solo botón dispara PDF + WhatsApp); falta la confirmación manual de que se siente "en pocos pasos" en el uso real.
+- [x] El mensaje utiliza el número correcto
+      **Verificación**: usa `receipt.customerSnapshot.phone`, el mismo congelado en el comprobante al emitirlo (no una referencia viva al cliente que pudo cambiar después).
+- [x] El PDF corresponde al pago seleccionado
+      **Verificación**: `buildReceiptPdf(receipt)` recibe el objeto `receipt` exacto de esa fila del panel, mismo helper que ya usa el botón de descarga de la Etapa 6.
+
+**Pendiente para el pase final**: probar el flujo real en Android y en escritorio con WhatsApp Web.
 
 ---
 
@@ -519,6 +533,7 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 | 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                       | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore                                           | Claude            |
 | 2026-08-01 | 5     | `/admin/subscriptions`: alta, edición, badges de vencimiento, renovación manual con cálculo de próximo vencimiento server-side                                            | Solo `pnpm build` + `pnpm lint` (sin test en vivo, por pedido de Cristian) — verificación funcional diferida al pase final                   | Claude            |
 | 2026-08-01 | 6     | `/admin/payments`: pagos, transacción crítica de emisión de comprobante (numeración `DD-AAAA-0001`, snapshot, auditoría, avance de suscripción), anulación, PDF con jsPDF | 14 pruebas en vivo enfocadas en la transacción crítica — incluye concurrencia real con `Promise.all`. Datos de prueba y contador restaurados | Claude            |
+| 2026-08-01 | 7     | Botón "Enviar por WhatsApp" en cada comprobante: mensaje automático + PDF (Web Share API en mobile, descarga + wa.me en escritorio)                                       | Solo `pnpm build` + `pnpm lint` — no toca datos financieros. Prueba real en Android/WhatsApp Web queda pendiente                             | Claude            |
 
 ## Decisiones pendientes
 
