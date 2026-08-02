@@ -294,24 +294,37 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 5 — Suscripciones y vencimientos
 
-- [ ] Crear colección `subscriptions`
-- [ ] Vincular cliente y producto
-- [ ] Registrar importe acordado
-- [ ] Registrar frecuencia
-- [ ] Registrar próxima fecha de vencimiento
-- [ ] Estados: activa, pendiente, vencida, pausada, cancelada
-- [ ] Registrar último pago
-- [ ] Calcular próximo vencimiento desde servidor
-- [ ] Evitar arrays crecientes de historial
-- [ ] Obtener historial consultando pagos vinculados
-- [ ] Crear listado de próximos vencimientos
-- [ ] Crear listado de suscripciones vencidas
+> Por pedido de Cristian, esta etapa se implementó sin la suite de pruebas en vivo contra Firebase real que se hizo en las etapas 0-4. El código está escrito y pasa `pnpm build` + `pnpm lint`, pero la verificación funcional (crear, editar, renovar, listados de vencimientos) queda para el pase de pruebas consolidado al final del roadmap. Por eso los ítems quedan en `[~]`, no en `[x]`.
+
+- [~] Crear colección `subscriptions`
+- [~] Vincular cliente y producto
+  **Nota**: `customerId`/`productId`, validados contra documentos existentes al crear (`404` si no existen).
+- [~] Registrar importe acordado
+- [~] Registrar frecuencia
+  **Nota**: `mensual` | `anual` | `unico`.
+- [~] Registrar próxima fecha de vencimiento
+- [~] Estados: activa, pendiente, vencida, pausada, cancelada
+- [~] Registrar último pago
+  **Nota**: implementado como acción "Registrar pago (avanza vencimiento)" — placeholder manual hasta que exista `payments` en la Etapa 6, que disparará esto mismo automáticamente en vez de un botón.
+- [~] Calcular próximo vencimiento desde servidor
+  **Nota**: `src/lib/subscriptions.ts` (`calculateNextDueDate`), usado por `POST /api/admin/subscriptions/[id]/renew` — nunca se confía en una fecha calculada del lado cliente.
+- [x] Evitar arrays crecientes de historial
+      **Verificación**: `SubscriptionRecord` no tiene ningún campo de array de historial embebido, por diseño.
+- [!] Obtener historial consultando pagos vinculados
+  **Bloqueado**: no hay nada que consultar todavía — `payments` no existe hasta la Etapa 6. Se retoma ahí.
+- [~] Crear listado de próximos vencimientos
+  **Nota**: badge "Próxima a vencer" (próximos 7 días) en `subscriptions-panel.tsx`.
+- [~] Crear listado de suscripciones vencidas
+  **Nota**: badge "Vencida" cuando `nextDueDate` ya pasó, calculado en cliente sobre datos leídos server-side — no hay automatización todavía que cambie el `status` solo (eso es Etapa 9/futuro).
 
 **Criterio de cierre**:
 
-- [ ] Cada servicio recurrente tiene su vencimiento
-- [ ] Los pagos futuros podrán actualizar la suscripción correctamente
-- [ ] No existe duplicación innecesaria de historial
+- [~] Cada servicio recurrente tiene su vencimiento
+- [~] Los pagos futuros podrán actualizar la suscripción correctamente
+  **Nota**: el mecanismo ya existe (`calculateNextDueDate` + endpoint de renovación); falta que la Etapa 6 lo dispare desde un pago real en vez del botón manual.
+- [x] No existe duplicación innecesaria de historial
+
+**Pendiente para el pase final de pruebas**: crear/editar/renovar una suscripción real, confirmar los badges de vencimiento, confirmar que `unico` no permite renovar.
 
 ---
 
@@ -473,14 +486,15 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## Registro de avances
 
-| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                                       | Responsable       |
-| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- | ----------------- |
-| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                        | Claude            |
-| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                   | Claude            |
-| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10            | Claude + Cristian |
-| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron            | Claude            |
-| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                              | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado     | Claude            |
-| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                      | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore | Claude            |
+| Fecha      | Etapa | Cambio realizado                                                                                                                                                         | Verificación                                                                                                               | Responsable       |
+| ---------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------- |
+| 2026-08-01 | 0     | Rama creada, build/lint verificados, deploy en vivo confirmado, roadmap versionado, convención de env vars definida                                                      | `pnpm build` y `pnpm lint` OK; fetch a delgadodev.com.ar OK                                                                | Claude            |
+| 2026-08-01 | 1     | Firebase `delgadodevgestion` conectado: SDKs instalados, `client.ts`/`admin.ts` creados, `firestore.rules` escrito, `adminUsers/{uid}` creado, conexión local verificada | `auth.getUser()` y lectura/escritura Firestore OK vía Admin SDK con `.env.local`                                           | Claude            |
+| 2026-08-01 | 1     | Cristian publica `firestore.rules`, confirma Hosting desactivado, carga env vars en Vercel; se corrige bug de init eager de Admin SDK que rompía el build de Preview     | Build local OK tras el fix; verificación en Vercel Preview diferida a antes de Etapa 10                                    | Claude + Cristian |
+| 2026-08-01 | 2     | Autenticación completa de `/admin`: login, sesión con cookie httpOnly, logout, `proxy.ts`, layout protegido                                                              | Suite de 11 pruebas reales contra `pnpm dev` (Firebase real, sin mocks) — todas pasaron                                    | Claude            |
+| 2026-08-01 | 3     | `/admin/apps` + `/descargar/[slug]`: PresuFácil y Mi Almacén ya usan rutas estables resueltas por Firestore                                                              | Suite de 9 pruebas reales — cambio de enlace sin redeploy confirmado; doc de prueba restaurado                             | Claude            |
+| 2026-08-01 | 4     | `/admin/customers` y `/admin/products`: alta/edición/búsqueda/desactivación de clientes, catálogo de 6 productos sembrado, vínculo cliente↔producto                      | Suite de 17 pruebas reales; se detectó y resolvió una dependencia de índice compuesto de Firestore                         | Claude            |
+| 2026-08-01 | 5     | `/admin/subscriptions`: alta, edición, badges de vencimiento, renovación manual con cálculo de próximo vencimiento server-side                                           | Solo `pnpm build` + `pnpm lint` (sin test en vivo, por pedido de Cristian) — verificación funcional diferida al pase final | Claude            |
 
 ## Decisiones pendientes
 

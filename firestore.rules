@@ -35,10 +35,14 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Todo lo demás queda cerrado por defecto. Cada colección (subscriptions,
-    // payments, counters, receipts, auditLogs, settings) recibe sus propias
-    // reglas explícitas en la etapa del roadmap en la que se construye, en
-    // vez de abrir un acceso genérico para colecciones que todavía no existen.
+    match /subscriptions/{subscriptionId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Todo lo demás queda cerrado por defecto. Cada colección (payments,
+    // counters, receipts, auditLogs, settings) recibe sus propias reglas
+    // explícitas en la etapa del roadmap en la que se construye, en vez de
+    // abrir un acceso genérico para colecciones que todavía no existen.
     match /{document=**} {
       allow read, write: if false;
     }
