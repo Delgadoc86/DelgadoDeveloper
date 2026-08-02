@@ -2,7 +2,7 @@ import "server-only";
 
 import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
-import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import { initializeFirestore, type Firestore } from "firebase-admin/firestore";
 
 function getAdminApp(): App {
   const existingApp = getApps()[0];
@@ -39,6 +39,10 @@ export function getAdminAuth(): Auth {
 }
 
 export function getAdminDb(): Firestore {
-  dbInstance ??= getFirestore(getAdminApp());
+  // preferRest evita el transporte gRPC por defecto del SDK: en el runtime
+  // serverless de Vercel esas conexiones pueden colgarse/fallar (Auth usa
+  // REST y funciona bien; Firestore por default usa gRPC), asi que se fuerza
+  // HTTPS/REST tambien para Firestore.
+  dbInstance ??= initializeFirestore(getAdminApp(), { preferRest: true });
   return dbInstance;
 }
