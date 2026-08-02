@@ -14,14 +14,14 @@ import { WhatsappButton } from "./whatsapp-button";
 
 export function PaymentsPanel({
   payments,
-  receiptsByPaymentId,
+  receiptsById,
   customers,
   products,
   subscriptions,
   initialShowForm = false,
 }: {
   payments: PaymentRecord[];
-  receiptsByPaymentId: Record<string, ReceiptRecord>;
+  receiptsById: Record<string, ReceiptRecord>;
   customers: CustomerRecord[];
   products: ProductRecord[];
   subscriptions: SubscriptionRecord[];
@@ -56,9 +56,7 @@ export function PaymentsPanel({
       )}
 
       {payments.map((payment) => {
-        const receipt = payment.receiptId
-          ? receiptsByPaymentId[payment.receiptId]
-          : undefined;
+        const receipt = payment.receiptId ? receiptsById[payment.receiptId] : undefined;
         return (
           <div
             key={payment.id}

@@ -51,7 +51,10 @@ export default async function AdminPaymentsPage({
     };
   });
 
-  const receiptsByPaymentId: Record<string, ReceiptRecord> = {};
+  // Ojo: se indexa por receipt.id (asi es como PaymentsPanel lo busca, via
+  // payment.receiptId), no por receipt.paymentId — son colecciones
+  // distintas con IDs distintos, no intercambiables.
+  const receiptsById: Record<string, ReceiptRecord> = {};
   for (const doc of receiptsSnapshot.docs) {
     const data = doc.data();
     const receipt: ReceiptRecord = {
@@ -70,7 +73,7 @@ export default async function AdminPaymentsPage({
       voidedBy: data.voidedBy ?? null,
       voidReason: data.voidReason ?? null,
     };
-    receiptsByPaymentId[receipt.paymentId] = receipt;
+    receiptsById[receipt.id] = receipt;
   }
 
   const customers: CustomerRecord[] = customersSnapshot.docs.map((doc) => {
@@ -139,7 +142,7 @@ export default async function AdminPaymentsPage({
 
       <PaymentsPanel
         payments={payments}
-        receiptsByPaymentId={receiptsByPaymentId}
+        receiptsById={receiptsById}
         customers={customers}
         products={products}
         subscriptions={subscriptions}
