@@ -152,6 +152,26 @@ Handlers, que ignora estas reglas).
   mutación posible es la anulación (con motivo).
 - Clientes nunca se eliminan, solo se desactivan.
 
+## Troubleshooting conocido
+
+**500 en `/admin/login` o `/api/auth/session` solo en producción (Vercel),
+nunca en local** (`pnpm dev` ni `pnpm build && pnpm start`): revisar el log
+del error en Vercel antes que nada — el mensaje real importa más que
+cualquier suposición (ver el incidente real más abajo como ejemplo de por
+qué). En Vercel → proyecto → Logs (o el deployment → Functions).
+
+**Incidente real (2026-08-01)**: al desplegar por primera vez, ese mismo
+error apareció con este mensaje: `Error [ERR_REQUIRE_ESM]: require() of ES
+Module .../jose/dist/webapi/index.js ... not supported`. Causa:
+`firebase-admin/auth` depende de `jwks-rsa`, que hace `require()` de
+`jose`; `jose@6` dejó el build CommonJS (quedó ESM puro), lo que rompe ese
+`require()` específicamente en el bundling serverless de Vercel (no se
+reproducía en ningún entorno local). Solución aplicada: fijar `jose` en
+`^5` (última mayor con build CJS) vía `overrides` en `pnpm-workspace.yaml`.
+Si en el futuro se actualiza `firebase-admin` y este override deja de hacer
+falta (porque `jwks-rsa` actualizó su propio import), se puede sacar — pero
+solo después de confirmar en un deploy de Preview, no directo en producción.
+
 ## Mantenimiento y backups
 
 - **Backup manual**: `node scripts/export-firestore-backup.mjs` (necesita

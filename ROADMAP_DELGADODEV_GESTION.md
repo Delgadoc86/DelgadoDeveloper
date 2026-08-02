@@ -532,14 +532,14 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 
 ## ETAPA 10 — Deploy y documentación
 
-- [!] Fusionar rama solamente después de aprobación
-  **Bloqueado — requiere aprobación explícita de Cristian**, es la propia regla del roadmap. No se hace sin confirmación separada.
-- [!] Configurar variables definitivas en Vercel Production
-  **Nota**: ya cargadas desde la Etapa 1 (Cristian confirmó). Pendiente una revisión final antes del merge (ver Etapa 9).
-- [!] Desplegar
-  **Bloqueado**: depende del merge a `main` (Vercel despliega producción automáticamente desde ahí).
-- [!] Probar producción
-  **Bloqueado**: depende del deploy.
+- [x] Fusionar rama solamente después de aprobación
+      **Verificación**: Cristian aprobó explícitamente vía pregunta directa ("merge lo hacés vos, pusheo yo"). Merge `--no-ff` de `feature/delgadodev-gestion` a `main`, sin conflictos (main no se había movido desde que se creó la rama).
+- [x] Configurar variables definitivas en Vercel Production
+      **Verificación**: ya cargadas desde la Etapa 1.
+- [x] Desplegar
+      **Verificación**: push a `main` disparó el deploy automático en Vercel.
+- [x] Probar producción
+      **Verificación**: se encontró un bug real que **no aparecía en ningún entorno local** — `POST /api/auth/session` y `GET /admin/login` devolvían 500 en producción. Cristian pasó el log real de Vercel, que reveló la causa: `firebase-admin/auth` depende de `jwks-rsa`, que hace `require()` de `jose`; `jose@6` es ESM puro (sin build CommonJS), lo que rompe ese `require()` específicamente en el bundling serverless de Vercel (no en `pnpm dev` ni en `pnpm build && pnpm start` locales, que no habían expuesto el problema). Un primer intento de arreglo (forzar transporte REST en Firestore, sospechando un problema de gRPC) **no era la causa real** y no lo solucionó — quedó registrado como intento fallido antes de llegar al log real. Fix real: `pnpm-workspace.yaml` fija `jose` en `^5` (última mayor con build CJS) vía `overrides`. Reverificado contra producción real después del fix: login, cookie de sesión, `/admin` autenticado y logout — todos los checks pasaron.
 - [x] Actualizar README
       **Verificación**: `README.md` ya no dice "sin base de datos" (afirmación desactualizada) — ahora aclara que el sitio público sigue sin CMS/DB pero el panel privado sí tiene Firestore propio, con la estructura de carpetas actualizada (`(marketing)`, `admin/`, `api/admin`, `api/auth`, `descargar/[slug]`) y referencias a `PANEL_ADMIN.md`.
 - [x] Documentar recuperación de acceso
@@ -586,6 +586,7 @@ El sufijo `_GESTION_` es deliberado: evita colisión si en el futuro se conecta 
 | 2026-08-01 | 8     | Dashboard tipo "power BI" (KPIs, filtros, accesos rápidos, vencimientos); se encontró y corrigió que `/admin` heredaba el shell público y usaba clases de color que no existen en el sitio (siempre oscuro) | Verificado con capturas reales (Playwright headless temporal) en mobile y desktop, antes/después del fix                                     | Claude            |
 | 2026-08-01 | 9     | CSRF (Origin check en proxy.ts), auditLogs extendido a todas las mutaciones, endpoint de debug eliminado, script de backup de Firestore, App Check wireado (opcional)                                       | 9 pruebas de seguridad en vivo + Lighthouse en producción (88/96/100/100) + capturas mobile/desktop/home pública                             | Claude            |
 | 2026-08-01 | 10    | Documentación final: `PANEL_ADMIN.md` (guías de uso, estructura de Firestore, seguridad, mantenimiento) + `README.md` actualizado                                                                           | Build/lint OK. Merge a `main` y deploy quedan pendientes de aprobación explícita de Cristian                                                 | Claude            |
+| 2026-08-01 | 10    | Merge a `main` (aprobado por Cristian) y deploy a producción. Se encontró y resolvió un bug real solo reproducible en Vercel (`jose@6` ESM rompe `jwks-rsa` en el bundling serverless)                      | Confirmado con el log real de Vercel (Cristian) + 6 checks contra producción real tras el fix (`jose` fijado en `^5`)                        | Claude + Cristian |
 
 ## Decisiones pendientes
 
