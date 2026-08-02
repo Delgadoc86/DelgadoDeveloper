@@ -189,7 +189,7 @@ export default async function AdminDashboardPage({
   const ingresosDeltaUp = ingresosDelta >= 0;
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-8 pb-16">
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-8 pb-16 lg:max-w-5xl">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="bg-accent text-accent-foreground flex size-9 items-center justify-center rounded-full text-sm font-semibold">
@@ -266,7 +266,7 @@ export default async function AdminDashboardPage({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile
             icon={<Receipt className="size-4" />}
             label="Cantidad de pagos"

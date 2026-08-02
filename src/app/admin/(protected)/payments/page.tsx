@@ -133,7 +133,7 @@ export default async function AdminPaymentsPage({
   });
 
   return (
-    <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4">
+    <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4 lg:max-w-3xl">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Pagos y comprobantes</h1>
         <div className="flex items-center gap-3">

@@ -68,7 +68,7 @@ export default async function AdminSubscriptionsPage() {
   });
 
   return (
-    <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4">
+    <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4 lg:max-w-3xl">
       <div className="flex items-center justify-between">
         <h1 className="text-lg font-semibold">Suscripciones y vencimientos</h1>
         <div className="flex items-center gap-3">
