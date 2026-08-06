@@ -7,6 +7,20 @@ const nextConfig: NextConfig = {
     "localhost",
     "127.0.0.1",
   ],
+  async redirects() {
+    return [
+      {
+        source: "/proyectos/presufacil",
+        destination: "/proyectos/presupdf",
+        permanent: true,
+      },
+      {
+        source: "/descargar/presufacil",
+        destination: "/descargar/presupdf",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

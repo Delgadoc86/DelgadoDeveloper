@@ -129,6 +129,11 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <h1 className="text-foreground mt-2 max-w-2xl text-4xl font-semibold text-balance sm:text-5xl">
               {project.name}
             </h1>
+            {project.previousName ? (
+              <p className="text-foreground-muted mt-1 text-sm">
+                Antes {project.previousName}
+              </p>
+            ) : null}
             <p className="text-foreground-muted mt-4 max-w-xl text-lg">
               {project.tagline}
             </p>
@@ -144,7 +149,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 {project.links.download ? (
                   <DownloadButton
                     href={project.links.download}
-                    projectSlug={project.slug}
+                    analyticsId={project.analyticsId ?? project.slug}
                   />
                 ) : null}
                 {project.links.demo ? (

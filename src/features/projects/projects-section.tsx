@@ -11,7 +11,7 @@ export function ProjectsSection() {
         <SectionHeading
           eyebrow="Proyectos"
           title="Apps que ya podés descargar y probar"
-          description="Mi Almacén (para comercios de barrio) y PresuFácil (para oficios y trabajadores independientes) son apps Android que ya podés descargar. También sumé Catálogo Autos, un sitio web para agencias de autos en Mendoza, como ejemplo de desarrollo a medida."
+          description="Mi Almacén (para comercios de barrio) y PresuPDF, antes PresuFácil (para oficios y trabajadores independientes), son apps Android que ya podés descargar. También sumé Catálogo Autos, un sitio web para agencias de autos en Mendoza, como ejemplo de desarrollo a medida."
         />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

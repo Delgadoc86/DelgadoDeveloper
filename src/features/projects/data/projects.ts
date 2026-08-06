@@ -7,13 +7,15 @@ import type { Project } from "@/types/project";
  */
 export const projects: Project[] = [
   {
-    slug: "presufacil",
-    name: "PresuFácil",
+    slug: "presupdf",
+    name: "PresuPDF",
+    previousName: "PresuFácil",
+    analyticsId: "presufacil",
     category: "App mobile · Presupuestos",
     platform: "mobile",
-    tagline: "Presupuestos profesionales, sin fricción, desde el celular.",
+    tagline: "Presupuestos profesionales listos para enviar.",
     description:
-      "App mobile para crear, guardar y compartir presupuestos profesionales en minutos, pensada para oficios y trabajadores independientes.",
+      "PresuPDF, antes PresuFácil, es una app mobile para crear, guardar y compartir presupuestos profesionales en minutos, pensada para oficios y trabajadores independientes.",
     problem:
       "Muchos trabajadores independientes y oficios —plomeros, gasistas, electricistas, albañiles, mecánicos, jardineros, diseñadores y otros— hacen presupuestos de forma improvisada: por WhatsApp, en notas, en papel o copiando mensajes anteriores. Eso genera pérdida de tiempo, poca prolijidad, errores en los datos, presupuestos difíciles de reencontrar y una imagen menos profesional frente al cliente.",
     targetUser:
@@ -64,32 +66,32 @@ export const projects: Project[] = [
     ],
     coverImage: {
       src: "/assets/projects/presu/home.webp",
-      alt: "Home principal de PresuFácil con accesos rápidos y resumen del mes",
+      alt: "Home principal de PresuPDF con accesos rápidos y resumen del mes",
     },
     gallery: [
       {
         src: "/assets/projects/presu/login.webp",
-        alt: "Pantalla de inicio de sesión de PresuFácil",
+        alt: "Pantalla de inicio de sesión de PresuPDF",
         caption: "Iniciá sesión",
       },
       {
         src: "/assets/projects/presu/crear.webp",
-        alt: "Creación de un nuevo presupuesto en PresuFácil",
+        alt: "Creación de un nuevo presupuesto en PresuPDF",
         caption: "Armá el presupuesto",
       },
       {
         src: "/assets/projects/presu/historial.webp",
-        alt: "Historial de presupuestos enviados en PresuFácil",
+        alt: "Historial de presupuestos enviados en PresuPDF",
         caption: "Seguí el historial",
       },
       {
         src: "/assets/projects/presu/pdf.webp",
-        alt: "PDF de presupuesto generado por PresuFácil",
+        alt: "PDF de presupuesto generado por PresuPDF",
         caption: "Compartilo en PDF",
       },
     ],
     links: {
-      download: "/descargar/presufacil",
+      download: "/descargar/presupdf",
       repo: "https://github.com/Delgadoc86/presupuestoapp",
     },
     legalTermsUrl: "/legal/presufacil/terminos-descarga",

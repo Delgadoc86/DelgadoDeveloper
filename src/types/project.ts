@@ -57,4 +57,13 @@ export interface Project {
   links: ProjectLinks;
   /** Ruta a los Términos de descarga y prueba específicos del producto, si aplica. */
   legalTermsUrl?: string;
+  /** Nombre anterior de la marca, mostrado discretamente junto al H1 durante la transición (ej. "PresuFácil"). */
+  previousName?: string;
+  /**
+   * Identificador estable para analytics y para el documento de Firestore
+   * detrás de `/descargar/[slug]`, independiente del `slug` público. Evita
+   * perder continuidad de datos históricos cuando el slug visible cambia
+   * por un rebranding. Si no se define, se usa `slug`.
+   */
+  analyticsId?: string;
 }
