@@ -48,6 +48,14 @@ necesidad de redeploy.
 - `published`: el botón público descarga normalmente.
 - `paused` o `draft`: `/descargar/[slug]` devuelve 404 (no revela el motivo).
 
+**Nota (rebranding 2026-08-06):** la marca pública de "presufacil" pasó a
+llamarse "PresuPDF" y su URL de descarga pública es `/descargar/presupdf`. El
+documento de Firestore, y por lo tanto lo que ves acá en "Aplicaciones", sigue
+llamándose `presufacil` a propósito — no se renombró para no perder el
+historial. `descargar/[slug]/route.ts` traduce `presupdf` → `presufacil` antes
+de consultar Firestore. Si algún día se agrega otra app cuyo slug público
+difiera de su id interno, sumarla a ese mismo mapa.
+
 ### Dar de alta un cliente
 
 `/admin/customers` → "Nuevo cliente", o desde el dashboard → "Nuevo cliente"
