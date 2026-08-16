@@ -7,6 +7,241 @@ import type { Project } from "@/types/project";
  */
 export const projects: Project[] = [
   {
+    slug: "decideser",
+    name: "DecideSer",
+    analyticsId: "decideser",
+    category: "Catálogo web personalizado · Cosmética",
+    platform: "mobile",
+    tagline:
+      "Una experiencia mobile-first para descubrir, comparar y pedir productos Avon y Natura.",
+    description:
+      "Catálogo web personalizado para DecideSer: 266 productos, diseño mobile-first, administración propia y pedido por WhatsApp. Desarrollado con Next.js y Firebase.",
+    problem:
+      "Cientos de productos, pero la experiencia se sentía una base de datos, no un catálogo profesional.",
+    targetUser:
+      "Personas que buscan productos Avon y Natura de forma rápida desde el celular, y el equipo de DecideSer, que necesita mantener el catálogo actualizado sin depender de un desarrollador para cada cambio.",
+    solution:
+      "Plataforma de catálogo digital construida con Next.js y Firebase: home con descubrimiento por categorías y marcas, catálogo con filtros y orden, ficha de producto, pedido por WhatsApp y un panel de administración propio para cargar y mantener los 266 productos.",
+    role: "Desarrollo completo de la plataforma: arquitectura Next.js, modelo de datos en Firestore, catálogo dinámico, panel de administración con autenticación, SEO técnico, performance y preparación de la infraestructura de analítica.",
+    stack: [
+      "Next.js",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "Firebase Auth",
+      "Firestore",
+      "Firebase Storage",
+      "Vercel",
+      "Google Analytics 4 (integración preparada)",
+    ],
+    features: [
+      "Catálogo dinámico",
+      "Categorías dinámicas",
+      "Marcas dinámicas",
+      "Búsqueda",
+      "Filtros",
+      "Ordenamiento",
+      "Disponibilidad",
+      "Ficha de producto",
+      "Mi Pedido persistente",
+      "Pedido por WhatsApp",
+      "Admin V2 protegido con autenticación",
+      "CRUD completo de productos (precio, stock, imagen, marca, categoría, promo, estado)",
+      "SEO dinámico con datos estructurados y sitemap",
+      "Consentimiento de cookies y política de privacidad",
+      "Panel de analítica (BI) propio con métricas de comportamiento",
+    ],
+    uxDecisions:
+      "Mobile-first (375-430px), fotos 1080×1080 como lenguaje visual propio y pedido por WhatsApp, el canal que el usuario ya usa.",
+    status:
+      "En producción en www.decideser.com.ar, con 266 productos reales y admin propio en uso diario.",
+    statusTag: "En producción",
+    results:
+      "Resultados técnicos verificados: catálogo real, performance y SEO medidos con PageSpeed Insights, y un panel de analítica propio que ya registra visitas y clics a WhatsApp. Todavía sin volumen suficiente para sacar conclusiones de negocio.",
+    pendingWork: "Integrar Google Analytics 4.",
+    screenshotsNeeded: [],
+    links: {
+      demo: "https://www.decideser.com.ar",
+      demoLabel: "Ver proyecto en vivo",
+    },
+    coverImage: {
+      src: "/assets/projects/decideser/home.webp",
+      alt: "Home de DecideSer con hero de marcas Avon y Natura y accesos a categorías",
+    },
+    gallery: [
+      {
+        src: "/assets/projects/decideser/categorias.webp",
+        alt: "Sección de categorías en la home de DecideSer: cremas, desodorantes y esmaltes",
+        caption: "Categorías",
+      },
+      {
+        src: "/assets/projects/decideser/marcas.webp",
+        alt: "Sección 'Explorá por marca' con Avon y Natura en la home de DecideSer",
+        caption: "Marcas",
+      },
+      {
+        src: "/assets/projects/decideser/catalogo.webp",
+        alt: "Catálogo de DecideSer en dos columnas con precio y marca de cada producto",
+        caption: "Catálogo",
+      },
+      {
+        src: "/assets/projects/decideser/filtros.webp",
+        alt: "Panel de filtros mobile de DecideSer: disponibilidad, marca, categoría y promociones",
+        caption: "Filtros",
+      },
+      {
+        src: "/assets/projects/decideser/producto.webp",
+        alt: "Ficha de producto de DecideSer con imagen, marca, precio y botón de agregar",
+        caption: "Producto",
+      },
+      {
+        src: "/assets/projects/decideser/pedido.webp",
+        alt: "Mi Pedido en DecideSer con productos, cantidades, total estimado y envío por WhatsApp",
+        caption: "Mi Pedido",
+      },
+      {
+        src: "/assets/projects/decideser/admin.webp",
+        alt: "Panel de administración de DecideSer con listado y búsqueda de productos",
+        caption: "Admin",
+      },
+      {
+        src: "/assets/projects/decideser/analytics.webp",
+        alt: "Panel de analítica propio de DecideSer con métricas de visitas y clics a WhatsApp",
+        caption: "Analytics",
+      },
+    ],
+    caseStudy: {
+      metrics: [
+        { value: "266", label: "productos reales" },
+        { value: "2", label: "marcas principales" },
+        { value: "98", label: "Performance mobile (PageSpeed)" },
+        { value: "100", label: "SEO (PageSpeed)" },
+        { value: "100", label: "Prácticas recomendadas (PageSpeed)" },
+        { value: "96", label: "Accesibilidad (PageSpeed)" },
+      ],
+      metricsNote:
+        "Medido con PageSpeed Insights (mobile). No es un valor fijo ni una certificación.",
+      challengeDetail:
+        "Cada producto se administra con una sola foto cuadrada 1080×1080 en fondo blanco. El desafío: que esa simplicidad se viera profesional, no genérica.",
+      positioning: "De un catálogo tradicional a una experiencia de compra mobile-first.",
+      solutionBlocks: [
+        {
+          number: "01",
+          title: "Mobile first",
+          description:
+            "Pantallas de 375 a 430px, dos columnas de producto y navegación con el pulgar.",
+        },
+        {
+          number: "02",
+          title: "Product-first",
+          description:
+            "Fotos 1080×1080 en blanco como lenguaje visual propio, sin banners ni fotografía editorial.",
+        },
+        {
+          number: "03",
+          title: "Descubrimiento",
+          description:
+            "Categorías, marcas, búsqueda, filtros y orden entre 266 productos.",
+        },
+        {
+          number: "04",
+          title: "Conversión",
+          description: "Ficha de producto, Mi Pedido y cierre por WhatsApp.",
+        },
+        {
+          number: "05",
+          title: "Administración",
+          description:
+            "Admin V2 con CRUD completo: precio, stock, imagen, marca, promo, estado.",
+        },
+        {
+          number: "06",
+          title: "Medición",
+          description:
+            "Panel de BI propio con visitas y clics a WhatsApp. GA4, en preparación.",
+        },
+      ],
+      featureGroups: [
+        {
+          title: "Catálogo",
+          items: [
+            "Catálogo dinámico",
+            "Categorías dinámicas",
+            "Marcas dinámicas",
+            "Búsqueda",
+            "Filtros",
+            "Ordenamiento",
+            "Disponibilidad",
+          ],
+        },
+        {
+          title: "Conversión",
+          items: ["Ficha de producto", "Mi Pedido persistente", "Pedido por WhatsApp"],
+        },
+        {
+          title: "Administración",
+          items: [
+            "Admin V2 protegido",
+            "Autenticación con permiso de administrador",
+            "Subida de imágenes",
+            "CRUD completo de productos",
+          ],
+        },
+        {
+          title: "SEO",
+          items: [
+            "Renderizado en servidor",
+            "Metadata dinámica",
+            "Canonical",
+            "Datos estructurados de producto",
+            "Datos estructurados de breadcrumb",
+            "Sitemap dinámico",
+            "Páginas de categorías y marcas",
+          ],
+        },
+        {
+          title: "Legal y privacidad",
+          items: [
+            "Consentimiento de cookies",
+            "Política de privacidad",
+            "Derechos del consumidor",
+          ],
+        },
+        {
+          title: "Analítica",
+          items: [
+            "Panel de BI propio: visitas, productos vistos y clics a WhatsApp",
+            "Integración con Google Analytics 4, en preparación",
+          ],
+        },
+      ],
+      performance: {
+        note: "Diseño visual sin sacrificar rendimiento.",
+        scores: [
+          { value: "98", label: "Performance" },
+          { value: "96", label: "Accessibility" },
+          { value: "100", label: "Best Practices" },
+          { value: "100", label: "SEO" },
+        ],
+        detail:
+          "Server Components, poco JS de cliente, next/image y Firestore optimizado.",
+        screenshot: {
+          src: "/assets/projects/decideser/pagespeed.webp",
+          alt: "Reporte de PageSpeed Insights de DecideSer: 98 Performance, 96 Accesibilidad, 100 Prácticas recomendadas, 100 SEO",
+        },
+        source:
+          "Medición mobile, PageSpeed Insights. Puede variar con cambios futuros del sitio.",
+      },
+      closingCta: {
+        question:
+          "¿Tu catálogo todavía depende de PDFs, estados de WhatsApp o publicaciones sueltas?",
+        pitch:
+          "Puedo convertirlo en un catálogo web personalizado, como hice con DecideSer.",
+      },
+      cardCtaLabel: "Ver caso de éxito",
+    },
+  },
+  {
     slug: "presupdf",
     name: "PresuPDF",
     previousName: "PresuFácil",

@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   ArrowUpRight,
   ChevronRight,
+  ImageOff,
   Images,
   Lightbulb,
   ListChecks,
@@ -25,6 +26,12 @@ import { GithubIcon } from "@/components/ui/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
 import { DownloadButton } from "@/features/projects/components/download-button";
+import { ChallengeSection } from "@/features/projects/components/case-study/challenge-section";
+import { ClosingCta } from "@/features/projects/components/case-study/closing-cta";
+import { FeatureGroups } from "@/features/projects/components/case-study/feature-groups";
+import { MetricsGrid } from "@/features/projects/components/case-study/metrics-grid";
+import { PerformanceSection } from "@/features/projects/components/case-study/performance-section";
+import { SolutionBlocks } from "@/features/projects/components/case-study/solution-blocks";
 import { projects } from "@/features/projects/data/projects";
 import { buildBreadcrumbJsonLd, buildProjectJsonLd } from "@/lib/seo";
 import { siteConfig } from "@/config/site.config";
@@ -46,7 +53,10 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     return {};
   }
 
-  const seoTitle = `${project.name} — ${project.category}`;
+  const seoTitle = project.caseStudy
+    ? `${project.name} — Caso de éxito | ${siteConfig.name}`
+    : `${project.name} — ${project.category}`;
+  const ogImages = project.coverImage ? [project.coverImage.src] : undefined;
 
   return {
     title: seoTitle,
@@ -65,13 +75,13 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
       url: `${siteConfig.url}/proyectos/${project.slug}`,
       title: seoTitle,
       description: project.description,
-      images: [project.coverImage.src],
+      images: ogImages,
     },
     twitter: {
       card: "summary_large_image",
       title: seoTitle,
       description: project.description,
-      images: [project.coverImage.src],
+      images: ogImages,
     },
   };
 }
@@ -157,7 +167,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     href={project.links.demo}
                     variant={project.links.download ? "secondary" : "primary"}
                   >
-                    Ver demo
+                    {project.links.demoLabel ?? "Ver demo"}
                     <ArrowUpRight className="size-4" aria-hidden />
                   </Button>
                 ) : null}
@@ -186,12 +196,107 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         </Container>
       </section>
 
-      <section className="pb-16">
-        <Container>
-          <FadeIn>
-            {project.platform === "mobile" ? (
-              <div className="bg-background-subtle border-border flex justify-center rounded-2xl border py-12">
-                <div className="border-border relative aspect-9/19 w-56 overflow-hidden rounded-[2rem] border-4 sm:w-64">
+      {project.caseStudy ? (
+        <>
+          <MetricsGrid
+            metrics={project.caseStudy.metrics}
+            note={project.caseStudy.metricsNote}
+          />
+
+          <ChallengeSection
+            problem={project.problem}
+            challengeDetail={project.caseStudy.challengeDetail}
+            positioning={project.caseStudy.positioning}
+          />
+
+          <CoverImage project={project} />
+
+          <SolutionBlocks blocks={project.caseStudy.solutionBlocks} />
+
+          <GallerySection project={project} />
+
+          {project.caseStudy.featureGroups ? (
+            <FeatureGroups groups={project.caseStudy.featureGroups} />
+          ) : null}
+
+          {project.caseStudy.performance ? (
+            <PerformanceSection performance={project.caseStudy.performance} />
+          ) : null}
+
+          <TechnicalDetails project={project} />
+
+          {project.caseStudy.closingCta ? (
+            <ClosingCta
+              question={project.caseStudy.closingCta.question}
+              pitch={project.caseStudy.closingCta.pitch}
+            />
+          ) : null}
+        </>
+      ) : (
+        <>
+          <CoverImage project={project} />
+
+          <GallerySection project={project} />
+
+          <section className="border-border/60 border-t py-12 sm:py-20">
+            <Container>
+              <div className="grid gap-6 sm:grid-cols-2">
+                {getHighlights(project).map((item, index) => (
+                  <FadeIn key={item.label} delay={index * 0.05}>
+                    <div className="border-border h-full rounded-xl border p-5">
+                      <div className="flex items-center gap-3">
+                        <span className="bg-accent-muted text-accent-bright flex size-9 shrink-0 items-center justify-center rounded-lg">
+                          <item.icon className="size-4" aria-hidden />
+                        </span>
+                        <h2 className="text-foreground text-sm font-semibold">
+                          {item.label}
+                        </h2>
+                      </div>
+                      <p className="text-foreground-muted mt-3 text-sm">{item.text}</p>
+                    </div>
+                  </FadeIn>
+                ))}
+              </div>
+            </Container>
+          </section>
+
+          <TechnicalDetails project={project} />
+
+          <section className="border-border/60 border-t py-12 sm:py-16">
+            <Container className="text-center">
+              <FadeIn>
+                <p className="text-foreground-muted mx-auto max-w-md text-sm">
+                  {project.name} es uno de los productos que construí — trabajo en
+                  soluciones similares para otros rubros y plataformas.
+                </p>
+                <Button
+                  href={`mailto:${docsMailto}`}
+                  variant="secondary"
+                  className="mt-5"
+                >
+                  <Mail className="size-4" aria-hidden />
+                  Pedir documentación completa
+                </Button>
+              </FadeIn>
+            </Container>
+          </section>
+        </>
+      )}
+
+      <ContactCta />
+    </>
+  );
+}
+
+function CoverImage({ project }: { project: Project }) {
+  return (
+    <section className="pb-16">
+      <Container>
+        <FadeIn>
+          {project.platform === "mobile" ? (
+            <div className="bg-background-subtle border-border flex justify-center rounded-2xl border py-12">
+              <div className="border-border bg-background relative aspect-9/19 w-56 overflow-hidden rounded-[2rem] border-4 sm:w-64">
+                {project.coverImage ? (
                   <Image
                     src={project.coverImage.src}
                     alt={project.coverImage.alt}
@@ -200,10 +305,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     className="object-cover object-top"
                     priority
                   />
-                </div>
+                ) : (
+                  <CoverImagePlaceholder />
+                )}
               </div>
-            ) : (
-              <div className="border-border bg-background-subtle relative aspect-16/10 w-full overflow-hidden rounded-2xl border">
+            </div>
+          ) : (
+            <div className="border-border bg-background-subtle relative aspect-16/10 w-full overflow-hidden rounded-2xl border">
+              {project.coverImage ? (
                 <Image
                   src={project.coverImage.src}
                   alt={project.coverImage.alt}
@@ -212,175 +321,153 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   className="object-cover object-top"
                   priority
                 />
-              </div>
-            )}
-          </FadeIn>
-        </Container>
-      </section>
+              ) : (
+                <CoverImagePlaceholder />
+              )}
+            </div>
+          )}
+        </FadeIn>
+      </Container>
+    </section>
+  );
+}
 
-      {project.gallery && project.gallery.length > 0 ? (
-        <section className="border-border/60 border-t py-12 sm:py-16">
-          <Container>
-            <FadeIn>
-              <div className="flex items-center gap-2">
-                <Images className="text-accent-bright size-4" aria-hidden />
-                <h2 className="text-foreground text-sm font-semibold">Capturas</h2>
-              </div>
+function CoverImagePlaceholder() {
+  return (
+    <div className="text-foreground-muted flex h-full w-full flex-col items-center justify-center gap-2">
+      <ImageOff className="size-6" aria-hidden />
+      <span className="text-sm">Captura pendiente de carga</span>
+    </div>
+  );
+}
 
-              <div className="mt-6 flex gap-6 overflow-x-auto pb-2">
-                {project.gallery.map((image, index) => (
-                  <div
-                    key={image.src}
-                    className="flex w-40 shrink-0 flex-col items-center gap-3 sm:w-48"
-                  >
-                    {project.platform === "mobile" ? (
-                      <div className="border-border bg-background-subtle relative aspect-9/19 w-full overflow-hidden rounded-[1.5rem] border-4">
-                        <Image
-                          src={image.src}
-                          alt={image.alt}
-                          fill
-                          sizes="192px"
-                          className="object-cover object-top"
-                        />
-                      </div>
-                    ) : (
-                      <div className="border-border bg-background-subtle relative aspect-16/10 w-72 overflow-hidden rounded-xl border sm:w-80">
-                        <Image
-                          src={image.src}
-                          alt={image.alt}
-                          fill
-                          sizes="320px"
-                          className="object-cover object-top"
-                        />
-                      </div>
-                    )}
+function GallerySection({ project }: { project: Project }) {
+  if (!project.gallery || project.gallery.length === 0) {
+    return null;
+  }
 
-                    {image.caption ? (
-                      <p className="text-foreground-muted flex items-center gap-1.5 text-center text-xs">
-                        <span className="text-accent-bright font-mono">
-                          {String(index + 1).padStart(2, "0")}
-                        </span>
-                        {image.caption}
-                      </p>
-                    ) : null}
+  return (
+    <section className="border-border/60 border-t py-12 sm:py-16">
+      <Container>
+        <FadeIn>
+          <div className="flex items-center gap-2">
+            <Images className="text-accent-bright size-4" aria-hidden />
+            <h2 className="text-foreground text-sm font-semibold">Capturas</h2>
+          </div>
+
+          <div className="mt-6 flex gap-6 overflow-x-auto pb-2">
+            {project.gallery.map((image, index) => (
+              <div
+                key={image.src}
+                className="flex w-40 shrink-0 flex-col items-center gap-3 sm:w-48"
+              >
+                {project.platform === "mobile" ? (
+                  <div className="border-border bg-background-subtle relative aspect-9/19 w-full overflow-hidden rounded-[1.5rem] border-4">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      sizes="192px"
+                      className="object-cover object-top"
+                    />
                   </div>
-                ))}
-              </div>
-            </FadeIn>
-          </Container>
-        </section>
-      ) : null}
+                ) : (
+                  <div className="border-border bg-background-subtle relative aspect-16/10 w-72 overflow-hidden rounded-xl border sm:w-80">
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      fill
+                      sizes="320px"
+                      className="object-cover object-top"
+                    />
+                  </div>
+                )}
 
-      <section className="border-border/60 border-t py-12 sm:py-20">
-        <Container>
-          <div className="grid gap-6 sm:grid-cols-2">
-            {getHighlights(project).map((item, index) => (
-              <FadeIn key={item.label} delay={index * 0.05}>
-                <div className="border-border h-full rounded-xl border p-5">
-                  <div className="flex items-center gap-3">
-                    <span className="bg-accent-muted text-accent-bright flex size-9 shrink-0 items-center justify-center rounded-lg">
-                      <item.icon className="size-4" aria-hidden />
+                {image.caption ? (
+                  <p className="text-foreground-muted flex items-center gap-1.5 text-center text-xs">
+                    <span className="text-accent-bright font-mono">
+                      {String(index + 1).padStart(2, "0")}
                     </span>
-                    <h2 className="text-foreground text-sm font-semibold">
-                      {item.label}
-                    </h2>
-                  </div>
-                  <p className="text-foreground-muted mt-3 text-sm">{item.text}</p>
-                </div>
-              </FadeIn>
+                    {image.caption}
+                  </p>
+                ) : null}
+              </div>
             ))}
           </div>
-        </Container>
-      </section>
+        </FadeIn>
+      </Container>
+    </section>
+  );
+}
 
-      <section className="border-border/60 border-t py-12 sm:py-16">
-        <Container>
-          <details className="group">
-            <summary className="text-foreground-muted hover:text-foreground flex cursor-pointer items-center gap-2 text-sm font-medium transition-colors [&::-webkit-details-marker]:hidden">
-              <ChevronRight
-                className="size-4 shrink-0 transition-transform group-open:rotate-90"
-                aria-hidden
-              />
-              Ver detalles técnicos
-            </summary>
+function TechnicalDetails({ project }: { project: Project }) {
+  return (
+    <section className="border-border/60 border-t py-12 sm:py-16">
+      <Container>
+        <details className="group">
+          <summary className="text-foreground-muted hover:text-foreground flex cursor-pointer items-center gap-2 text-sm font-medium transition-colors [&::-webkit-details-marker]:hidden">
+            <ChevronRight
+              className="size-4 shrink-0 transition-transform group-open:rotate-90"
+              aria-hidden
+            />
+            Ver detalles técnicos
+          </summary>
 
-            <div className="mt-8 grid gap-8 sm:grid-cols-2">
-              <div>
-                <div className="flex items-center gap-2">
-                  <ListChecks className="text-accent-bright size-4" aria-hidden />
-                  <h3 className="text-foreground text-sm font-semibold">
-                    Funcionalidades principales
-                  </h3>
-                </div>
-                <ul className="text-foreground-muted mt-3 space-y-1.5 text-sm">
-                  {project.features.map((feature) => (
-                    <li key={feature}>· {feature}</li>
-                  ))}
-                </ul>
+          <div className="mt-8 grid gap-8 sm:grid-cols-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <ListChecks className="text-accent-bright size-4" aria-hidden />
+                <h3 className="text-foreground text-sm font-semibold">
+                  Funcionalidades principales
+                </h3>
               </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <PenTool className="text-accent-bright size-4" aria-hidden />
-                  <h3 className="text-foreground text-sm font-semibold">
-                    Decisiones de UX
-                  </h3>
-                </div>
-                <p className="text-foreground-muted mt-3 text-sm">
-                  {project.uxDecisions}
-                </p>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <Activity className="text-accent-bright size-4" aria-hidden />
-                  <h3 className="text-foreground text-sm font-semibold">Estado actual</h3>
-                </div>
-                <p className="text-foreground-muted mt-3 text-sm">{project.status}</p>
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2">
-                  <ListTodo className="text-accent-bright size-4" aria-hidden />
-                  <h3 className="text-foreground text-sm font-semibold">
-                    Qué falta completar
-                  </h3>
-                </div>
-                <p className="text-foreground-muted mt-3 text-sm">
-                  {project.pendingWork}
-                </p>
-              </div>
-
-              <div className="sm:col-span-2">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="text-accent-bright size-4" aria-hidden />
-                  <h3 className="text-foreground text-sm font-semibold">
-                    Resultados o aprendizajes
-                  </h3>
-                </div>
-                <p className="text-foreground-muted mt-3 text-sm">{project.results}</p>
-              </div>
+              <ul className="text-foreground-muted mt-3 space-y-1.5 text-sm">
+                {project.features.map((feature) => (
+                  <li key={feature}>· {feature}</li>
+                ))}
+              </ul>
             </div>
-          </details>
-        </Container>
-      </section>
 
-      <section className="border-border/60 border-t py-12 sm:py-16">
-        <Container className="text-center">
-          <FadeIn>
-            <p className="text-foreground-muted mx-auto max-w-md text-sm">
-              {project.name} es uno de los productos que construí — trabajo en soluciones
-              similares para otros rubros y plataformas.
-            </p>
-            <Button href={`mailto:${docsMailto}`} variant="secondary" className="mt-5">
-              <Mail className="size-4" aria-hidden />
-              Pedir documentación completa
-            </Button>
-          </FadeIn>
-        </Container>
-      </section>
+            <div>
+              <div className="flex items-center gap-2">
+                <PenTool className="text-accent-bright size-4" aria-hidden />
+                <h3 className="text-foreground text-sm font-semibold">
+                  Decisiones de UX
+                </h3>
+              </div>
+              <p className="text-foreground-muted mt-3 text-sm">{project.uxDecisions}</p>
+            </div>
 
-      <ContactCta />
-    </>
+            <div>
+              <div className="flex items-center gap-2">
+                <Activity className="text-accent-bright size-4" aria-hidden />
+                <h3 className="text-foreground text-sm font-semibold">Estado actual</h3>
+              </div>
+              <p className="text-foreground-muted mt-3 text-sm">{project.status}</p>
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <ListTodo className="text-accent-bright size-4" aria-hidden />
+                <h3 className="text-foreground text-sm font-semibold">
+                  Qué falta completar
+                </h3>
+              </div>
+              <p className="text-foreground-muted mt-3 text-sm">{project.pendingWork}</p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="text-accent-bright size-4" aria-hidden />
+                <h3 className="text-foreground text-sm font-semibold">
+                  Resultados o aprendizajes
+                </h3>
+              </div>
+              <p className="text-foreground-muted mt-3 text-sm">{project.results}</p>
+            </div>
+          </div>
+        </details>
+      </Container>
+    </section>
   );
 }

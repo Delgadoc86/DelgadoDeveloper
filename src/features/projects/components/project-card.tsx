@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ImageOff } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { Project } from "@/types/project";
 
@@ -9,7 +9,9 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const ctaLabel = project.links.download ? "Conocé más y descargá" : "Ver proyecto";
+  const ctaLabel =
+    project.caseStudy?.cardCtaLabel ??
+    (project.links.download ? "Conocé más y descargá" : "Ver proyecto");
 
   return (
     <Link
@@ -32,14 +34,18 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       {project.platform === "mobile" ? (
         <div className="bg-background flex min-h-56 flex-1 items-center justify-center sm:min-h-64">
-          <div className="border-border relative aspect-9/19 h-44 overflow-hidden rounded-[1.75rem] border-4 sm:h-52">
-            <Image
-              src={project.coverImage.src}
-              alt={project.coverImage.alt}
-              fill
-              sizes="180px"
-              className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-            />
+          <div className="border-border bg-background-subtle relative aspect-9/19 h-44 overflow-hidden rounded-[1.75rem] border-4 sm:h-52">
+            {project.coverImage ? (
+              <Image
+                src={project.coverImage.src}
+                alt={project.coverImage.alt}
+                fill
+                sizes="180px"
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <CoverPlaceholder />
+            )}
           </div>
         </div>
       ) : (
@@ -51,13 +57,17 @@ export function ProjectCard({ project }: ProjectCardProps) {
           </div>
 
           <div className="bg-background relative w-full flex-1 overflow-hidden">
-            <Image
-              src={project.coverImage.src}
-              alt={project.coverImage.alt}
-              fill
-              sizes="(min-width: 1024px) 33vw, 100vw"
-              className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
-            />
+            {project.coverImage ? (
+              <Image
+                src={project.coverImage.src}
+                alt={project.coverImage.alt}
+                fill
+                sizes="(min-width: 1024px) 33vw, 100vw"
+                className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <CoverPlaceholder />
+            )}
           </div>
         </div>
       )}
@@ -70,5 +80,14 @@ export function ProjectCard({ project }: ProjectCardProps) {
         />
       </div>
     </Link>
+  );
+}
+
+function CoverPlaceholder() {
+  return (
+    <div className="text-foreground-muted flex h-full w-full flex-col items-center justify-center gap-2">
+      <ImageOff className="size-5" aria-hidden />
+      <span className="text-xs">Captura pendiente</span>
+    </div>
   );
 }

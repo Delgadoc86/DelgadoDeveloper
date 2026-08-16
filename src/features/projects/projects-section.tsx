@@ -10,8 +10,8 @@ export function ProjectsSection() {
       <Container>
         <SectionHeading
           eyebrow="Proyectos"
-          title="Apps que ya podés descargar y probar"
-          description="Mi Almacén (para comercios de barrio) y PresuPDF, antes PresuFácil (para oficios y trabajadores independientes), son apps Android que ya podés descargar. También sumé Catálogo Autos, un sitio web para agencias de autos en Mendoza, como ejemplo de desarrollo a medida."
+          title="De la idea al producto en producción"
+          description="DecideSer es mi caso de estudio más completo: un catálogo digital de cosmética con 266 productos, mobile-first y con panel de administración propio. También sumé Mi Almacén (para comercios de barrio) y PresuPDF, antes PresuFácil (para oficios y trabajadores independientes), apps Android que ya podés descargar, y Catálogo Autos, un sitio web para agencias de autos en Mendoza."
         />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
