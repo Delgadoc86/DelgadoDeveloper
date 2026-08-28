@@ -1,4 +1,5 @@
 import type { PaymentMethod } from "@/types/payment";
+import type { SubscriptionFrequency } from "@/types/subscription";
 
 export interface ReceiptCustomerSnapshot {
   name: string;
@@ -8,11 +9,28 @@ export interface ReceiptCustomerSnapshot {
   email: string | null;
 }
 
+export interface ReceiptProductSnapshot {
+  name: string;
+}
+
+// Se guarda solo cuando el pago está atado a una suscripción (payment.subscriptionId).
+// periodStart/periodEnd son el vencimiento anterior y el nuevo tras este pago —
+// el "período cubierto" por este comprobante — no confundir con `startDate`,
+// que es la fecha de alta de la suscripción en sí (fija, no cambia con cada pago).
+export interface ReceiptSubscriptionSnapshot {
+  frequency: SubscriptionFrequency;
+  startDate: string;
+  periodStart: string;
+  periodEnd: string;
+}
+
 export interface ReceiptRecord {
   id: string;
   number: string;
   paymentId: string;
   customerSnapshot: ReceiptCustomerSnapshot;
+  productSnapshot: ReceiptProductSnapshot | null;
+  subscriptionSnapshot: ReceiptSubscriptionSnapshot | null;
   amount: number;
   concept: string;
   period: string;

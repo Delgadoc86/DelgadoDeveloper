@@ -45,6 +45,9 @@ export async function POST(
       }
       const customer = customerSnap.data()!;
 
+      const productSnap = await tx.get(db.collection("products").doc(payment.productId));
+      const product = productSnap.exists ? productSnap.data()! : null;
+
       const subscriptionRef = payment.subscriptionId
         ? db.collection("subscriptions").doc(payment.subscriptionId)
         : null;
@@ -53,6 +56,30 @@ export async function POST(
       const counterSnap = await tx.get(counterRef);
       const nextSequence = (counterSnap.data()?.lastNumber ?? 0) + 1;
       const number = formatReceiptNumber(year, nextSequence);
+
+      // Snapshot de la suscripción para el comprobante: fecha de alta (fija,
+      // no cambia entre pagos) y el período que cubre este pago puntual
+      // (vencimiento anterior -> nuevo vencimiento). Se calcula acá, antes
+      // de escribir nada, para que el comprobante y la suscripción queden
+      // con el mismo valor de "próximo vencimiento".
+      let subscriptionSnapshot = null;
+      if (subscriptionRef && subscriptionSnap?.exists) {
+        const subscription = subscriptionSnap.data()!;
+        const periodStart = subscription.nextDueDate;
+        const periodEnd =
+          subscription.frequency === "unico"
+            ? periodStart
+            : calculateNextDueDate(new Date(periodStart), subscription.frequency)
+                .toISOString()
+                .slice(0, 10);
+        subscriptionSnapshot = {
+          frequency: subscription.frequency,
+          startDate:
+            subscription.createdAt?.toDate?.().toISOString().slice(0, 10) ?? periodStart,
+          periodStart,
+          periodEnd,
+        };
+      }
 
       tx.set(counterRef, { year, lastNumber: nextSequence }, { merge: true });
 
@@ -66,6 +93,8 @@ export async function POST(
           phone: customer.phone ?? null,
           email: customer.email ?? null,
         },
+        productSnapshot: product ? { name: product.name } : null,
+        subscriptionSnapshot,
         amount: payment.amount,
         concept: payment.concept,
         period: payment.period,
@@ -85,21 +114,18 @@ export async function POST(
         updatedBy: result.admin.uid,
       });
 
-      if (subscriptionRef && subscriptionSnap?.exists) {
-        const subscription = subscriptionSnap.data()!;
-        if (subscription.frequency !== "unico") {
-          const nextDueDate = calculateNextDueDate(
-            new Date(subscription.nextDueDate),
-            subscription.frequency,
-          );
-          tx.update(subscriptionRef, {
-            nextDueDate: nextDueDate.toISOString().slice(0, 10),
-            lastPaymentAt: FieldValue.serverTimestamp(),
-            status: "activa",
-            updatedAt: FieldValue.serverTimestamp(),
-            updatedBy: result.admin.uid,
-          });
-        }
+      if (
+        subscriptionRef &&
+        subscriptionSnapshot &&
+        subscriptionSnapshot.frequency !== "unico"
+      ) {
+        tx.update(subscriptionRef, {
+          nextDueDate: subscriptionSnapshot.periodEnd,
+          lastPaymentAt: FieldValue.serverTimestamp(),
+          status: "activa",
+          updatedAt: FieldValue.serverTimestamp(),
+          updatedBy: result.admin.uid,
+        });
       }
 
       tx.set(auditLogRef, {

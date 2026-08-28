@@ -1,5 +1,5 @@
 export type ProductType = "app" | "servicio" | "mantenimiento" | "catalogo" | "otro";
-export type ProductFrequency = "mensual" | "anual" | "unico";
+export type ProductFrequency = "mensual" | "semestral" | "anual" | "unico";
 
 export const PRODUCT_TYPES: ProductType[] = [
   "app",
@@ -8,7 +8,12 @@ export const PRODUCT_TYPES: ProductType[] = [
   "catalogo",
   "otro",
 ];
-export const PRODUCT_FREQUENCIES: ProductFrequency[] = ["mensual", "anual", "unico"];
+export const PRODUCT_FREQUENCIES: ProductFrequency[] = [
+  "mensual",
+  "semestral",
+  "anual",
+  "unico",
+];
 
 export interface ProductRecord {
   id: string;

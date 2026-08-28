@@ -63,6 +63,8 @@ export default async function AdminPaymentsPage({
       number: data.number,
       paymentId: data.paymentId,
       customerSnapshot: data.customerSnapshot,
+      productSnapshot: data.productSnapshot ?? null,
+      subscriptionSnapshot: data.subscriptionSnapshot ?? null,
       amount: data.amount,
       concept: data.concept,
       period: data.period,

@@ -1,6 +1,6 @@
 export type SubscriptionStatus =
   "activa" | "pendiente" | "vencida" | "pausada" | "cancelada";
-export type SubscriptionFrequency = "mensual" | "anual" | "unico";
+export type SubscriptionFrequency = "mensual" | "semestral" | "anual" | "unico";
 
 export const SUBSCRIPTION_STATUSES: SubscriptionStatus[] = [
   "activa",
@@ -11,6 +11,7 @@ export const SUBSCRIPTION_STATUSES: SubscriptionStatus[] = [
 ];
 export const SUBSCRIPTION_FREQUENCIES: SubscriptionFrequency[] = [
   "mensual",
+  "semestral",
   "anual",
   "unico",
 ];

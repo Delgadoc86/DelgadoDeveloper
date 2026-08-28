@@ -21,10 +21,13 @@ decisiones de arquitectura tomadas en el camino.
 Si perdés el acceso (olvidaste la contraseña, o necesitás dar de alta a otro
 admin):
 
-1. **Contraseña olvidada**: Firebase Console → Authentication → Users → el
-   usuario → "Reset password" (o desde ahí generar un link de reseteo). No hay
-   flujo de "olvidé mi contraseña" dentro del panel (a propósito: es un solo
-   usuario, no vale la pena esa superficie extra).
+1. **Contraseña olvidada**: en `/admin/login` → "¿Olvidaste tu contraseña?"
+   envía un mail de recuperación con `sendPasswordResetEmail` de Firebase
+   Auth (client SDK, sin backend propio). El mensaje de confirmación es el
+   mismo exista o no la cuenta, a propósito, para no revelar qué correos
+   están dados de alta como admin. Si por algún motivo el mail no llega,
+   queda la vía manual: Firebase Console → Authentication → Users → el
+   usuario → "Reset password".
 2. **Nuevo admin**: crear el usuario en Firebase Console → Authentication →
    Add user, copiar su UID, y crear manualmente el documento
    `adminUsers/{uid}` en Firestore con `{ email, displayName, role: "owner" }`.
@@ -50,9 +53,16 @@ necesidad de redeploy.
 
 **Nota (rebranding 2026-08-06):** la marca pública de "presufacil" pasó a
 llamarse "PresuPDF" y su URL de descarga pública es `/descargar/presupdf`. El
-documento de Firestore, y por lo tanto lo que ves acá en "Aplicaciones", sigue
-llamándose `presufacil` a propósito — no se renombró para no perder el
-historial. `descargar/[slug]/route.ts` traduce `presupdf` → `presufacil` antes
+**id interno** del documento de Firestore (el encabezado gris que ves arriba
+de cada formulario en "Aplicaciones") sigue llamándose `presufacil` a
+propósito — no se renombró para no perder el historial. Eso es distinto del
+campo **"Nombre"** del formulario (el que se guarda en `name` y es lo que
+verían clientes/reportes si se mostrara en algún lado): ese sí hay que
+editarlo a mano para que diga "PresuPDF" — no se actualiza solo por cambiar
+el id. Lo mismo aplica al producto/servicio homónimo en "Productos" (usado en
+suscripciones, pagos y comprobantes): su campo "Nombre" también hay que
+pasarlo a "PresuPDF" si todavía dice "PresuFácil".
+`descargar/[slug]/route.ts` traduce `presupdf` → `presufacil` antes
 de consultar Firestore. Si algún día se agrega otra app cuyo slug público
 difiera de su id interno, sumarla a ese mismo mapa.
 
