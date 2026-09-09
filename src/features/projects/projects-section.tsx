@@ -6,10 +6,10 @@ import { projects } from "@/features/projects/data/projects";
 
 export function ProjectsSection() {
   return (
-    <section id="proyectos" className="scroll-mt-24 py-16 sm:py-24">
+    <section id="trabajos" className="scroll-mt-24 py-16 sm:py-24">
       <Container>
         <SectionHeading
-          eyebrow="Proyectos"
+          eyebrow="Trabajos"
           title="De la idea al producto en producción"
           description="DecideSer es mi caso de estudio más completo: un catálogo digital de cosmética con 266 productos, mobile-first y con panel de administración propio. También sumé Mi Almacén (para comercios de barrio) y PresuPDF, antes PresuFácil (para oficios y trabajadores independientes), apps Android que ya podés descargar, y Catálogo Autos, un sitio web para agencias de autos en Mendoza."
         />

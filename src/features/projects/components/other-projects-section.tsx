@@ -9,9 +9,7 @@ export function OtherProjectsSection() {
     <section className="border-border/60 border-t py-12 sm:py-16">
       <Container>
         <FadeIn>
-          <h2 className="text-foreground text-lg font-semibold">
-            Otros proyectos online
-          </h2>
+          <h2 className="text-foreground text-lg font-semibold">Otros trabajos online</h2>
           <p className="text-foreground-muted mt-1.5 max-w-xl text-sm">
             Sitios reales para clientes, operativos hoy, con seguimiento y mejoras
             continuas.

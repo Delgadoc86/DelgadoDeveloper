@@ -7,9 +7,15 @@ export interface ProjectImage {
 
 export interface ProjectLinks {
   demo?: string;
-  repo?: string;
   /** Enlace directo de descarga (ej. instalador APK alojado en Google Drive). */
   download?: string;
+  /**
+   * Sitio oficial del producto (dominio propio), cuando existe uno.
+   * Si está presente, la ficha muestra "Visitar sitio oficial" en vez de
+   * un botón de descarga directa — DelgadoDev deja de ser el punto de
+   * distribución y pasa a enlazar hacia la fuente oficial.
+   */
+  official?: string;
   /** Texto del botón de `demo`. Default: "Ver demo". */
   demoLabel?: string;
 }
@@ -104,6 +110,15 @@ export interface Project {
   role: string;
   /** 7. Stack real usado */
   stack: string[];
+  /**
+   * 2-3 beneficios concretos, en lenguaje llano y sin jerga técnica, para
+   * mostrar en la tarjeta del home en vez del `stack`. El stack (React,
+   * Firebase, TypeScript...) genera desconfianza en un cliente no técnico
+   * que no sabe qué significa eso — estos puntos venden el producto, no la
+   * tecnología. El stack completo se sigue mostrando en la ficha del
+   * proyecto, donde sí es información útil (para reclutadores, por ejemplo).
+   */
+  sellingPoints?: string[];
   /** 8. Funcionalidades principales */
   features: string[];
   /** 9. Decisiones de UX */
@@ -125,6 +140,19 @@ export interface Project {
   links: ProjectLinks;
   /** Ruta a los Términos de descarga y prueba específicos del producto, si aplica. */
   legalTermsUrl?: string;
+  /**
+   * Override del <title> de SEO cuando el patrón genérico
+   * (`${name} — ${category}`) no describe bien la página — por ejemplo,
+   * para diferenciar el caso de estudio de un sitio oficial externo con el
+   * mismo nombre de producto. Default: el patrón genérico.
+   */
+  seoTitle?: string;
+  /**
+   * Override de la meta description / OpenGraph / Twitter, cuando
+   * `description` (pensada como copy de portfolio) no es lo que conviene
+   * mostrar en buscadores. Default: `description`.
+   */
+  seoDescription?: string;
   /** Nombre anterior de la marca, mostrado discretamente junto al H1 durante la transición (ej. "PresuFácil"). */
   previousName?: string;
   /**

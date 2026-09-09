@@ -42,7 +42,7 @@ export function buildProjectJsonLd(project: Project) {
     "@type": "CreativeWork",
     name: project.name,
     description: project.description,
-    url: `${siteConfig.url}/proyectos/${project.slug}`,
+    url: `${siteConfig.url}/trabajos/${project.slug}`,
     creator: {
       "@type": "Person",
       name: siteConfig.author.name,
@@ -50,6 +50,17 @@ export function buildProjectJsonLd(project: Project) {
     // JSON.stringify drops keys set to undefined, so this is omitted cleanly
     // for projects without a live demo instead of emitting `sameAs: null`.
     sameAs: project.links.demo ? [project.links.demo] : undefined,
+    // Este CreativeWork es el caso de estudio del producto, no el producto
+    // en sí — por eso la relación con el sitio oficial se modela como
+    // `about` (de qué trata este caso de estudio) y no como `sameAs`
+    // (que implicaría que ambas URLs identifican la misma entidad).
+    about: project.links.official
+      ? {
+          "@type": "SoftwareApplication",
+          name: project.name,
+          url: project.links.official,
+        }
+      : undefined,
   };
 }
 

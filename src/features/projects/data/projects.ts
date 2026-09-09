@@ -13,9 +13,9 @@ export const projects: Project[] = [
     category: "Catálogo web personalizado · Cosmética",
     platform: "mobile",
     tagline:
-      "Una experiencia mobile-first para descubrir, comparar y pedir productos Avon y Natura.",
+      "Catálogo mobile-first con 266 productos reales: encontrá, elegí y pedí por WhatsApp en segundos.",
     description:
-      "Catálogo web personalizado para DecideSer: 266 productos, diseño mobile-first, administración propia y pedido por WhatsApp. Desarrollado con Next.js y Firebase.",
+      "Catálogo web personalizado para DecideSer: 266 productos reales, diseño mobile-first, administración propia y pedido directo por WhatsApp.",
     problem:
       "Cientos de productos, pero la experiencia se sentía una base de datos, no un catálogo profesional.",
     targetUser:
@@ -33,6 +33,11 @@ export const projects: Project[] = [
       "Firebase Storage",
       "Vercel",
       "Google Analytics 4 (integración preparada)",
+    ],
+    sellingPoints: [
+      "266 productos reales, listos para comprar",
+      "El cliente pide directo por WhatsApp",
+      "Vos actualizás precios y stock, sin depender de un programador",
     ],
     features: [
       "Catálogo dinámico",
@@ -62,7 +67,7 @@ export const projects: Project[] = [
     screenshotsNeeded: [],
     links: {
       demo: "https://www.decideser.com.ar",
-      demoLabel: "Ver proyecto en vivo",
+      demoLabel: "Ver trabajo en vivo",
     },
     coverImage: {
       src: "/assets/projects/decideser/home.webp",
@@ -248,7 +253,8 @@ export const projects: Project[] = [
     analyticsId: "presufacil",
     category: "App mobile · Presupuestos",
     platform: "mobile",
-    tagline: "Presupuestos profesionales listos para enviar.",
+    tagline:
+      "Armá presupuestos profesionales en minutos y compartilos por WhatsApp, sin planillas ni papeles sueltos.",
     description:
       "PresuPDF, antes PresuFácil, es una app mobile para crear, guardar y compartir presupuestos profesionales en minutos, pensada para oficios y trabajadores independientes.",
     problem:
@@ -269,6 +275,11 @@ export const projects: Project[] = [
       "expo-print",
       "expo-sharing",
       "EAS Build",
+    ],
+    sellingPoints: [
+      "Presupuesto en PDF, listo en minutos",
+      "Se comparte directo por WhatsApp",
+      "Guarda el historial de todos tus presupuestos",
     ],
     features: [
       "Registro e inicio de sesión",
@@ -326,17 +337,21 @@ export const projects: Project[] = [
       },
     ],
     links: {
-      download: "/descargar/presupdf",
-      repo: "https://github.com/Delgadoc86/presupuestoapp",
+      official: "https://www.presupdf.com.ar",
     },
-    legalTermsUrl: "/legal/presufacil/terminos-descarga",
+    // Sin "| DelgadoDev": el root layout ya aplica ese sufijo vía
+    // `title.template`, y agregarlo acá lo duplicaría.
+    seoTitle: "PresuPDF — Caso de estudio",
+    seoDescription:
+      "PresuPDF es una app Android desarrollada por DelgadoDev para crear, guardar y compartir presupuestos profesionales en PDF. Caso de estudio: arquitectura, diseño de producto y desarrollo con React Native, Expo y Firebase.",
   },
   {
     slug: "mi-almacen",
     name: "Mi Almacén",
     category: "App mobile · Comercios",
     platform: "mobile",
-    tagline: "Gestión simple para el comercio de barrio.",
+    tagline:
+      "Reemplazá el cuaderno: controlá caja, fiados y stock de tu comercio desde el celular.",
     description:
       "App mobile para gestionar productos, precios, fiados y caja diaria en comercios de barrio, pensada para reemplazar el cuaderno.",
     problem:
@@ -357,6 +372,11 @@ export const projects: Project[] = [
       "expo-sharing",
       "expo-file-system",
       "EAS Build",
+    ],
+    sellingPoints: [
+      "Reemplaza el cuaderno de fiados",
+      "Caja diaria, sin cuentas a mano",
+      "Lista de precios lista para compartir",
     ],
     features: [
       "Registro e inicio de sesión",
@@ -424,7 +444,6 @@ export const projects: Project[] = [
     ],
     links: {
       download: "/descargar/mi-almacen",
-      repo: "https://github.com/Delgadoc86/Mi-Almacen",
     },
     legalTermsUrl: "/legal/mi-almacen/terminos-descarga",
   },
@@ -433,7 +452,8 @@ export const projects: Project[] = [
     name: "Catálogo Autos",
     category: "Web app · Agencias en Mendoza",
     platform: "web",
-    tagline: "El catálogo propio que complementa Marketplace y WhatsApp.",
+    tagline:
+      "El catálogo propio que hace lucir profesional tu stock de autos, sin dejar de usar Marketplace y WhatsApp.",
     description:
       "Aplicación web para que agencias de autos en Mendoza administren y publiquen su propio catálogo de vehículos, como complemento profesional a Marketplace, WhatsApp e Instagram.",
     problem:
@@ -453,6 +473,11 @@ export const projects: Project[] = [
       "Material UI",
       "Vercel",
       "Google Analytics",
+    ],
+    sellingPoints: [
+      "Cada auto con fotos y datos completos",
+      "Contacto directo por WhatsApp",
+      "Suma a Marketplace, no lo reemplaza",
     ],
     features: [
       "Catálogo de vehículos",
@@ -488,7 +513,6 @@ export const projects: Project[] = [
     },
     links: {
       demo: "https://autosmendoza.vercel.app",
-      repo: "https://github.com/Delgadoc86/AgenciaAutos",
     },
   },
 ];

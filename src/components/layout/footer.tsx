@@ -65,7 +65,7 @@ export function Footer() {
               {projects.map((project) => (
                 <li key={project.slug}>
                   <Link
-                    href={`/proyectos/${project.slug}`}
+                    href={`/trabajos/${project.slug}`}
                     className="text-foreground-muted hover:text-foreground text-sm transition-colors"
                   >
                     {project.name}

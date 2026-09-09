@@ -29,7 +29,7 @@ sitio) — ver [`PANEL_ADMIN.md`](PANEL_ADMIN.md) para su documentación complet
 ```
 src/
   app/
-    (marketing)/          # Sitio público: home, /sobre-mi, /proyectos/[slug],
+    (marketing)/          # Sitio público: home, /sobre-mi, /trabajos/[slug],
                            # /privacidad, /cookies, /legal/[producto]/terminos-descarga
                            # (route group — no aparece en la URL, solo agrupa el layout
                            # con Header/Footer/CookieConsent)
@@ -106,11 +106,11 @@ El proyecto se despliega en Vercel, que detecta Next.js automáticamente por `ne
 ## Estado del proyecto
 
 Sitio completo y funcional: home, `/sobre-mi`, case studies de los 3 proyectos propios más
-completos (`PresúFácil`, `Mi Almacén`, `Catálogo Autos` — con repo público linkeado en cada
-uno), una sección más liviana con otros dos sitios reales para clientes (`Date un Gusto`,
+completos (`PresuPDF`, `Mi Almacén`, `Catálogo Autos` — sin link a repositorio desde la web,
+ver nota más abajo), una sección más liviana con otros dos sitios reales para clientes (`Date un Gusto`,
 `Silverio Foodtruck` — sin caso de estudio, repos privados por ser de terceros), páginas
 legales del sitio (`/privacidad`, `/cookies`) y páginas legales por producto
-(`/legal/mi-almacen/terminos-descarga`, `/legal/presufacil/terminos-descarga`), con SEO
+(`/legal/mi-almacen/terminos-descarga`), con SEO
 técnico (sitemap, robots, JSON-LD con `knowsAbout` derivado del stack, Open Graph y Twitter
 Card propios por página de proyecto), accesibilidad (navegación por teclado, focus visible,
 `prefers-reduced-motion`), performance optimizada (imágenes, fuentes self-hosted, sin
@@ -125,9 +125,36 @@ Educación IT), formación complementaria de menor jerarquía visual, y un bloqu
 aprendizaje autodidacta aplicado (Next.js, React Native, Firebase...) respaldado por
 evidencia real de proyectos, no solo enunciado.
 
-Mi Almacén y PresuFácil se distribuyen como APK fuera de Google Play: cada uno tiene un
-botón "Descargar APK" en su página (enlace a Google Drive) y un evento de Google
-Analytics propio por clic (`download_click_mi_almacen` / `download_click_presufacil`).
+Mi Almacén se distribuye como APK fuera de Google Play: tiene un botón "Descargar APK" en
+su página (enlace a Google Drive) y un evento de Google Analytics propio por clic
+(`download_click_mi_almacen`).
+
+**PresuPDF (2026-09-08): DelgadoDev dejó de distribuir la descarga.** El sitio oficial
+`https://www.presupdf.com.ar` es ahora la única fuente de descarga, términos, privacidad y
+eliminación de cuenta. La ficha `/trabajos/presupdf` funciona solo como caso de estudio:
+su CTA es "Visitar sitio oficial" (`links.official` en `projects.ts`, componente
+`OfficialSiteButton`, evento `official_site_click_presupdf`) en vez de "Descargar APK". El
+histórico `download_click_presufacil` no se tocó ni se borró — solo dejó de dispararse
+hacia adelante, porque el botón que lo generaba ya no existe para este producto. Las 4
+páginas `/legal/presufacil/*` se eliminaron y redirigen (308) a sus equivalentes en
+`presupdf.com.ar` — ver `next.config.ts`.
+
+**"Proyectos" → "Trabajos" (2026-09-08).** La sección/nav/ruta pasó de `Proyectos` /
+`/proyectos/[slug]` a `Trabajos` / `/trabajos/[slug]` (carpeta de rutas movida, no solo
+texto). Todas las URLs viejas indexadas redirigen (308) a su equivalente nueva —
+`next.config.ts` tiene un redirect específico para `/proyectos/presufacil` (va directo a
+`/trabajos/presupdf`, sin encadenar) y uno genérico `/proyectos/:slug → /trabajos/:slug`
+para el resto. Canonical, OpenGraph, JSON-LD, breadcrumbs, sitemap y todos los links
+internos (header, footer, hero, tarjetas) se actualizaron a la ruta nueva. Los
+identificadores internos (`Project`, `ProjectCard`, `projects.ts`, `features/projects/`)
+no se renombraron — es un cambio de cara al usuario, no un refactor de código.
+
+**Repositorios (2026-09-08): sin link a GitHub desde la web para ningún proyecto.** El
+botón "Repositorio" de `/trabajos/[slug]` se quitó y el campo `repo` de `ProjectLinks` se
+eliminó del tipo — no queda ningún repo de PresuPDF, Mi Almacén ni Catálogo Autos
+enlazable desde el sitio público. El ícono de GitHub del header/footer/contacto sigue
+existiendo, pero apunta al perfil personal de Cristian (`socialLinks.github`), no a un
+repositorio de proyecto puntual.
 
 **CV**: el botón "Descargar CV" (hero, header, contacto y menú móvil) es condicional —
 `src/lib/cv.ts` chequea con `fs.existsSync` si existe `/public/Cristian-Delgado-CV.pdf`.
@@ -140,9 +167,9 @@ publicado con ese nombre exacto, así que los botones están activos en todas la
 
 ## Camino a Google Play (cuando termine la etapa de prueba)
 
-Hoy Mi Almacén y PresuFácil se distribuyen fuera de Google Play (APK por Google Drive).
-Publicarlas en la store exige más que lo que ya tenemos. Ya existen **borradores** de
-las páginas que hacen falta, marcados con un aviso visible "Documento en preparación" y
+Hoy Mi Almacén se distribuye fuera de Google Play (APK por Google Drive). Publicarla en la
+store exige más que lo que ya tenemos. Ya existen **borradores** de las páginas que hacen
+falta, marcados con un aviso visible "Documento en preparación" y
 `robots: { index: false }` (no los indexa Google todavía) hasta que se completen y
 tengan revisión:
 
@@ -151,9 +178,10 @@ tengan revisión:
 | Privacidad de Mi Almacén      | `/legal/mi-almacen/privacidad`      | Completar `[PENDIENTE]` de retención de datos y revisión legal.                                                     |
 | Eliminar cuenta — Mi Almacén  | `/legal/mi-almacen/eliminar-cuenta` | Construir la opción de borrado **dentro de la app** (Google la exige además de esta página web) y confirmar plazos. |
 | Términos de Uso de Mi Almacén | `/legal/mi-almacen/terminos-de-uso` | Definir condiciones de suspensión de cuenta y revisión legal.                                                       |
-| Privacidad de PresuFácil      | `/legal/presufacil/privacidad`      | Completar `[PENDIENTE]` de retención de datos y revisión legal.                                                     |
-| Eliminar cuenta — PresuFácil  | `/legal/presufacil/eliminar-cuenta` | Construir la opción de borrado **dentro de la app** y confirmar plazos.                                             |
-| Términos de Uso de PresuFácil | `/legal/presufacil/terminos-de-uso` | Cerrar la lógica de planes demo/pro y revisión legal.                                                               |
+
+PresuPDF ya no tiene páginas legales en este repo — viven únicamente en
+`https://www.presupdf.com.ar`, así que su camino a Google Play (si aplica) se gestiona
+del lado del sitio oficial, no acá.
 
 Estas páginas no están linkeadas desde ningún lado del sitio (a propósito, para que
 ningún visitante se las cruce por accidente) — solo se accede escribiendo la URL

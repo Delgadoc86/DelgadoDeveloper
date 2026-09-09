@@ -66,6 +66,17 @@ pasarlo a "PresuPDF" si todavía dice "PresuFácil".
 de consultar Firestore. Si algún día se agrega otra app cuyo slug público
 difiera de su id interno, sumarla a ese mismo mapa.
 
+**Nota (separación de sitios, 2026-09-08):** `https://www.presupdf.com.ar` pasó a ser el
+único sitio oficial de descarga de PresuPDF — `delgadodev.com.ar/trabajos/presupdf` ya no
+ofrece un botón de descarga, solo un link "Visitar sitio oficial" hacia ese dominio. Por
+eso `/descargar/presupdf` y `/descargar/presufacil` ahora son redirects 308 a
+`https://www.presupdf.com.ar/descargar` definidos en `next.config.ts` — **ya no llegan a
+este route handler ni consultan Firestore**. El documento `apps/presufacil` y su
+`downloadUrl` de Google Drive no se tocaron: siguen existiendo como infraestructura
+histórica y este formulario del panel sigue funcionando igual, solo que ya no hay ningún
+botón público en DelgadoDev que use ese enlace. Mi Almacén no cambió: sigue distribuyéndose
+igual que antes por este mismo flujo.
+
 ### Dar de alta un cliente
 
 `/admin/customers` → "Nuevo cliente", o desde el dashboard → "Nuevo cliente"

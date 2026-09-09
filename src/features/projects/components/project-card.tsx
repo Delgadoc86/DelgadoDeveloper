@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, ImageOff } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { ArrowUpRight, Check, ImageOff } from "lucide-react";
 import type { Project } from "@/types/project";
 
 interface ProjectCardProps {
@@ -11,25 +10,42 @@ interface ProjectCardProps {
 export function ProjectCard({ project }: ProjectCardProps) {
   const ctaLabel =
     project.caseStudy?.cardCtaLabel ??
-    (project.links.download ? "Conocé más y descargá" : "Ver proyecto");
+    (project.links.download ? "Conocé más y descargá" : "Ver trabajo");
 
   return (
     <Link
-      href={`/proyectos/${project.slug}`}
+      href={`/trabajos/${project.slug}`}
       className="group border-border bg-background-subtle hover:border-foreground-muted flex h-full flex-col overflow-hidden rounded-2xl border transition-colors active:scale-[0.99]"
     >
       <div className="shrink-0 p-6">
-        <span className="bg-accent-muted text-accent-bright mb-3 inline-block rounded-full px-2.5 py-1 font-mono text-[11px]">
-          {project.category}
-        </span>
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="bg-accent-muted text-accent-bright inline-block rounded-full px-2.5 py-1 font-mono text-[11px]">
+            {project.category}
+          </span>
+          <span className="border-border text-foreground-muted inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px]">
+            <span className="bg-accent size-1.5 rounded-full" aria-hidden />
+            {project.statusTag}
+          </span>
+        </div>
         <h3 className="text-foreground text-lg font-semibold">{project.name}</h3>
         <p className="text-foreground-muted mt-2 text-sm">{project.tagline}</p>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          {project.stack.map((tech) => (
-            <Badge key={tech}>{tech}</Badge>
-          ))}
-        </div>
+        {project.sellingPoints ? (
+          <ul className="mt-4 space-y-1.5">
+            {project.sellingPoints.map((point) => (
+              <li
+                key={point}
+                className="text-foreground-muted flex items-start gap-2 text-sm"
+              >
+                <Check
+                  className="text-accent-bright mt-0.5 size-3.5 shrink-0"
+                  aria-hidden
+                />
+                {point}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       {project.platform === "mobile" ? (

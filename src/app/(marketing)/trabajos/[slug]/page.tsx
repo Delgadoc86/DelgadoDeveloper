@@ -22,10 +22,10 @@ import {
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { GithubIcon } from "@/components/ui/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
 import { DownloadButton } from "@/features/projects/components/download-button";
+import { OfficialSiteButton } from "@/features/projects/components/official-site-button";
 import { ChallengeSection } from "@/features/projects/components/case-study/challenge-section";
 import { ClosingCta } from "@/features/projects/components/case-study/closing-cta";
 import { FeatureGroups } from "@/features/projects/components/case-study/feature-groups";
@@ -53,16 +53,19 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     return {};
   }
 
-  const seoTitle = project.caseStudy
-    ? `${project.name} — Caso de éxito | ${siteConfig.name}`
-    : `${project.name} — ${project.category}`;
+  const seoTitle =
+    project.seoTitle ??
+    (project.caseStudy
+      ? `${project.name} — Caso de éxito | ${siteConfig.name}`
+      : `${project.name} — ${project.category}`);
+  const seoDescription = project.seoDescription ?? project.description;
   const ogImages = project.coverImage ? [project.coverImage.src] : undefined;
 
   return {
     title: seoTitle,
-    description: project.description,
+    description: seoDescription,
     alternates: {
-      canonical: `/proyectos/${project.slug}`,
+      canonical: `/trabajos/${project.slug}`,
     },
     // Next.js no mezcla `openGraph`/`twitter` en profundidad entre layout y
     // page: si el objeto se define acá, reemplaza al del root layout entero
@@ -72,15 +75,15 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
       type: "website",
       locale: siteConfig.locale,
       siteName: siteConfig.name,
-      url: `${siteConfig.url}/proyectos/${project.slug}`,
+      url: `${siteConfig.url}/trabajos/${project.slug}`,
       title: seoTitle,
-      description: project.description,
+      description: seoDescription,
       images: ogImages,
     },
     twitter: {
       card: "summary_large_image",
       title: seoTitle,
-      description: project.description,
+      description: seoDescription,
       images: ogImages,
     },
   };
@@ -105,8 +108,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
     { name: "Inicio", url: siteConfig.url },
-    { name: "Proyectos", url: `${siteConfig.url}/#proyectos` },
-    { name: project.name, url: `${siteConfig.url}/proyectos/${project.slug}` },
+    { name: "Trabajos", url: `${siteConfig.url}/#trabajos` },
+    { name: project.name, url: `${siteConfig.url}/trabajos/${project.slug}` },
   ]);
 
   const docsMailto = `${siteConfig.author.email}?subject=${encodeURIComponent(
@@ -126,16 +129,20 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
         <Container>
           <FadeIn>
             <Link
-              href="/#proyectos"
+              href="/#trabajos"
               className="text-foreground-muted hover:text-foreground inline-flex items-center gap-2 text-sm transition-colors"
             >
               <ArrowLeft className="size-4" aria-hidden />
-              Proyectos
+              Trabajos
             </Link>
 
-            <p className="text-accent-bright mt-8 font-mono text-sm">
-              {project.category}
-            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <p className="text-accent-bright font-mono text-sm">{project.category}</p>
+              <span className="border-border text-foreground-muted inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs">
+                <span className="bg-accent size-1.5 rounded-full" aria-hidden />
+                {project.statusTag}
+              </span>
+            </div>
             <h1 className="text-foreground mt-2 max-w-2xl text-4xl font-semibold text-balance sm:text-5xl">
               {project.name}
             </h1>
@@ -154,8 +161,14 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               ))}
             </div>
 
-            {(project.links.download ?? project.links.demo ?? project.links.repo) ? (
+            {(project.links.official ?? project.links.download ?? project.links.demo) ? (
               <div className="mt-8 flex flex-wrap gap-4">
+                {project.links.official ? (
+                  <OfficialSiteButton
+                    href={project.links.official}
+                    analyticsId={project.slug}
+                  />
+                ) : null}
                 {project.links.download ? (
                   <DownloadButton
                     href={project.links.download}
@@ -165,19 +178,34 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                 {project.links.demo ? (
                   <Button
                     href={project.links.demo}
-                    variant={project.links.download ? "secondary" : "primary"}
+                    variant={
+                      project.links.official || project.links.download
+                        ? "secondary"
+                        : "primary"
+                    }
                   >
                     {project.links.demoLabel ?? "Ver demo"}
                     <ArrowUpRight className="size-4" aria-hidden />
                   </Button>
                 ) : null}
-                {project.links.repo ? (
-                  <Button href={project.links.repo} variant="secondary">
-                    <GithubIcon className="size-4" aria-hidden />
-                    Repositorio
-                  </Button>
-                ) : null}
               </div>
+            ) : null}
+
+            {project.links.official ? (
+              <p className="text-foreground-muted mt-4 text-xs">
+                La descarga oficial de {project.name} para Android está disponible
+                únicamente en{" "}
+                <a
+                  href={project.links.official}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-accent-bright underline underline-offset-2"
+                >
+                  {new URL(project.links.official).hostname.replace(/^www\./, "")}
+                  <span className="sr-only"> (se abre en una nueva pestaña)</span>
+                </a>
+                .
+              </p>
             ) : null}
 
             {project.links.download && project.legalTermsUrl ? (

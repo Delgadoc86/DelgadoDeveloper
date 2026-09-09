@@ -1,32 +1,47 @@
+import Image from "next/image";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { CvButton } from "@/components/ui/cv-button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { HeroConstellation } from "@/components/motion/hero-constellation";
 import { cvAvailable } from "@/lib/cv";
-import { socialLinks } from "@/constants/social-links";
+import { projects } from "@/features/projects/data/projects";
 
 /**
- * Curado a propósito para el hero: nombre + qué hace + disponibilidad
- * concreta, en vez de reusar el tagline largo de cada caso de estudio.
+ * Curado a propósito para el hero: qué hace + disponibilidad concreta, en
+ * vez de reusar el tagline largo de cada caso de estudio. El nombre y la
+ * captura se toman de `projects.ts` (no se hardcodean acá) para que nunca
+ * queden desactualizados si un proyecto cambia de nombre o de portada.
  */
-const heroHighlights = [
+const heroHighlightSlugs = [
   {
-    name: "PresúFácil",
-    label: "Presupuestos desde el celular",
+    slug: "presupdf",
+    label: "Presupuestos en minutos, sin papeles",
     availability: "APK disponible",
   },
   {
-    name: "Mi Almacén",
-    label: "Caja, fiados y productos",
+    slug: "mi-almacen",
+    label: "Controlá caja, fiados y stock reales",
     availability: "APK disponible",
   },
   {
-    name: "Catálogo Autos",
-    label: "Catálogo y panel administrativo",
+    slug: "catalogo-autos",
+    label: "El catálogo que hace lucir tu stock",
     availability: "Demo funcional",
   },
-];
+] as const;
+
+const heroHighlights = heroHighlightSlugs.map(({ slug, label, availability }) => {
+  const project = projects.find((item) => item.slug === slug);
+  return {
+    slug,
+    label,
+    availability,
+    name: project?.name ?? slug,
+    coverImage: project?.coverImage,
+  };
+});
 
 export function Hero() {
   return (
@@ -70,10 +85,7 @@ export function Hero() {
 
           <FadeIn delay={0.15}>
             <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-8">
-              <Button href="/#proyectos">Ver proyectos</Button>
-              <Button href={socialLinks.github} variant="secondary">
-                Ver GitHub
-              </Button>
+              <Button href="/#trabajos">Ver trabajos</Button>
               {cvAvailable ? <CvButton variant="secondary" /> : null}
               <Button
                 href="/#contacto"
@@ -87,21 +99,21 @@ export function Hero() {
 
           <FadeIn delay={0.18}>
             <p className="text-foreground-muted mt-3 text-xs sm:text-sm">
-              2 APK disponibles · 2 webs online · 1 demo comercial funcional · GitHub
-              público
+              2 APK disponibles · 2 webs online · 1 demo comercial funcional
             </p>
           </FadeIn>
 
           <FadeIn delay={0.2} className="lg:hidden">
             <div className="mt-3 flex flex-wrap gap-2">
               {heroHighlights.map((item) => (
-                <span
-                  key={item.name}
-                  className="border-border text-foreground-muted inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs"
+                <Link
+                  key={item.slug}
+                  href={`/trabajos/${item.slug}`}
+                  className="border-border text-foreground-muted hover:border-foreground-muted hover:text-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition-colors"
                 >
                   <span className="bg-accent size-1.5 rounded-full" aria-hidden />
                   {item.name}
-                </span>
+                </Link>
               ))}
             </div>
           </FadeIn>
@@ -117,21 +129,38 @@ export function Hero() {
             <div className="mb-4 flex items-center gap-2">
               <span className="bg-accent size-1.5 rounded-full" aria-hidden />
               <p className="text-foreground text-xs font-semibold tracking-wide uppercase">
-                Proyectos destacados
+                Trabajos destacados
               </p>
             </div>
 
             <ul className="space-y-2.5">
               {heroHighlights.map((item) => (
-                <li
-                  key={item.name}
-                  className="border-border/80 bg-background rounded-xl border p-3.5"
-                >
-                  <p className="text-foreground text-sm font-medium">{item.name}</p>
-                  <p className="text-foreground-muted mt-1 text-xs">{item.label}</p>
-                  <span className="bg-accent-muted text-accent-bright mt-2 inline-block rounded-full px-2 py-0.5 font-mono text-[10px]">
-                    {item.availability}
-                  </span>
+                <li key={item.slug}>
+                  <Link
+                    href={`/trabajos/${item.slug}`}
+                    className="border-border/80 bg-background hover:border-foreground-muted group flex items-center gap-3 rounded-xl border p-3.5 transition-colors"
+                  >
+                    <div className="bg-background-subtle relative size-12 shrink-0 overflow-hidden rounded-lg">
+                      {item.coverImage ? (
+                        <Image
+                          src={item.coverImage.src}
+                          alt={item.coverImage.alt}
+                          fill
+                          sizes="48px"
+                          className="object-cover object-top transition-transform duration-500 group-hover:scale-[1.05]"
+                        />
+                      ) : null}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-foreground text-sm font-medium">{item.name}</p>
+                      <p className="text-foreground-muted mt-1 truncate text-xs">
+                        {item.label}
+                      </p>
+                      <span className="bg-accent-muted text-accent-bright mt-2 inline-block rounded-full px-2 py-0.5 font-mono text-[10px]">
+                        {item.availability}
+                      </span>
+                    </div>
+                  </Link>
                 </li>
               ))}
             </ul>
