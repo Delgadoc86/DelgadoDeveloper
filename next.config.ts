@@ -7,6 +7,14 @@ const nextConfig: NextConfig = {
     "localhost",
     "127.0.0.1",
   ],
+  images: {
+    // La optimización de imágenes de Vercel (/_next/image) tiene una cuota
+    // gratis en el plan Hobby; al superarla, Vercel devuelve 402 Payment
+    // Required y las imágenes dejan de cargar en todo el sitio. Los assets
+    // ya son .webp livianos (28-190 KB), así que se sirven directos como
+    // estáticos sin pasar por ese pipeline pago.
+    unoptimized: true,
+  },
   async redirects() {
     return [
       // La sección "Proyectos" pasó a llamarse "Trabajos" (2026-09-08): las
