@@ -62,16 +62,18 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
-              {projects.map((project) => (
-                <li key={project.slug}>
-                  <Link
-                    href={`/trabajos/${project.slug}`}
-                    className="text-foreground-muted hover:text-foreground text-sm transition-colors"
-                  >
-                    {project.name}
-                  </Link>
-                </li>
-              ))}
+              {projects
+                .filter((project) => project.slug !== "mi-almacen")
+                .map((project) => (
+                  <li key={project.slug}>
+                    <Link
+                      href={`/trabajos/${project.slug}`}
+                      className="text-foreground-muted hover:text-foreground text-sm transition-colors"
+                    >
+                      {project.name}
+                    </Link>
+                  </li>
+                ))}
             </ul>
           </div>
 

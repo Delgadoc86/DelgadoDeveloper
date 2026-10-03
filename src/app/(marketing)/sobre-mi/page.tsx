@@ -26,9 +26,9 @@ import {
   selfTaughtIntro,
 } from "@/features/about/data/education";
 
-const title = "Sobre mí — Desarrollador Frontend & Mobile en Mendoza";
+const title = "Sobre mí — Desarrollo web y sistemas a medida para negocios";
 const description =
-  "Cristian Delgado, desarrollador Frontend & Mobile en Mendoza, Argentina. Trabajo con React, Next.js, React Native y Firebase para construir productos digitales para oficios, comercios y pequeños negocios.";
+  "Cristian Delgado desarrolla sitios web, sistemas y productos digitales para negocios que necesitan vender, operar y automatizar mejor.";
 
 export const metadata: Metadata = {
   title,
@@ -105,17 +105,11 @@ export default function SobreMiPage() {
               Sobre mí · Mendoza, Argentina
             </p>
             <h1 className="text-foreground max-w-2xl text-4xl font-semibold text-balance sm:text-5xl">
-              Cristian Delgado — Frontend &amp; Mobile Developer
+              Cristian Delgado — Desarrollo web y sistemas a medida para negocios
             </h1>
             <p className="text-foreground-muted mt-6 max-w-xl text-lg">
-              Desarrollo aplicaciones web y mobile con React, Next.js, React Native y
-              Firebase. Construí productos funcionales, aplicaciones Android descargables
-              y sitios actualmente online: no son ejercicios ni maquetas. Busco
-              incorporarme a un equipo donde pueda aportar esta experiencia, seguir
-              creciendo y trabajar sobre productos reales.
-            </p>
-            <p className="text-foreground-muted mt-3 max-w-xl text-sm">
-              También tomo proyectos freelance de forma independiente.
+              Desarrollo sitios web, sistemas y productos digitales para negocios que
+              necesitan vender mejor, operar con más claridad y automatizar procesos.
             </p>
           </FadeIn>
 

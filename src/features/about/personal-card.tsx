@@ -25,7 +25,9 @@ export function PersonalCard({ className }: PersonalCardProps) {
 
       <div>
         <p className="text-foreground text-sm font-semibold">Cristian Delgado</p>
-        <p className="text-foreground-muted text-sm">Frontend &amp; Mobile Developer</p>
+        <p className="text-foreground-muted text-sm">
+          Desarrollo web y sistemas a medida para negocios
+        </p>
         <p className="text-foreground-muted mt-1 text-xs">Mendoza, Argentina</p>
         <p className="text-foreground-muted mt-2 font-mono text-xs">
           React · React Native · Firebase

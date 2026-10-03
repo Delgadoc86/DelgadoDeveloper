@@ -9,7 +9,7 @@ export function buildPersonJsonLd() {
     "@type": "Person",
     name: siteConfig.author.name,
     url: siteConfig.url,
-    jobTitle: "Frontend & Mobile Developer",
+    jobTitle: "Desarrollo web y sistemas a medida para negocios",
     address: {
       "@type": "PostalAddress",
       addressLocality: "Mendoza",

@@ -15,11 +15,13 @@ export function ProjectsSection() {
         />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, index) => (
-            <FadeIn key={project.slug} delay={index * 0.05} className="h-full">
-              <ProjectCard project={project} />
-            </FadeIn>
-          ))}
+          {projects
+            .filter((project) => project.slug !== "mi-almacen")
+            .map((project, index) => (
+              <FadeIn key={project.slug} delay={index * 0.05} className="h-full">
+                <ProjectCard project={project} />
+              </FadeIn>
+            ))}
         </div>
       </Container>
     </section>

@@ -2,10 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { CvButton } from "@/components/ui/cv-button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { HeroConstellation } from "@/components/motion/hero-constellation";
-import { cvAvailable } from "@/lib/cv";
 import { projects } from "@/features/projects/data/projects";
 
 /**
@@ -18,12 +16,7 @@ const heroHighlightSlugs = [
   {
     slug: "presupdf",
     label: "Presupuestos en minutos, sin papeles",
-    availability: "APK disponible",
-  },
-  {
-    slug: "mi-almacen",
-    label: "Controlá caja, fiados y stock reales",
-    availability: "APK disponible",
+    availability: "Web app",
   },
   {
     slug: "catalogo-autos",
@@ -58,41 +51,40 @@ export function Hero() {
             <div className="border-border bg-background-subtle mb-3 inline-flex items-center gap-2 rounded-full border px-3 py-1 sm:mb-4">
               <span className="bg-accent size-1.5 rounded-full" aria-hidden />
               <span className="text-foreground-muted text-xs font-medium">
-                Disponible para oportunidades Frontend / React
+                Desarrollo web y sistemas a medida para negocios
               </span>
             </div>
           </FadeIn>
 
           <FadeIn delay={0.03}>
             <p className="text-accent-bright mb-2 font-mono text-sm sm:mb-3">
-              Frontend &amp; Mobile Developer · Mendoza, Argentina
+              Desarrollo web y sistemas a medida para negocios · Mendoza, Argentina
             </p>
           </FadeIn>
 
           <FadeIn delay={0.05}>
             <h1 className="text-foreground max-w-2xl text-3xl font-semibold text-balance sm:text-4xl lg:text-5xl">
-              Diseño y desarrollo productos digitales completos, de la idea a producción.
+              Diseñamos y desarrollamos soluciones digitales para negocios.
             </h1>
           </FadeIn>
 
           <FadeIn delay={0.1}>
             <p className="text-foreground-muted mt-4 max-w-xl text-lg sm:mt-5">
-              Desarrollo aplicaciones Android descargables, sitios web en producción y
-              plataformas comerciales con panel administrativo. Trabajo con React,
-              Next.js, React Native y Firebase.
+              Creamos sitios web, sistemas y productos digitales para ayudar a empresas,
+              comercios y equipos a vender mejor, operar con más claridad y automatizar
+              procesos.
             </p>
           </FadeIn>
 
           <FadeIn delay={0.15}>
             <div className="mt-6 flex flex-wrap items-center gap-3 sm:mt-8">
               <Button href="/#trabajos">Ver trabajos</Button>
-              {cvAvailable ? <CvButton variant="secondary" /> : null}
               <Button
                 href="/#contacto"
                 variant="ghost"
                 className="text-accent-bright hover:text-foreground underline-offset-4 hover:underline"
               >
-                Contactarme
+                Hablemos de tu proyecto
               </Button>
             </div>
           </FadeIn>

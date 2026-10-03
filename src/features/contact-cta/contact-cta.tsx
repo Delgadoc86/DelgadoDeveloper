@@ -1,24 +1,12 @@
 import { Mail, MessageCircle } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { CvButton } from "@/components/ui/cv-button";
-import {
-  GithubIcon,
-  InstagramIcon,
-  LinkedinIcon,
-  TiktokIcon,
-} from "@/components/ui/icons";
+import { InstagramIcon, TiktokIcon } from "@/components/ui/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { socialLinks } from "@/constants/social-links";
-import { cvAvailable } from "@/lib/cv";
 
-// Orden por prioridad para reclutadores: LinkedIn y Email primero (el CV, si
-// existe, se antepone a todos desde el render), después GitHub y WhatsApp, y
-// por último las redes que aportan menos a una oportunidad laboral.
 const contactChannels = [
-  { label: "LinkedIn", href: socialLinks.linkedin, icon: LinkedinIcon },
   { label: "Email", href: socialLinks.email, icon: Mail },
-  { label: "GitHub", href: socialLinks.github, icon: GithubIcon },
   { label: "WhatsApp", href: socialLinks.whatsapp, icon: MessageCircle },
   { label: "Instagram", href: socialLinks.instagram, icon: InstagramIcon },
   { label: "TikTok", href: socialLinks.tiktok, icon: TiktokIcon },
@@ -40,15 +28,14 @@ export function ContactCta() {
 
             <p className="text-accent-bright mb-4 font-mono text-sm">Contacto</p>
             <h2 className="text-foreground mx-auto max-w-2xl text-3xl font-semibold text-balance sm:text-4xl">
-              ¿Buscás sumar un desarrollador al equipo o necesitás crear un proyecto?
+              ¿Necesitás un sitio, sistema o producto digital para tu negocio?
             </h2>
             <p className="text-foreground-muted mx-auto mt-4 max-w-md text-base">
-              Estoy disponible para oportunidades Frontend / React y también para
-              proyectos freelance. Respondo personalmente cada mensaje.
+              Diseñamos y desarrollamos soluciones web para negocios que quieren vender,
+              operar y automatizar mejor.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-              {cvAvailable ? <CvButton variant="secondary" /> : null}
               {contactChannels.map(({ label, href, icon: Icon }) => (
                 <Button key={label} href={href} variant="secondary">
                   <Icon className="size-4" strokeWidth={1.75} aria-hidden />
