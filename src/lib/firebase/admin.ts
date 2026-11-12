@@ -10,10 +10,12 @@ function getAdminApp(): App {
 
   const projectId = process.env.FIREBASE_GESTION_ADMIN_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_GESTION_ADMIN_CLIENT_EMAIL;
-  const privateKey = process.env.FIREBASE_GESTION_ADMIN_PRIVATE_KEY?.replace(
-    /\\n/g,
-    "\n",
-  );
+  // Tolera los dos formatos con que suele pegarse la clave en Vercel: con o
+  // sin las comillas de afuera, y con "\n" literales o saltos de línea reales.
+  // Si quedan las comillas, el parseo del PEM falla y todo /admin da 500.
+  const privateKey = process.env.FIREBASE_GESTION_ADMIN_PRIVATE_KEY?.trim()
+    .replace(/^"|"$/g, "")
+    .replace(/\\n/g, "\n");
 
   if (!projectId || !clientEmail || !privateKey) {
     throw new Error(
