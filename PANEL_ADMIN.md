@@ -228,6 +228,23 @@ existía), el login del panel fallaba y `/descargar/mi-almacen` dejó de funcion
 - El usuario admin se crea de nuevo (Authentication → Correo electrónico/contraseña
   tiene que estar habilitado en la consola: activarlo por API exige facturación).
 
+**Acceso y despliegue después de la migración:**
+
+- Usuario admin: `delgadocdev@hotmail.com`, con su documento `adminUsers/{uid}`
+  (`role: "owner"`). Si se borra y se vuelve a crear el usuario desde la consola,
+  cambia el UID y hay que crear de nuevo `adminUsers/{nuevoUid}`: sin ese documento
+  el login de Firebase funciona, pero el panel rechaza la sesión.
+- Variables en Vercel: se cargan las 9 `…FIREBASE_GESTION_…` pegando el bloque
+  `.env` en el campo **Key** de Settings → Environment Variables, con **Production**
+  tildado. Síntoma de que las de servidor (`FIREBASE_GESTION_ADMIN_*`) están mal o
+  faltan en Production: `/descargar/mi-almacen` da 500 y el login responde
+  "Credenciales inválidas", aunque el navegador ya use el proyecto nuevo.
+- `src/lib/firebase/admin.ts` acepta la clave privada con o sin comillas y con
+  `
+` literales o saltos de línea reales, para evitar errores al pegarla.
+- Pendiente: rotar la clave de la cuenta de servicio (la actual se compartió en
+  un chat de soporte) y actualizar solo `FIREBASE_GESTION_ADMIN_PRIVATE_KEY`.
+
 **Lección:** correr el backup manual cada mes (ver abajo). Es lo único que permite
 recuperar datos si el proyecto se borra.
 
