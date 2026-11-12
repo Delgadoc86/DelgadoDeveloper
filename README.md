@@ -30,6 +30,7 @@ sitio) — ver [`PANEL_ADMIN.md`](PANEL_ADMIN.md) para su documentación complet
 src/
   app/
     (marketing)/          # Sitio público: home, /sobre-mi, /trabajos/[slug],
+                           # /trabajos/presupdf y /trabajos/qrevento (rutas estáticas),
                            # /privacidad, /cookies, /legal/[producto]/terminos-descarga
                            # (route group — no aparece en la URL, solo agrupa el layout
                            # con Header/Footer/CookieConsent)
@@ -41,24 +42,29 @@ src/
                             # resuelto contra Firestore (ver PANEL_ADMIN.md)
                          # sitemap, robots, manifest, iconos, OG image quedan a nivel raíz
   components/
-    ui/                 # Componentes genéricos sin lógica de negocio (Button, Badge, TechIcon, CvButton...)
+    ui/                 # Componentes genéricos sin lógica de negocio (Button, Badge, CvButton...)
     layout/             # Header, Footer, MobileNav
     motion/             # Wrappers de animación (FadeIn)
     analytics/          # Google Analytics + banner de consentimiento de cookies
-  features/             # Piezas con conocimiento de dominio (hero, proyectos, stack, about, contacto)
-    projects/data/        # projects.ts (3 casos de estudio) + other-projects.ts (sitios de
-                           # cliente sin caso de estudio, repos privados)
+  features/             # Piezas con conocimiento de dominio (hero, productos, servicios,
+                         # proceso, proyectos, stack, about, contacto)
+    products/             # Productos propios destacados (PresuPDF, QREvento): datos,
+                           # tarjetas, página de caso y marcos CSS de PC/teléfono
+    projects/data/        # projects.ts (DecideSer, Catálogo Autos, Mi Almacén oculto) +
+                           # other-projects.ts (sitios sin caso de estudio)
     projects/components/  # ProjectCard, DownloadButton (tracking de clic por producto),
-                           # OtherProjectsSection
+                           # OtherProjectsList
     about/data/            # education.ts — certificaciones, formación complementaria y
                            # aprendizaje autodidacta aplicado, mostrados en /sobre-mi
   config/               # site.config.ts — fuente única de verdad (nombre, url, autor)
   constants/            # Nav y links sociales
-  lib/                  # utils (cn), helpers de SEO/JSON-LD/GA (trackPageview, trackEvent) y
+  lib/                  # utils (cn), helpers de SEO/JSON-LD/GA (trackPageview, trackEvent),
+                         # og.tsx (imágenes Open Graph), contact.ts (links de WhatsApp) y
                          # cv.ts (detecta si /public/Cristian-Delgado-CV.pdf existe, server-only)
   types/                # Tipos compartidos
 public/
   assets/               # Screenshots de proyectos e íconos de marca
+  images/proyectos/     # Capturas WebP de PresuPDF y QREvento (PC y móvil)
 ```
 
 ## Empezar
@@ -105,14 +111,17 @@ El proyecto se despliega en Vercel, que detecta Next.js automáticamente por `ne
 
 ## Estado del proyecto
 
-Sitio completo y funcional: home, `/sobre-mi`, case studies de los 3 proyectos propios más
-completos (`PresuPDF`, `Mi Almacén`, `Catálogo Autos` — sin link a repositorio desde la web,
-ver nota más abajo), una sección más liviana con otros dos sitios reales para clientes (`Date un Gusto`,
-`Silverio Foodtruck` — sin caso de estudio, repos privados por ser de terceros), páginas
+> **Rediseño comercial y SEO (2026-11-12):** el detalle de cada cambio y su motivo está en
+> [`CAMBIOS_VENTA_SEO_DELGADODEV.md`](CAMBIOS_VENTA_SEO_DELGADODEV.md). Algunas notas
+> históricas de abajo (reclutadores, PresuPDF como APK) ya no describen el sitio actual.
+
+Sitio completo y funcional: home con PresuPDF y QREvento como productos destacados (cada uno
+con caso propio), casos de `DecideSer` y `Catálogo Autos`, otros dos sitios en producción
+(`Date un Gusto`, `Silverio Foodtruck` — sin caso de estudio), `/sobre-mi`, páginas
 legales del sitio (`/privacidad`, `/cookies`) y páginas legales por producto
 (`/legal/mi-almacen/terminos-descarga`), con SEO
-técnico (sitemap, robots, JSON-LD con `knowsAbout` derivado del stack, Open Graph y Twitter
-Card propios por página de proyecto), accesibilidad (navegación por teclado, focus visible,
+técnico (sitemap, robots, JSON-LD `ProfessionalService` + `SoftwareApplication`, canonical y
+Open Graph propios por página), accesibilidad (navegación por teclado, focus visible,
 `prefers-reduced-motion`), performance optimizada (imágenes, fuentes self-hosted, sin
 dependencias innecesarias) y Google Analytics detrás de un banner de consentimiento de
 cookies (Ley 25.326 / buenas prácticas RGPD).

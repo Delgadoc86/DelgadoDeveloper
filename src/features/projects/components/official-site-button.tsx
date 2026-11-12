@@ -8,6 +8,9 @@ interface OfficialSiteButtonProps {
   href: string;
   /** Identificador estable para el evento de Analytics. */
   analyticsId: string;
+  /** Default: "Visitar sitio oficial". */
+  label?: string;
+  variant?: "primary" | "secondary";
 }
 
 /**
@@ -17,12 +20,21 @@ interface OfficialSiteButtonProps {
  * distinto de `download_click_*`, para no mezclar una visita al sitio
  * oficial con una descarga real en las métricas.
  */
-export function OfficialSiteButton({ href, analyticsId }: OfficialSiteButtonProps) {
+export function OfficialSiteButton({
+  href,
+  analyticsId,
+  label = "Visitar sitio oficial",
+  variant = "primary",
+}: OfficialSiteButtonProps) {
   const eventName = `official_site_click_${analyticsId.replace(/-/g, "_")}`;
 
   return (
-    <Button href={href} onClick={() => trackEvent(eventName, { project: analyticsId })}>
-      Visitar sitio oficial
+    <Button
+      href={href}
+      variant={variant}
+      onClick={() => trackEvent(eventName, { project: analyticsId })}
+    >
+      {label}
       <ArrowUpRight className="size-4" aria-hidden />
     </Button>
   );

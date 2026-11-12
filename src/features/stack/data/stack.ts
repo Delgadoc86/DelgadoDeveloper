@@ -9,6 +9,7 @@ export const stackGroups = [
       "JavaScript",
       "Tailwind CSS",
       "Material UI",
+      "PWA",
     ],
   },
   {
@@ -19,7 +20,7 @@ export const stackGroups = [
   {
     category: "Backend & Servicios",
     description: "Autenticación, base de datos y almacenamiento en la nube.",
-    items: ["Firebase Auth", "Firestore", "Firebase Storage"],
+    items: ["Firebase Auth", "Firestore", "Firebase Storage", "Mercado Pago"],
   },
   {
     category: "Deploy & Herramientas",

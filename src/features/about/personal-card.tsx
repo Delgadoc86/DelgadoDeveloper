@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { siteConfig } from "@/config/site.config";
 import { cn } from "@/lib/utils";
 
 interface PersonalCardProps {
@@ -24,7 +25,7 @@ export function PersonalCard({ className }: PersonalCardProps) {
       </div>
 
       <div>
-        <p className="text-foreground text-sm font-semibold">Cristian Delgado</p>
+        <p className="text-foreground text-sm font-semibold">{siteConfig.name}</p>
         <p className="text-foreground-muted text-sm">
           Desarrollo web y sistemas a medida para negocios
         </p>

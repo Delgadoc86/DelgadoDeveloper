@@ -26,9 +26,9 @@ import {
   selfTaughtIntro,
 } from "@/features/about/data/education";
 
-const title = "Sobre mí — Desarrollo web y sistemas a medida para negocios";
+const title = "Sobre mí: desarrollo web en Mendoza";
 const description =
-  "Cristian Delgado desarrolla sitios web, sistemas y productos digitales para negocios que necesitan vender, operar y automatizar mejor.";
+  "Detrás de DelgadoDev hay un desarrollador, no una agencia: desarrollo web, sistemas a medida y apps para negocios de Mendoza y toda Argentina.";
 
 export const metadata: Metadata = {
   title,
@@ -105,7 +105,7 @@ export default function SobreMiPage() {
               Sobre mí · Mendoza, Argentina
             </p>
             <h1 className="text-foreground max-w-2xl text-4xl font-semibold text-balance sm:text-5xl">
-              Cristian Delgado — Desarrollo web y sistemas a medida para negocios
+              DelgadoDev — Desarrollo web y sistemas a medida para negocios
             </h1>
             <p className="text-foreground-muted mt-6 max-w-xl text-lg">
               Desarrollo sitios web, sistemas y productos digitales para negocios que

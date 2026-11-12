@@ -1,42 +1,31 @@
 import { Container } from "@/components/ui/container";
-import { SectionHeading } from "@/components/ui/section-heading";
-import { TechIcon } from "@/components/ui/tech-icon";
-import { FadeIn } from "@/components/motion/fade-in";
 import { stackGroups } from "@/features/stack/data/stack";
 
-export function StackSection() {
+/**
+ * Franja discreta con las tecnologías que uso. Solo texto: el stack es
+ * información de respaldo, no lo que se le vende al cliente.
+ */
+export function StackStrip() {
+  const items = stackGroups.flatMap((group) => group.items);
+
   return (
     <section
       id="tecnologias"
-      className="border-border/60 bg-background-subtle scroll-mt-24 border-t py-16 sm:py-20"
+      aria-labelledby="stack-heading"
+      className="border-border/60 bg-background-subtle scroll-mt-24 border-y py-8"
     >
-      <Container>
-        <SectionHeading eyebrow="Stack" title="Con qué trabajo" />
-
-        <div className="mt-10 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {stackGroups.map((group, index) => (
-            <FadeIn key={group.category} delay={index * 0.05}>
-              <h3 className="text-foreground text-sm font-semibold">{group.category}</h3>
-              <p className="text-foreground-muted mt-1 mb-4 text-xs">
-                {group.description}
-              </p>
-
-              <ul className="space-y-2">
-                {group.items.map((item) => (
-                  <li
-                    key={item}
-                    className="border-border bg-background flex items-center gap-2.5 rounded-lg border px-3 py-2.5"
-                  >
-                    <span className="text-foreground-muted flex size-4 shrink-0 items-center justify-center">
-                      <TechIcon name={item} className="size-4" />
-                    </span>
-                    <span className="text-foreground text-sm">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </FadeIn>
+      <Container className="flex flex-col gap-3 sm:flex-row sm:items-baseline sm:gap-6">
+        <h2
+          id="stack-heading"
+          className="text-foreground-muted shrink-0 font-mono text-xs tracking-wide uppercase"
+        >
+          Con qué trabajo
+        </h2>
+        <ul className="text-foreground-muted flex flex-wrap gap-x-4 gap-y-1.5 text-sm">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
           ))}
-        </div>
+        </ul>
       </Container>
     </section>
   );

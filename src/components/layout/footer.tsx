@@ -10,8 +10,10 @@ import {
 } from "@/components/ui/icons";
 import { siteConfig } from "@/config/site.config";
 import { socialLinks } from "@/constants/social-links";
+import { buildContactWhatsappUrl } from "@/lib/contact";
 import { mainNav } from "@/constants/nav";
-import { projects } from "@/features/projects/data/projects";
+import { featuredProjects } from "@/features/projects/data/projects";
+import { products } from "@/features/products/data/products";
 
 const socialIcons = [
   { label: "LinkedIn", href: socialLinks.linkedin, icon: LinkedinIcon },
@@ -40,8 +42,8 @@ export function Footer() {
               {siteConfig.name}
             </Link>
             <p className="text-foreground-muted mt-4 max-w-xs text-sm">
-              Construyo aplicaciones web y mobile simples, claras y funcionales para
-              resolver problemas reales de pequeños negocios, oficios y comercios.
+              Desarrollo web, sistemas a medida y apps para negocios de Mendoza y toda
+              Argentina.
             </p>
             <p className="text-foreground-muted mt-4 flex items-center gap-1.5 text-xs">
               <MapPin className="size-3.5" aria-hidden />
@@ -62,18 +64,16 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
-              {projects
-                .filter((project) => project.slug !== "mi-almacen")
-                .map((project) => (
-                  <li key={project.slug}>
-                    <Link
-                      href={`/trabajos/${project.slug}`}
-                      className="text-foreground-muted hover:text-foreground text-sm transition-colors"
-                    >
-                      {project.name}
-                    </Link>
-                  </li>
-                ))}
+              {[...products, ...featuredProjects].map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/trabajos/${item.slug}`}
+                    className="text-foreground-muted hover:text-foreground text-sm transition-colors"
+                  >
+                    Caso {item.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -90,7 +90,7 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href={socialLinks.whatsapp}
+                  href={buildContactWhatsappUrl()}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="text-foreground-muted hover:text-foreground text-sm transition-colors"

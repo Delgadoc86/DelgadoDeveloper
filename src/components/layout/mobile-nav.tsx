@@ -6,7 +6,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import { Mail, Menu, MessageCircle, X } from "lucide-react";
-import { InstagramIcon, TiktokIcon } from "@/components/ui/icons";
+import {
+  GithubIcon,
+  InstagramIcon,
+  LinkedinIcon,
+  TiktokIcon,
+} from "@/components/ui/icons";
 import { mainNav } from "@/constants/nav";
 import { socialLinks } from "@/constants/social-links";
 import { siteConfig } from "@/config/site.config";
@@ -14,6 +19,8 @@ import { siteConfig } from "@/config/site.config";
 const socialChannels = [
   { label: "Email", href: socialLinks.email, icon: Mail },
   { label: "WhatsApp", href: socialLinks.whatsapp, icon: MessageCircle },
+  { label: "GitHub", href: socialLinks.github, icon: GithubIcon },
+  { label: "LinkedIn", href: socialLinks.linkedin, icon: LinkedinIcon },
   { label: "Instagram", href: socialLinks.instagram, icon: InstagramIcon },
   { label: "TikTok", href: socialLinks.tiktok, icon: TiktokIcon },
 ];
@@ -174,7 +181,7 @@ export function MobileNav() {
   );
 
   return (
-    <div className="sm:hidden">
+    <div className="md:hidden">
       <button
         ref={triggerRef}
         type="button"

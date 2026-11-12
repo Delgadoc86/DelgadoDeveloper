@@ -32,7 +32,7 @@ import { FeatureGroups } from "@/features/projects/components/case-study/feature
 import { MetricsGrid } from "@/features/projects/components/case-study/metrics-grid";
 import { PerformanceSection } from "@/features/projects/components/case-study/performance-section";
 import { SolutionBlocks } from "@/features/projects/components/case-study/solution-blocks";
-import { projects } from "@/features/projects/data/projects";
+import { featuredProjects, projects } from "@/features/projects/data/projects";
 import { buildBreadcrumbJsonLd, buildProjectJsonLd } from "@/lib/seo";
 import { siteConfig } from "@/config/site.config";
 import type { Project } from "@/types/project";
@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
   const seoTitle =
     project.seoTitle ??
     (project.caseStudy
-      ? `${project.name} — Caso de éxito | ${siteConfig.name}`
+      ? `${project.name} — Caso de éxito`
       : `${project.name} — ${project.category}`);
   const seoDescription = project.seoDescription ?? project.description;
   const ogImages = project.coverImage ? [project.coverImage.src] : undefined;
@@ -67,6 +67,11 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     alternates: {
       canonical: `/trabajos/${project.slug}`,
     },
+    // Fichas que no se promocionan (ver `featuredProjects`) siguen accesibles
+    // por link directo, pero no se indexan.
+    robots: featuredProjects.some((item) => item.slug === project.slug)
+      ? undefined
+      : { index: false, follow: true },
     // Next.js no mezcla `openGraph`/`twitter` en profundidad entre layout y
     // page: si el objeto se define acá, reemplaza al del root layout entero
     // en vez de combinarse campo a campo. Por eso se repiten `type`, `locale`
@@ -189,23 +194,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                   </Button>
                 ) : null}
               </div>
-            ) : null}
-
-            {project.links.official ? (
-              <p className="text-foreground-muted mt-4 text-xs">
-                La descarga oficial de {project.name} para Android está disponible
-                únicamente en{" "}
-                <a
-                  href={project.links.official}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="text-accent-bright underline underline-offset-2"
-                >
-                  {new URL(project.links.official).hostname.replace(/^www\./, "")}
-                  <span className="sr-only"> (se abre en una nueva pestaña)</span>
-                </a>
-                .
-              </p>
             ) : null}
 
             {project.links.download && project.legalTermsUrl ? (

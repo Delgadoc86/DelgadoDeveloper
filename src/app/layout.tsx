@@ -20,9 +20,8 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  alternates: {
-    canonical: "/",
-  },
+  // El canonical se define en cada página (no acá): si viviera en el root
+  // layout, toda página sin canonical propio heredaría "/" por error.
   openGraph: {
     type: "website",
     locale: siteConfig.locale,

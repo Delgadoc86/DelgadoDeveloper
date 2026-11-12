@@ -2,7 +2,7 @@ import { MotionConfig } from "motion/react";
 import { CookieConsent } from "@/components/analytics/cookie-consent";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { buildPersonJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
+import { buildProfessionalServiceJsonLd, buildWebsiteJsonLd } from "@/lib/seo";
 
 export default function MarketingLayout({
   children,
@@ -14,7 +14,10 @@ export default function MarketingLayout({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([buildPersonJsonLd(), buildWebsiteJsonLd()]),
+          __html: JSON.stringify([
+            buildProfessionalServiceJsonLd(),
+            buildWebsiteJsonLd(),
+          ]),
         }}
       />
       <a

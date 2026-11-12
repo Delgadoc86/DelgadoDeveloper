@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/config/site.config";
-import { projects } from "@/features/projects/data/projects";
+import { products } from "@/features/products/data/products";
+import { featuredProjects } from "@/features/projects/data/projects";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
@@ -26,11 +27,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   ];
 
-  const projectRoutes: MetadataRoute.Sitemap = projects.map((project) => ({
-    url: `${siteConfig.url}/trabajos/${project.slug}`,
-    changeFrequency: "yearly",
-    priority: 0.8,
+  const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
+    url: `${siteConfig.url}/trabajos/${product.slug}`,
+    changeFrequency: "monthly",
+    priority: 0.9,
   }));
 
-  return [...staticRoutes, ...projectRoutes];
+  const projectRoutes: MetadataRoute.Sitemap = featuredProjects.map((project) => ({
+    url: `${siteConfig.url}/trabajos/${project.slug}`,
+    changeFrequency: "yearly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...productRoutes, ...projectRoutes];
 }

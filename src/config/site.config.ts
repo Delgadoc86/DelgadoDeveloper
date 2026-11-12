@@ -1,8 +1,8 @@
 export const siteConfig = {
   name: "DelgadoDev",
-  title: "DelgadoDev | Desarrollo web y sistemas a medida para negocios",
+  title: "DelgadoDev | Desarrollo web y apps a medida en Mendoza",
   description:
-    "DelgadoDev desarrolla sitios web, sistemas y productos digitales para negocios que necesitan vender, operar y automatizar mejor.",
+    "Desarrollo web en Mendoza: sitios, sistemas a medida y web apps para negocios. DelgadoDev, desarrollo React freelance para toda Argentina.",
   url: "https://www.delgadodev.com.ar",
   locale: "es_AR",
   author: {

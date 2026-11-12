@@ -11,12 +11,12 @@ export function AboutSummary() {
         <FadeIn>
           <SectionHeading
             eyebrow="Sobre mí"
-            title="No hago solo páginas web: diseño y desarrollo productos digitales para negocios"
-            description="Soy Cristian Delgado. Desarrollo sitios web, sistemas y productos digitales para negocios que necesitan soluciones claras, funcionales y orientadas a resultados reales."
+            title="DelgadoDev soy yo: un desarrollador, no una agencia"
+            description="Trabajo solo y de punta a punta: hablo con vos, diseño, programo, publico y mantengo. Me especializo en React, Next.js y React Native, y cada proyecto que publico, de PresuPDF a Date un Gusto, lo sigo manteniendo."
           />
 
           <Button href="/sobre-mi" variant="secondary" className="mt-6">
-            Hablemos de tu proyecto
+            Conocé más sobre mí
           </Button>
         </FadeIn>
 
