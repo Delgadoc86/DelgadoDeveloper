@@ -4,7 +4,6 @@ export interface OtherProject {
   /** Función principal del sitio para ese negocio puntual (evita textos genéricos repetidos entre proyectos). */
   focus: string;
   status: string;
-  stack: string[];
   url: string;
   responsibility: string;
 }
@@ -22,7 +21,6 @@ export const otherProjects: OtherProject[] = [
     focus:
       "Presencia web para un emprendimiento de comida casera, con presentación del negocio y contacto directo para pedidos.",
     status: "En producción",
-    stack: ["React", "Vite", "Firebase"],
     url: "https://dateungusto.vercel.app",
     responsibility:
       "Diseño, desarrollo y mantenimiento continuo, con panel propio para cargar menú y promos.",
@@ -33,7 +31,6 @@ export const otherProjects: OtherProject[] = [
     focus:
       "Sitio para un food truck de comida casera y cerveza artesanal, pensado para mostrar la propuesta del negocio y facilitar el contacto.",
     status: "En producción",
-    stack: ["React", "Vite", "Firebase"],
     url: "https://silverio-food-truck.vercel.app",
     responsibility:
       "Diseño, desarrollo y mantenimiento continuo, con panel propio para cargar menú y promos.",

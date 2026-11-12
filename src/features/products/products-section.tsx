@@ -1,7 +1,6 @@
 import { ArrowRight, Check } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { OfficialSiteButton } from "@/features/projects/components/official-site-button";
@@ -51,14 +50,6 @@ export function ProductsSection() {
                           aria-hidden
                         />
                         {benefit}
-                      </li>
-                    ))}
-                  </ul>
-
-                  <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Stack">
-                    {product.stack.map((tech) => (
-                      <li key={tech}>
-                        <Badge className="px-2.5 py-0.5 text-[11px]">{tech}</Badge>
                       </li>
                     ))}
                   </ul>

@@ -1,5 +1,4 @@
 import { ArrowUpRight } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/motion/fade-in";
 import { otherProjects } from "@/features/projects/data/other-projects";
 
@@ -32,12 +31,6 @@ export function OtherProjectsList() {
               </div>
 
               <p className="text-foreground-muted mt-3 text-sm">{project.focus}</p>
-
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {project.stack.map((tech) => (
-                  <Badge key={tech}>{tech}</Badge>
-                ))}
-              </div>
 
               <p className="text-foreground-muted mt-3 text-xs">
                 {project.responsibility}

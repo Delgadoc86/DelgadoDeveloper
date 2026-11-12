@@ -54,8 +54,6 @@ src/
                            # other-projects.ts (sitios sin caso de estudio)
     projects/components/  # ProjectCard, DownloadButton (tracking de clic por producto),
                            # OtherProjectsList
-    about/data/            # education.ts — certificaciones, formación complementaria y
-                           # aprendizaje autodidacta aplicado, mostrados en /sobre-mi
   config/               # site.config.ts — fuente única de verdad (nombre, url, autor)
   constants/            # Nav y links sociales
   lib/                  # utils (cn), helpers de SEO/JSON-LD/GA (trackPageview, trackEvent),
@@ -113,7 +111,7 @@ El proyecto se despliega en Vercel, que detecta Next.js automáticamente por `ne
 
 > **Rediseño comercial y SEO (2026-11-12):** el detalle de cada cambio y su motivo está en
 > [`CAMBIOS_VENTA_SEO_DELGADODEV.md`](CAMBIOS_VENTA_SEO_DELGADODEV.md). Algunas notas
-> históricas de abajo (reclutadores, PresuPDF como APK) ya no describen el sitio actual.
+> históricas de abajo (por ejemplo, PresuPDF como APK) ya no describen el sitio actual.
 
 Sitio completo y funcional: home con PresuPDF y QREvento como productos destacados (cada uno
 con caso propio), casos de `DecideSer` y `Catálogo Autos`, otros dos sitios en producción
@@ -126,13 +124,8 @@ Open Graph propios por página), accesibilidad (navegación por teclado, focus v
 dependencias innecesarias) y Google Analytics detrás de un banner de consentimiento de
 cookies (Ley 25.326 / buenas prácticas RGPD).
 
-El home está pensado primero para reclutadores (indicador de disponibilidad laboral en el
-hero, botón "Ver GitHub" al perfil público, CV descargable) y en segundo lugar para
-clientes freelance — ambos objetivos conviven sin secciones separadas. La sección
-"Formación" de `/sobre-mi` distingue tres niveles: certificaciones formales (Coderhouse,
-Educación IT), formación complementaria de menor jerarquía visual, y un bloque de
-aprendizaje autodidacta aplicado (Next.js, React Native, Firebase...) respaldado por
-evidencia real de proyectos, no solo enunciado.
+El sitio vende servicios como empresa: no muestra stack técnico, formación ni CV de cara al
+cliente (ver `CAMBIOS_VENTA_SEO_DELGADODEV.md`, sección "Sin stack ni señales de CV").
 
 Mi Almacén se distribuye como APK fuera de Google Play: tiene un botón "Descargar APK" en
 su página (enlace a Google Drive) y un evento de Google Analytics propio por clic

@@ -36,7 +36,6 @@ export interface ProductShowcase {
   summary: string;
   /** Exactamente 3 beneficios en lenguaje de cliente, sin jerga técnica. */
   benefits: [string, string, string];
-  stack: string[];
   /** Capturas usadas en la tarjeta y en el encabezado de la página del caso. */
   showcase: { desktop: DeviceShot; mobile: DeviceShot };
   gallery: DeviceShot[];

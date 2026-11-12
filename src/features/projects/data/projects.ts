@@ -25,8 +25,8 @@ export const projects: Project[] = [
     targetUser:
       "Personas que buscan productos Avon y Natura de forma rápida desde el celular, y el equipo de DecideSer, que necesita mantener el catálogo actualizado sin depender de un desarrollador para cada cambio.",
     solution:
-      "Plataforma de catálogo digital construida con Next.js y Firebase: home con descubrimiento por categorías y marcas, catálogo con filtros y orden, ficha de producto, pedido por WhatsApp y un panel de administración propio para cargar y mantener los 266 productos.",
-    role: "Desarrollo completo de la plataforma: arquitectura Next.js, modelo de datos en Firestore, catálogo dinámico, panel de administración con autenticación, SEO técnico, performance y preparación de la infraestructura de analítica.",
+      "Plataforma de catálogo digital a medida: home con descubrimiento por categorías y marcas, catálogo con filtros y orden, ficha de producto, pedido por WhatsApp y un panel de administración propio para cargar y mantener los 266 productos.",
+    role: "Desarrollo completo de la plataforma: diseño, base de datos, catálogo dinámico, panel de administración con autenticación, SEO técnico, performance y preparación de la infraestructura de analítica.",
     stack: [
       "Next.js",
       "React",
@@ -233,7 +233,7 @@ export const projects: Project[] = [
           { value: "100", label: "SEO" },
         ],
         detail:
-          "Server Components, poco JS de cliente, next/image y Firestore optimizado.",
+          "Optimizado para cargar rápido en el celular, incluso con cientos de productos.",
         screenshot: {
           src: "/assets/projects/decideser/pagespeed.webp",
           alt: "Reporte de PageSpeed Insights de DecideSer: 98 Performance, 96 Accesibilidad, 100 Prácticas recomendadas, 100 SEO",
@@ -367,7 +367,7 @@ export const projects: Project[] = [
       "Agencias de autos pequeñas y medianas que desean mostrar su stock de forma profesional sin reemplazar sus canales habituales de venta.",
     solution:
       "Aplicación web que permite administrar y publicar un catálogo propio de vehículos con fotografías, información técnica, filtros de búsqueda y contacto directo por WhatsApp. El objetivo no es reemplazar Marketplace o Instagram, sino complementarlos con un sitio propio donde el cliente encuentre toda la información organizada.",
-    role: "Diseño y desarrollo del producto completo: investigación inicial, definición del MVP, arquitectura frontend, modelo de datos en Firebase, panel de administración, carga de vehículos, filtros de búsqueda, optimización responsive y despliegue en Vercel. También realicé visitas comerciales a agencias para validar la propuesta y obtener feedback directo.",
+    role: "Diseño y desarrollo del producto completo: investigación inicial, definición del MVP, diseño, base de datos, panel de administración, carga de vehículos, filtros de búsqueda, adaptación a celulares y publicación. También realicé visitas comerciales a agencias para validar la propuesta y obtener feedback directo.",
     stack: [
       "React",
       "Vite",

@@ -5,7 +5,6 @@ import { ServicesSection } from "@/features/services/services-section";
 import { ProjectsSection } from "@/features/projects/projects-section";
 import { ProcessSection } from "@/features/process/process-section";
 import { AboutSummary } from "@/features/about/about-summary";
-import { StackStrip } from "@/features/stack/stack-section";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
 
 export const metadata: Metadata = {
@@ -23,7 +22,6 @@ export default function Home() {
       <ProjectsSection />
       <ProcessSection />
       <AboutSummary />
-      <StackStrip />
       <ContactCta />
     </>
   );

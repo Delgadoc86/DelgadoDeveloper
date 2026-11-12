@@ -34,7 +34,7 @@ export function Hero() {
             <div className="border-border bg-background-subtle mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1">
               <span className="bg-accent size-1.5 rounded-full" aria-hidden />
               <span className="text-foreground-muted text-xs font-medium">
-                Desarrollador React freelance · Mendoza
+                Desarrollo web y apps · Mendoza
               </span>
             </div>
           </FadeIn>

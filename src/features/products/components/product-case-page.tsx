@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, MessageCircle } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
@@ -109,7 +108,7 @@ export function ProductCasePage({ product }: ProductCasePageProps) {
         </Container>
       </section>
 
-      {/* Qué construí + stack */}
+      {/* Qué construí */}
       <section className="border-border/60 border-t py-12 sm:py-16">
         <Container>
           <FadeIn>
@@ -145,17 +144,6 @@ export function ProductCasePage({ product }: ProductCasePageProps) {
               </FadeIn>
             ))}
           </div>
-
-          <FadeIn>
-            <h2 className="text-foreground mt-12 text-sm font-semibold">Stack</h2>
-            <ul className="mt-3 flex flex-wrap gap-2">
-              {product.stack.map((tech) => (
-                <li key={tech}>
-                  <Badge>{tech}</Badge>
-                </li>
-              ))}
-            </ul>
-          </FadeIn>
         </Container>
       </section>
 

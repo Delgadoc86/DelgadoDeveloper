@@ -11,8 +11,6 @@ import {
   Images,
   Lightbulb,
   ListChecks,
-  ListTodo,
-  Mail,
   PenTool,
   Puzzle,
   TrendingUp,
@@ -20,7 +18,6 @@ import {
   Users,
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
@@ -117,10 +114,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     { name: project.name, url: `${siteConfig.url}/trabajos/${project.slug}` },
   ]);
 
-  const docsMailto = `${siteConfig.author.email}?subject=${encodeURIComponent(
-    `Documentación de ${project.name}`,
-  )}`;
-
   return (
     <>
       <script
@@ -159,12 +152,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
             <p className="text-foreground-muted mt-4 max-w-xl text-lg">
               {project.tagline}
             </p>
-
-            <div className="mt-6 flex flex-wrap gap-2">
-              {project.stack.map((tech) => (
-                <Badge key={tech}>{tech}</Badge>
-              ))}
-            </div>
 
             {(project.links.official ?? project.links.download ?? project.links.demo) ? (
               <div className="mt-8 flex flex-wrap gap-4">
@@ -277,25 +264,6 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
           </section>
 
           <TechnicalDetails project={project} />
-
-          <section className="border-border/60 border-t py-12 sm:py-16">
-            <Container className="text-center">
-              <FadeIn>
-                <p className="text-foreground-muted mx-auto max-w-md text-sm">
-                  {project.name} es uno de los productos que construí — trabajo en
-                  soluciones similares para otros rubros y plataformas.
-                </p>
-                <Button
-                  href={`mailto:${docsMailto}`}
-                  variant="secondary"
-                  className="mt-5"
-                >
-                  <Mail className="size-4" aria-hidden />
-                  Pedir documentación completa
-                </Button>
-              </FadeIn>
-            </Container>
-          </section>
         </>
       )}
 
@@ -426,7 +394,7 @@ function TechnicalDetails({ project }: { project: Project }) {
               className="size-4 shrink-0 transition-transform group-open:rotate-90"
               aria-hidden
             />
-            Ver detalles técnicos
+            Ver más detalles del proyecto
           </summary>
 
           <div className="mt-8 grid gap-8 sm:grid-cols-2">
@@ -460,16 +428,6 @@ function TechnicalDetails({ project }: { project: Project }) {
                 <h3 className="text-foreground text-sm font-semibold">Estado actual</h3>
               </div>
               <p className="text-foreground-muted mt-3 text-sm">{project.status}</p>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2">
-                <ListTodo className="text-accent-bright size-4" aria-hidden />
-                <h3 className="text-foreground text-sm font-semibold">
-                  Qué falta completar
-                </h3>
-              </div>
-              <p className="text-foreground-muted mt-3 text-sm">{project.pendingWork}</p>
             </div>
 
             <div className="sm:col-span-2">

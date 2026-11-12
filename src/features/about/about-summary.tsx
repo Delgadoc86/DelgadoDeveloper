@@ -12,7 +12,7 @@ export function AboutSummary() {
           <SectionHeading
             eyebrow="Sobre mí"
             title="DelgadoDev soy yo: un desarrollador, no una agencia"
-            description="Trabajo solo y de punta a punta: hablo con vos, diseño, programo, publico y mantengo. Me especializo en React, Next.js y React Native, y cada proyecto que publico, de PresuPDF a Date un Gusto, lo sigo manteniendo."
+            description="Trabajo solo y de punta a punta: hablo con vos, diseño, programo, publico y mantengo. Cada proyecto que publico, de PresuPDF a Date un Gusto, lo sigo manteniendo."
           />
 
           <Button href="/sobre-mi" variant="secondary" className="mt-6">

@@ -69,13 +69,12 @@ export const products: ProductShowcase[] = [
       "Clientes, historial y estado de cada presupuesto",
       "Misma cuenta en PC y celular, instalable como app",
     ],
-    stack: ["React", "Next.js", "TypeScript", "Firebase", "Vercel"],
     showcase: { desktop: presupdfDesktop, mobile: presupdfMobile },
     gallery: [presupdfDesktop, presupdfMobile],
     seo: {
       title: "Caso PresuPDF: app de presupuestos en PDF",
       description:
-        "Cómo construí PresuPDF, la app de presupuestos en PDF para oficios y pymes: web app + PWA con Next.js y Firebase, cobro con Mercado Pago y +500 usuarios.",
+        "Cómo construí PresuPDF, la app de presupuestos en PDF para oficios y pymes: web app + PWA con cobro por Mercado Pago y más de 500 usuarios registrados.",
       h1: "PresuPDF: app de presupuestos en PDF para oficios y pymes",
     },
     intro:
@@ -137,7 +136,6 @@ export const products: ProductShowcase[] = [
       "Feed en vivo y pantalla gigante, con moderación automática",
       "Descarga de todo el álbum en alta resolución",
     ],
-    stack: ["Next.js 15", "TypeScript", "Tailwind CSS", "Firebase"],
     showcase: { desktop: qreventoLive, mobile: qreventoDemo },
     gallery: [qreventoDesktop, qreventoMobile, qreventoLive, qreventoDemo],
     extraLinks: [
@@ -150,7 +148,7 @@ export const products: ProductShowcase[] = [
     seo: {
       title: "Caso QREvento: álbum QR para eventos en vivo",
       description:
-        "QREvento, el álbum QR para eventos que desarrollé: los invitados suben fotos sin instalar apps y se ven en pantalla gigante. Next.js 15 y Firebase.",
+        "QREvento, el álbum QR para eventos que desarrollé: los invitados suben fotos sin instalar apps y se ven en vivo en la pantalla gigante del salón.",
       h1: "QREvento: álbum QR para eventos con fotos en vivo",
     },
     intro:

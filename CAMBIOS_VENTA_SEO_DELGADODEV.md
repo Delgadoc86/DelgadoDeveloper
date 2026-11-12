@@ -28,7 +28,7 @@ Mendoza". Se mantuvo el diseño visual existente (tema oscuro, acento violeta, c
 ## Cambios en el home
 
 Nuevo orden: Hero → Mis productos → Qué puedo hacer por tu negocio → Más trabajos → Cómo
-trabajo → Sobre mí → franja de stack → Contacto.
+trabajo → Sobre mí → Contacto.
 
 | Sección                            | Qué cambió                                                                                                                                                                                                                                          | Por qué                                                                                                                                                                            |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -37,7 +37,7 @@ trabajo → Sobre mí → franja de stack → Contacto.
 | **Qué puedo hacer por tu negocio** | 6 beneficios (aparecer en Google, vender por WhatsApp, dejar las planillas, cobrar online, actualizarlo uno mismo, estar en el celular), cada uno con el trabajo real que lo respalda.                                                              | Un cliente no técnico compra resultados, no tecnologías.                                                                                                                           |
 | **Más trabajos**                   | Reúne DecideSer y Catálogo Autos (tarjetas con caso) más Date un Gusto y Silverio Foodtruck ("Más sitios en producción").                                                                                                                           | Mantiene visibles todos los trabajos con menor peso que los productos destacados.                                                                                                  |
 | **Cómo trabajo**                   | 4 pasos: Charlamos → Diseño → Desarrollo → Lanzamiento y soporte.                                                                                                                                                                                   | Le quita incertidumbre al cliente sobre el proceso, sin prometer precios ni plazos.                                                                                                |
-| **Stack**                          | La grilla de 4 columnas con íconos pasó a una franja discreta de solo texto.                                                                                                                                                                        | El stack es respaldo, no lo que se vende. Además corrige "NNext.js" y "TSTypeScript": los monogramas de `TechIcon` se leían pegados al nombre.                                     |
+| **Stack**                          | Eliminado del sitio (ver "Sin stack ni señales de CV").                                                                                                                                                                                             | Al cliente le importa qué se resuelve, no con qué tecnología.                                                                                                                      |
 | **Contacto**                       | Formulario corto (nombre, qué necesitás, WhatsApp opcional) que abre WhatsApp con el mensaje armado, sin backend. GitHub y LinkedIn visibles junto a los otros canales.                                                                             | WhatsApp es el canal que ya usa el cliente. Sin backend no hay datos guardados ni nada que mantener.                                                                               |
 
 **Navegación:** Productos · Trabajos · Cómo trabajo · Sobre mí · Contacto. Con 5 links, el
@@ -80,7 +80,32 @@ legales. Ver `HIDDEN_PROJECT_SLUGS` / `featuredProjects` en `projects.ts`.
   nuevos y excluye Mi Almacén.
 - **Bug corregido:** el title de DecideSer repetía "| DelgadoDev | DelgadoDev".
 - Palabras clave usadas de forma natural en el texto visible: desarrollo web Mendoza,
-  desarrollador React freelance, sistemas a medida, app de presupuestos, álbum QR para eventos.
+  sistemas a medida, app de presupuestos, álbum QR para eventos. "Desarrollador React
+  freelance" se descartó a propósito (ver "Sin stack ni señales de CV").
+
+## Sin stack ni señales de CV
+
+DelgadoDev se presenta como una empresa que resuelve problemas, no como alguien que busca
+trabajo en IT. Por eso se quitó del sitio todo lo que se lee como currículum:
+
+- La franja "Con qué trabajo" del home y los badges de tecnologías de las tarjetas, de "Más
+  sitios en producción" y de todas las páginas de caso.
+- "Desarrollador React freelance" del hero y de la meta description. El badge ahora dice
+  "Desarrollo web y apps · Mendoza".
+- Las tecnologías de la tarjeta personal y del bloque "Sobre mí", y las menciones a
+  frameworks en los textos de DecideSer y Catálogo Autos.
+- La sección **Formación** de `/sobre-mi` (cursos, certificaciones, aprendizaje autodidacta)
+  y su archivo de datos `education.ts`.
+- En las fichas de DecideSer y Catálogo Autos: el bloque "Qué falta completar" (mostraba
+  trabajo pendiente al cliente) y el botón "Pedir documentación completa" (pensado para
+  reclutadores). El desplegable pasó a llamarse "Ver más detalles del proyecto".
+
+_Por qué:_ un cliente no técnico no valora el stack y puede confundirlo. Lo que convence son
+las capturas, las métricas y los beneficios. Que la competencia vea el stack no fue el motivo
+principal: cualquier desarrollador lo detecta con una extensión del navegador.
+
+Se mantiene, sin mostrarse en la página: `knowsAbout` en el JSON-LD (derivado de
+`features/stack/data/stack.ts`) y el campo `stack` de `projects.ts` como dato interno.
 
 ## Capturas
 

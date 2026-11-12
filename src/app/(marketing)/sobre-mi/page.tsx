@@ -13,18 +13,10 @@ import {
 } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
-import { Badge } from "@/components/ui/badge";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
 import { PersonalCard } from "@/features/about/personal-card";
 import { siteConfig } from "@/config/site.config";
-import {
-  complementaryCredentials,
-  educationIntro,
-  mainCredentials,
-  selfTaughtAreas,
-  selfTaughtIntro,
-} from "@/features/about/data/education";
 
 const title = "Sobre mí: desarrollo web en Mendoza";
 const description =
@@ -166,89 +158,6 @@ export default function SobreMiPage() {
                 </li>
               ))}
             </ul>
-          </FadeIn>
-        </Container>
-      </section>
-
-      <section className="border-border/60 border-t py-16 sm:py-24">
-        <Container>
-          <FadeIn>
-            <SectionHeading
-              eyebrow="Formación"
-              title="Formación y aprendizaje continuo"
-              description={educationIntro}
-            />
-          </FadeIn>
-
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
-            {mainCredentials.map((credential, index) => (
-              <FadeIn key={credential.name} delay={index * 0.05}>
-                <div className="border-border h-full rounded-xl border p-5">
-                  <p className="text-foreground text-sm font-semibold">
-                    {credential.name}
-                  </p>
-                  <p className="text-foreground-muted mt-1 text-xs">
-                    {credential.institution}
-                  </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <Badge>{credential.status}</Badge>
-                    <span className="text-foreground-muted font-mono text-xs">
-                      {credential.period}
-                    </span>
-                  </div>
-                  <p className="text-foreground-muted mt-3 text-xs">
-                    {credential.description}
-                  </p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-
-          <FadeIn delay={0.1}>
-            <div className="mt-14">
-              <h3 className="text-foreground text-lg font-semibold">
-                Aprendizaje autodidacta aplicado
-              </h3>
-              <p className="text-foreground-muted mt-2 max-w-2xl text-sm">
-                {selfTaughtIntro}
-              </p>
-
-              <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                {selfTaughtAreas.map((area) => (
-                  <div
-                    key={area.title}
-                    className="border-border bg-background-subtle rounded-xl border p-5"
-                  >
-                    <p className="text-foreground text-sm font-semibold">{area.title}</p>
-                    <div className="mt-3 flex flex-wrap gap-1.5">
-                      {area.items.map((item) => (
-                        <Badge key={item}>{item}</Badge>
-                      ))}
-                    </div>
-                    {area.evidence ? (
-                      <p className="text-foreground-muted mt-3 text-xs">
-                        Evidencia: {area.evidence.join(", ")}
-                      </p>
-                    ) : null}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.15}>
-            <div className="mt-14">
-              <h3 className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
-                Formación complementaria
-              </h3>
-              <ul className="mt-4 space-y-1.5">
-                {complementaryCredentials.map((credential) => (
-                  <li key={credential.name} className="text-foreground-muted text-sm">
-                    {credential.name} — {credential.institution} — {credential.period}
-                  </li>
-                ))}
-              </ul>
-            </div>
           </FadeIn>
         </Container>
       </section>

@@ -31,7 +31,7 @@ export function PersonalCard({ className }: PersonalCardProps) {
         </p>
         <p className="text-foreground-muted mt-1 text-xs">Mendoza, Argentina</p>
         <p className="text-foreground-muted mt-2 font-mono text-xs">
-          React · React Native · Firebase
+          Sitios · Sistemas · Apps
         </p>
       </div>
     </div>
