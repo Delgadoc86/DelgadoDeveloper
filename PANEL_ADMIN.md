@@ -2,8 +2,10 @@
 
 Panel privado en `/admin` para gestionar los productos de DelgadoDev: enlaces
 de descarga de apps, clientes, productos/servicios, suscripciones, pagos y
-comprobantes. Backend en un proyecto Firebase separado (`delgadodevgestion`),
-independiente del Firebase de PresuFácil, Mi Almacén o cualquier catálogo.
+comprobantes. Backend en un proyecto Firebase separado (`delgadodev-gestion`,
+cuenta `delgadodev86@gmail.com`), independiente del Firebase de PresuPDF, QREvento,
+Mi Almacén o cualquier catálogo. Hasta 2026-11 era `delgadodevgestion`; ver
+"Migración de proyecto Firebase (2026-11-12)" más abajo.
 
 Ver [`ROADMAP_DELGADODEV_GESTION.md`](ROADMAP_DELGADODEV_GESTION.md) para el
 detalle etapa por etapa de cómo se construyó (con notas de verificación) y las
@@ -34,8 +36,9 @@ admin):
    No hay forma de crear un admin nuevo desde el panel mismo (a propósito: solo
    se hace desde la consola, nunca desde un formulario público).
 3. Si la cuenta de Firebase Auth se pierde por completo, el proyecto
-   `delgadodevgestion` y sus datos en Firestore siguen intactos — solo hay que
-   recrear el acceso, no los datos.
+   `delgadodev-gestion` y sus datos en Firestore siguen intactos — solo hay que
+   recrear el acceso, no los datos. Si lo que se pierde es **el proyecto entero**,
+   los datos solo se recuperan desde un backup (ver la migración de 2026-11-12).
 
 ## Guías de uso
 
@@ -201,6 +204,33 @@ Si en el futuro se actualiza `firebase-admin` y este override deja de hacer
 falta (porque `jwks-rsa` actualizó su propio import), se puede sacar — pero
 solo después de confirmar en un deploy de Preview, no directo en producción.
 
+## Migración de proyecto Firebase (2026-11-12)
+
+**Qué pasó:** el proyecto original `delgadodevgestion` se borró por error desde la
+consola de Firebase. Google mantiene un proyecto borrado 30 días en "pendiente de
+eliminación" y se puede restaurar en ese plazo, pero cuando se detectó ya había
+pasado más de un mes: no figuraba como restaurable en ninguna de las cuentas de
+Google. Síntomas: no llegaba el mail de recuperación de contraseña (la cuenta ya no
+existía), el login del panel fallaba y `/descargar/mi-almacen` dejó de funcionar.
+
+**Qué se hizo:**
+
+- Proyecto nuevo **`delgadodev-gestion`** en la cuenta `delgadodev86@gmail.com`.
+- Firestore en `southamerica-east1` (São Paulo, la región más cercana a Mendoza),
+  con las mismas reglas de `firestore.rules`.
+- App web y clave de cuenta de servicio nuevas: actualizadas en `.env.local` y en
+  las variables de entorno de Vercel (mismos nombres de variables, solo cambian
+  los valores; no hubo cambios de código).
+- Restaurado desde `backups/firestore-backup-2026-08-02...json`: `apps` (link del
+  APK de Mi Almacén) y `products` (6 productos del catálogo).
+- **Se perdió:** clientes, suscripciones, pagos y comprobantes cargados después del
+  2026-08-02, porque no había un backup más reciente.
+- El usuario admin se crea de nuevo (Authentication → Correo electrónico/contraseña
+  tiene que estar habilitado en la consola: activarlo por API exige facturación).
+
+**Lección:** correr el backup manual cada mes (ver abajo). Es lo único que permite
+recuperar datos si el proyecto se borra.
+
 ## Mantenimiento y backups
 
 - **Backup manual**: `node scripts/export-firestore-backup.mjs` (necesita
@@ -208,8 +238,9 @@ solo después de confirmar en un deploy de Preview, no directo en producción.
   colecciones en `backups/`, que está en `.gitignore` — nunca se sube a Git
   porque tiene datos reales de clientes y pagos.
 - **Cuándo correrlo**: antes de cualquier cambio grande al modelo de datos, y
-  como buena práctica cada tanto (mensual, por ejemplo) mientras no exista un
-  backup automático programado.
+  **una vez por mes** mientras no exista un backup automático programado. Sin
+  backup reciente, un proyecto borrado se pierde con todos sus datos (pasó en
+  2026-11, ver la migración de arriba).
 - **Reglas de Firestore**: si se edita `firestore.rules`, hay que republicarlo
   a mano en Firebase Console → Firestore Database → Reglas (no hay
   despliegue automático desde este repo).
