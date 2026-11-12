@@ -1,394 +1,411 @@
 import Link from "next/link";
 import {
-  AlertCircle,
-  AlertTriangle,
-  ArrowDown,
-  ArrowUp,
-  DollarSign,
-  Package,
+  ArrowDownRight,
+  ArrowRight,
+  ArrowUpRight,
+  CalendarClock,
+  FileWarning,
   Receipt,
-  Repeat,
-  Smartphone,
-  UserPlus,
   Users,
+  Wallet,
 } from "lucide-react";
-import { getAdminDb } from "@/lib/firebase/admin";
-import { getSessionAdmin } from "@/lib/auth/session";
+import {
+  getCustomers,
+  getPayments,
+  getProducts,
+  getReceiptsById,
+  getSubscriptions,
+} from "@/lib/admin/data";
+import {
+  dueState,
+  formatCurrency,
+  formatPeriod,
+  formatPeriodShort,
+  formatRelativeDay,
+  METHOD_LABEL,
+} from "@/lib/admin/format";
 import {
   getArgentinaCurrentPeriod,
   getArgentinaTodayISO,
-  addDaysISO,
   shiftPeriod,
 } from "@/lib/timezone";
-import type { PaymentRecord } from "@/types/payment";
-import type { CustomerRecord } from "@/types/customer";
-import type { ProductRecord } from "@/types/product";
-import type { SubscriptionRecord } from "@/types/subscription";
-import { StatTile } from "./stat-tile";
+import { PAYMENT_METHODS, type PaymentRecord } from "@/types/payment";
+import { cn } from "@/lib/utils";
+import { ButtonLink } from "../_ui/button";
+import { BarList, SegmentedBar } from "../_ui/charts/breakdown";
+import { TrendChart } from "../_ui/charts/trend-chart";
+import { PaymentItem } from "../_ui/payment-item";
+import { Avatar, Card, CardHeader, EmptyState, StatusBadge } from "../_ui/primitives";
 import { DashboardFilters } from "./dashboard-filters";
-import { LogoutButton } from "./logout-button";
-import { ThemeToggle } from "../theme-toggle";
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function percentDelta(current: number, previous: number): number {
-  if (previous === 0) return current === 0 ? 0 : 100;
+/** % de variación. null = mes anterior en cero (no hay contra qué comparar). */
+function delta(current: number, previous: number): number | null {
+  if (previous === 0) return null;
   return ((current - previous) / previous) * 100;
 }
+
+const METHOD_COLOR: Record<string, string> = {
+  transferencia: "var(--method-1)",
+  mercado_pago: "var(--method-2)",
+  efectivo: "var(--method-3)",
+  otro: "var(--method-4)",
+};
 
 export default async function AdminDashboardPage({
   searchParams,
 }: {
   searchParams: Promise<{ period?: string; productId?: string }>;
 }) {
-  const admin = await getSessionAdmin();
-  if (!admin) return null;
-
   const params = await searchParams;
-  const db = getAdminDb();
+  const [payments, customers, products, subscriptions, receiptsById] = await Promise.all([
+    getPayments(),
+    getCustomers(),
+    getProducts(),
+    getSubscriptions(),
+    getReceiptsById(),
+  ]);
 
-  const [paymentsSnapshot, customersSnapshot, productsSnapshot, subscriptionsSnapshot] =
-    await Promise.all([
-      db.collection("payments").get(),
-      db.collection("customers").get(),
-      db.collection("products").get(),
-      db.collection("subscriptions").get(),
-    ]);
-
-  const payments: PaymentRecord[] = paymentsSnapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      customerId: data.customerId,
-      productId: data.productId,
-      subscriptionId: data.subscriptionId ?? null,
-      amount: data.amount,
-      concept: data.concept,
-      period: data.period,
-      method: data.method,
-      date: data.date,
-      transferReference: data.transferReference ?? null,
-      notes: data.notes ?? null,
-      status: data.status,
-      receiptId: data.receiptId ?? null,
-      createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-      updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-      createdBy: data.createdBy,
-      updatedBy: data.updatedBy,
-    };
-  });
-
-  const customers: CustomerRecord[] = customersSnapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      name: data.name,
-      businessName: data.businessName ?? undefined,
-      phone: data.phone,
-      phoneRaw: data.phoneRaw,
-      email: data.email ?? undefined,
-      taxId: data.taxId ?? undefined,
-      type: data.type,
-      status: data.status,
-      notes: data.notes ?? undefined,
-      productIds: data.productIds ?? [],
-      createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-      updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-      createdBy: data.createdBy,
-      updatedBy: data.updatedBy,
-    };
-  });
-
-  const products: ProductRecord[] = productsSnapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      name: data.name,
-      type: data.type,
-      suggestedPrice: data.suggestedPrice ?? null,
-      suggestedFrequency: data.suggestedFrequency ?? null,
-      active: data.active,
-      createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-      updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-    };
-  });
-
-  const subscriptions: SubscriptionRecord[] = subscriptionsSnapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      customerId: data.customerId,
-      productId: data.productId,
-      amount: data.amount,
-      frequency: data.frequency,
-      nextDueDate: data.nextDueDate,
-      status: data.status,
-      lastPaymentAt: data.lastPaymentAt?.toDate?.().toISOString() ?? null,
-      createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-      updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-      createdBy: data.createdBy,
-      updatedBy: data.updatedBy,
-    };
-  });
-
+  const today = getArgentinaTodayISO();
   const period = params.period || getArgentinaCurrentPeriod();
   const previousPeriod = shiftPeriod(period, -1);
   const productId = params.productId || "all";
 
-  const matchesFilter = (payment: PaymentRecord, targetPeriod: string) =>
-    payment.period === targetPeriod &&
-    payment.status === "emitido" &&
-    (productId === "all" || payment.productId === productId);
+  // Ingresos = todo cobro no anulado (con o sin comprobante), por período.
+  const counts = (p: PaymentRecord) =>
+    p.status !== "anulado" && (productId === "all" || p.productId === productId);
+  const inPeriod = (target: string) =>
+    payments.filter((p) => counts(p) && p.period === target);
 
-  const currentPayments = payments.filter((payment) => matchesFilter(payment, period));
-  const previousPayments = payments.filter((payment) =>
-    matchesFilter(payment, previousPeriod),
-  );
+  const current = inPeriod(period);
+  const previous = inPeriod(previousPeriod);
+  const income = current.reduce((s, p) => s + p.amount, 0);
+  const incomePrev = previous.reduce((s, p) => s + p.amount, 0);
+  const incomeDelta = delta(income, incomePrev);
+  const countDelta = delta(current.length, previous.length);
+  const avgTicket = current.length ? income / current.length : 0;
+  const avgTicketPrev = previous.length ? incomePrev / previous.length : 0;
 
-  const ingresos = currentPayments.reduce((sum, payment) => sum + payment.amount, 0);
-  const ingresosPrev = previousPayments.reduce((sum, payment) => sum + payment.amount, 0);
-  const cantidadPagos = currentPayments.length;
-  const cantidadPagosPrev = previousPayments.length;
+  const trend = Array.from({ length: 12 }, (_, i) => {
+    const key = shiftPeriod(period, i - 11);
+    return {
+      key,
+      label: formatPeriodShort(key),
+      fullLabel: formatPeriod(key),
+      value: inPeriod(key).reduce((s, p) => s + p.amount, 0),
+    };
+  });
 
-  const clientesActivos = customers.filter(
-    (customer) => customer.status === "activo",
-  ).length;
-  const suscripcionesActivas = subscriptions.filter(
-    (sub) => sub.status === "activa",
-  ).length;
+  const byProduct = products.map((product) => ({
+    key: product.id,
+    label: product.name,
+    value: current
+      .filter((p) => p.productId === product.id)
+      .reduce((s, p) => s + p.amount, 0),
+  }));
 
-  const today = getArgentinaTodayISO();
-  const in7Days = addDaysISO(today, 7);
-  const isTrackable = (sub: SubscriptionRecord) =>
-    sub.status !== "cancelada" && sub.status !== "pausada";
+  const byMethod = PAYMENT_METHODS.map((method) => ({
+    key: method,
+    label: METHOD_LABEL[method],
+    color: METHOD_COLOR[method],
+    value: current.filter((p) => p.method === method).reduce((s, p) => s + p.amount, 0),
+  }));
 
-  const proximosVencimientos = subscriptions
-    .filter(
-      (sub) => isTrackable(sub) && sub.nextDueDate >= today && sub.nextDueDate <= in7Days,
-    )
-    .sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate));
+  const pendingReceipts = payments.filter((p) => p.status === "registrado");
+  const activeCustomers = customers.filter((c) => c.status === "activo").length;
 
-  const pagosVencidos = subscriptions
-    .filter((sub) => isTrackable(sub) && sub.nextDueDate < today)
-    .sort((a, b) => a.nextDueDate.localeCompare(b.nextDueDate));
+  const toCollect = subscriptions
+    .map((sub) => ({ sub, state: dueState(sub, today) }))
+    .filter(({ state }) => state === "vencida" || state === "proxima");
+  const toCollectAmount = toCollect.reduce((s, { sub }) => s + sub.amount, 0);
+  const overdueCount = toCollect.filter(({ state }) => state === "vencida").length;
 
-  const ultimosPagos = [...payments]
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 5);
-
-  const customerName = (id: string) => customers.find((c) => c.id === id)?.name ?? id;
-  const productName = (id: string) => products.find((p) => p.id === id)?.name ?? id;
-
-  const ingresosDelta = percentDelta(ingresos, ingresosPrev);
-  const ingresosDeltaUp = ingresosDelta >= 0;
+  const customerName = (id: string) =>
+    customers.find((c) => c.id === id)?.name ?? "Cliente";
+  const productName = (id: string) =>
+    products.find((p) => p.id === id)?.name ?? "Servicio";
+  const latest = payments.slice(0, 5);
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pt-8 pb-16 lg:max-w-5xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="bg-accent text-accent-foreground flex size-9 items-center justify-center rounded-full text-sm font-semibold">
-            D
-          </span>
-          <div>
-            <h1 className="text-foreground text-lg font-semibold">DelgadoDev Gestión</h1>
-            <p className="text-foreground-muted text-xs">
-              {admin.email} · {admin.role}
+    <div className="flex flex-col gap-5">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-foreground-muted text-[13px] font-medium">Resumen de</p>
+          <h1 className="text-foreground text-2xl font-semibold tracking-tight sm:text-[28px]">
+            {formatPeriod(period)}
+          </h1>
+        </div>
+        <DashboardFilters
+          period={period}
+          currentPeriod={getArgentinaCurrentPeriod()}
+          productId={productId}
+          products={products}
+        />
+      </header>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {/* Ingresos del mes + tendencia de 12 meses */}
+        <Card className="overflow-hidden lg:col-span-2">
+          <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-5">
+            <div>
+              <p className="text-foreground-muted text-[13px] font-medium">
+                Ingresos del mes
+              </p>
+              <p className="text-foreground mt-1 text-4xl font-semibold tracking-tight sm:text-5xl">
+                {formatCurrency(income)}
+              </p>
+              <p className="text-foreground-muted mt-2 flex flex-wrap items-center gap-2 text-[13px]">
+                <DeltaPill value={incomeDelta} />
+                vs. {formatCurrency(incomePrev)} en{" "}
+                {formatPeriod(previousPeriod).toLowerCase()}
+              </p>
+            </div>
+          </div>
+          <div className="px-2 pt-4 pb-3 sm:px-3">
+            <TrendChart
+              points={trend}
+              highlightKey={period}
+              ariaLabel="Ingresos por mes, últimos 12 meses"
+            />
+          </div>
+        </Card>
+
+        {/* Por cobrar */}
+        <Card className="flex flex-col">
+          <CardHeader
+            title="Por cobrar"
+            description="Vencidos y próximos 7 días"
+            action={
+              <Link
+                href="/admin/subscriptions"
+                className="text-accent-bright text-[13px] font-medium hover:underline"
+              >
+                Ver todo
+              </Link>
+            }
+          />
+          <div className="px-5 pt-3">
+            <p className="text-foreground text-3xl font-semibold tracking-tight">
+              {formatCurrency(toCollectAmount)}
+            </p>
+            <p className="text-foreground-muted mt-1 text-[13px]">
+              {toCollect.length === 0
+                ? "Nada pendiente"
+                : `${toCollect.length} ${toCollect.length === 1 ? "cobro" : "cobros"}${
+                    overdueCount
+                      ? ` · ${overdueCount} vencido${overdueCount > 1 ? "s" : ""}`
+                      : ""
+                  }`}
             </p>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
-          <LogoutButton />
-        </div>
+          {toCollect.length === 0 ? (
+            <EmptyState
+              icon={CalendarClock}
+              title="Estás al día"
+              description="No hay abonos vencidos ni por vencer esta semana."
+              className="py-8"
+            />
+          ) : (
+            <ul className="divide-border mt-3 flex-1 divide-y">
+              {toCollect.slice(0, 4).map(({ sub, state }) => (
+                <li key={sub.id} className="flex items-center gap-3 px-5 py-3">
+                  <Avatar name={customerName(sub.customerId)} size="sm" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-foreground truncate text-sm font-medium">
+                      {customerName(sub.customerId)}
+                    </p>
+                    <p className="text-foreground-muted text-[12px]">
+                      {formatCurrency(sub.amount)} ·{" "}
+                      {formatRelativeDay(sub.nextDueDate, today)}
+                    </p>
+                  </div>
+                  <StatusBadge
+                    tone={state === "vencida" ? "critical" : "warning"}
+                    className="hidden sm:inline-flex"
+                  >
+                    {state === "vencida" ? "Vencido" : "Próximo"}
+                  </StatusBadge>
+                  <ButtonLink
+                    href={`/admin/payments/new?subscriptionId=${sub.id}`}
+                    size="icon-sm"
+                    variant="secondary"
+                    aria-label={`Cobrar a ${customerName(sub.customerId)}`}
+                  >
+                    <Wallet className="size-4" aria-hidden />
+                  </ButtonLink>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-        <Link
-          href="/admin/payments?new=1"
-          className="bg-accent text-accent-foreground hover:bg-accent/90 flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium"
-        >
-          <Receipt className="size-4" /> Registrar pago
-        </Link>
-        <Link
-          href="/admin/customers?new=1"
-          className="border-border text-foreground flex items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium"
-        >
-          <UserPlus className="size-4" /> Nuevo cliente
-        </Link>
-        <Link
-          href="/admin/apps"
-          className="border-border text-foreground flex items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium"
-        >
-          <Smartphone className="size-4" /> Aplicaciones
-        </Link>
-      </div>
-
-      <DashboardFilters period={period} productId={productId} products={products} />
-
-      <div className="flex flex-col gap-3">
-        <p className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
-          Resumen del mes
-        </p>
-
-        <div className="border-border bg-background-subtle border-l-accent relative flex flex-col gap-1 rounded-xl border border-l-4 p-4 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-foreground-muted flex items-center gap-2 text-sm">
-              <DollarSign className="size-4" /> Ingresos del mes
-            </span>
-            {Number.isFinite(ingresosDelta) && (
-              <span
-                className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                  ingresosDeltaUp
-                    ? "bg-[#0ca30c]/10 text-[#0ca30c]"
-                    : "bg-[#d03b3b]/10 text-[#d03b3b]"
-                }`}
-              >
-                {ingresosDeltaUp ? (
-                  <ArrowUp className="size-3" />
-                ) : (
-                  <ArrowDown className="size-3" />
-                )}
-                {Math.abs(ingresosDelta).toFixed(0)}%
-              </span>
-            )}
-          </div>
-          <span className="text-foreground text-3xl font-bold tracking-tight md:text-4xl">
-            {formatCurrency(ingresos)}
-          </span>
-          <span className="text-foreground-muted text-xs">
-            vs. {formatCurrency(ingresosPrev)} el mes anterior
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatTile
-            icon={<Receipt className="size-4" />}
-            label="Cantidad de pagos"
-            value={String(cantidadPagos)}
-            delta={{
-              value: percentDelta(cantidadPagos, cantidadPagosPrev),
-              goodDirection: "up",
-            }}
-          />
-          <StatTile
-            icon={<Users className="size-4" />}
-            label="Clientes activos"
-            value={String(clientesActivos)}
-            status="good"
-          />
-          <StatTile
-            icon={<Repeat className="size-4" />}
-            label="Suscripciones activas"
-            value={String(suscripcionesActivas)}
-            status="good"
-          />
-          <StatTile
-            icon={<AlertTriangle className="size-4" />}
-            label="Próximos vencimientos"
-            value={String(proximosVencimientos.length)}
-            status="warning"
-          />
-        </div>
-
-        <StatTile
-          icon={<AlertCircle className="size-4" />}
-          label="Pagos vencidos"
-          value={String(pagosVencidos.length)}
-          status="critical"
+      {/* KPIs secundarios */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        <Kpi
+          icon={Receipt}
+          label="Cobros del mes"
+          value={String(current.length)}
+          deltaValue={countDelta}
+        />
+        <Kpi
+          icon={Wallet}
+          label="Ticket promedio"
+          value={formatCurrency(avgTicket)}
+          deltaValue={delta(avgTicket, avgTicketPrev)}
+        />
+        <Kpi
+          icon={FileWarning}
+          label="Sin comprobante"
+          value={String(pendingReceipts.length)}
+          href={pendingReceipts.length ? "/admin/payments?status=registrado" : undefined}
+          hint={pendingReceipts.length ? "Emitir ahora" : "Todo emitido"}
+        />
+        <Kpi
+          icon={Users}
+          label="Clientes activos"
+          value={String(activeCustomers)}
+          href="/admin/customers"
+          hint="Ver clientes"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        <section className="border-border bg-background-subtle flex flex-col gap-2 rounded-xl border p-4">
-          <h2 className="text-sm font-semibold">Vencimientos</h2>
-          {pagosVencidos.length === 0 && proximosVencimientos.length === 0 && (
-            <p className="text-foreground-muted text-sm">
-              Sin vencimientos próximos ni atrasados.
-            </p>
-          )}
-          {pagosVencidos.map((sub) => (
-            <div key={sub.id} className="flex items-center justify-between text-sm">
-              <span>
-                {customerName(sub.customerId)} — {productName(sub.productId)}
-              </span>
-              <span className="text-xs font-semibold text-[#d03b3b]">
-                Vencida {sub.nextDueDate}
-              </span>
-            </div>
-          ))}
-          {proximosVencimientos.map((sub) => (
-            <div key={sub.id} className="flex items-center justify-between text-sm">
-              <span>
-                {customerName(sub.customerId)} — {productName(sub.productId)}
-              </span>
-              <span className="text-xs font-semibold text-[#fab219]">
-                Vence {sub.nextDueDate}
-              </span>
-            </div>
-          ))}
-        </section>
-
-        <section className="border-border bg-background-subtle flex flex-col gap-2 rounded-xl border p-4">
-          <h2 className="text-sm font-semibold">Últimos pagos</h2>
-          {ultimosPagos.length === 0 && (
-            <p className="text-foreground-muted text-sm">
-              Todavía no hay pagos registrados.
-            </p>
-          )}
-          {ultimosPagos.map((payment) => (
-            <div key={payment.id} className="flex items-center justify-between text-sm">
-              <span>{customerName(payment.customerId)}</span>
-              <span className="text-foreground-muted text-xs">
-                {formatCurrency(payment.amount)} · {payment.date}
-              </span>
-            </div>
-          ))}
-        </section>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <Card>
+          <CardHeader title="Ingresos por servicio" description={formatPeriod(period)} />
+          <div className="p-5">
+            <BarList items={byProduct} />
+          </div>
+        </Card>
+        <Card>
+          <CardHeader title="Medios de pago" description={formatPeriod(period)} />
+          <div className="p-5">
+            <SegmentedBar items={byMethod} />
+          </div>
+        </Card>
       </div>
 
-      <div className="flex flex-col gap-3">
-        <p className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
-          Accesos rápidos
-        </p>
-        <nav className="grid grid-cols-2 gap-3 text-sm">
-          <Link
-            href="/admin/customers"
-            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
-          >
-            <Users className="size-4" /> Clientes
-          </Link>
-          <Link
-            href="/admin/products"
-            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
-          >
-            <Package className="size-4" /> Productos
-          </Link>
-          <Link
-            href="/admin/subscriptions"
-            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
-          >
-            <Repeat className="size-4" /> Suscripciones
-          </Link>
-          <Link
-            href="/admin/payments"
-            className="border-border bg-background-subtle flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
-          >
-            <Receipt className="size-4" /> Pagos
-          </Link>
-          <Link
-            href="/admin/apps"
-            className="border-border bg-background-subtle col-span-2 flex items-center gap-2 rounded-lg border px-4 py-3 font-medium"
-          >
-            <Smartphone className="size-4" /> Apps
-          </Link>
-        </nav>
-      </div>
+      <Card className="overflow-hidden">
+        <CardHeader
+          title="Últimos cobros"
+          action={
+            <Link
+              href="/admin/payments"
+              className="text-accent-bright inline-flex items-center gap-1 text-[13px] font-medium hover:underline"
+            >
+              Ver todos <ArrowRight className="size-3.5" aria-hidden />
+            </Link>
+          }
+        />
+        {latest.length === 0 ? (
+          <EmptyState
+            icon={Receipt}
+            title="Todavía no registraste cobros"
+            description="Cuando cobres un trabajo, registralo y emití el comprobante en el momento."
+            action={
+              <ButtonLink href="/admin/payments/new">Registrar el primero</ButtonLink>
+            }
+          />
+        ) : (
+          <div className="divide-border mt-3 divide-y">
+            {latest.map((payment) => (
+              <PaymentItem
+                key={payment.id}
+                payment={payment}
+                receipt={payment.receiptId ? receiptsById[payment.receiptId] : undefined}
+                customerName={customerName(payment.customerId)}
+                productName={productName(payment.productId)}
+              />
+            ))}
+          </div>
+        )}
+      </Card>
     </div>
+  );
+}
+
+function DeltaPill({ value }: { value: number | null }) {
+  if (value === null) {
+    return (
+      <span className="bg-surface-sunken text-foreground-muted ring-border rounded-full px-2 py-0.5 text-[12px] font-medium ring-1 ring-inset">
+        Sin comparación
+      </span>
+    );
+  }
+  const up = value >= 0;
+  const Icon = up ? ArrowUpRight : ArrowDownRight;
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[12px] font-semibold tabular-nums",
+        up
+          ? "bg-status-good/10 text-status-good"
+          : "bg-status-critical/10 text-status-critical",
+      )}
+    >
+      <Icon className="size-3.5" aria-hidden />
+      {Math.abs(value).toFixed(0)}%
+    </span>
+  );
+}
+
+function Kpi({
+  icon: Icon,
+  label,
+  value,
+  deltaValue,
+  href,
+  hint,
+}: {
+  icon: typeof Receipt;
+  label: string;
+  value: string;
+  deltaValue?: number | null;
+  href?: string;
+  hint?: string;
+}) {
+  const content = (
+    <>
+      <div className="flex items-center justify-between">
+        <span className="text-foreground-muted text-[13px] font-medium">{label}</span>
+        <span className="bg-accent-muted text-accent-bright flex size-8 items-center justify-center rounded-lg">
+          <Icon className="size-4" aria-hidden />
+        </span>
+      </div>
+      <p className="text-foreground mt-2 text-2xl font-semibold tracking-tight">
+        {value}
+      </p>
+      <div className="mt-1.5 min-h-5 text-[12px]">
+        {deltaValue !== undefined ? (
+          <span className="text-foreground-muted inline-flex items-center gap-1.5">
+            <DeltaPill value={deltaValue} />
+            <span className="hidden sm:inline">vs. mes anterior</span>
+          </span>
+        ) : hint ? (
+          <span
+            className={cn(
+              "font-medium",
+              href ? "text-accent-bright" : "text-foreground-muted",
+            )}
+          >
+            {hint}
+            {href ? " →" : ""}
+          </span>
+        ) : null}
+      </div>
+    </>
+  );
+
+  const className =
+    "border-border bg-background-subtle block rounded-2xl border p-4 shadow-[0_1px_2px_rgba(16,24,40,0.04)] sm:p-5";
+
+  return href ? (
+    <Link
+      href={href}
+      className={cn(className, "hover:border-accent/40 transition-colors")}
+    >
+      {content}
+    </Link>
+  ) : (
+    <div className={className}>{content}</div>
   );
 }

@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getSessionAdmin } from "@/lib/auth/session";
+import { AppShell } from "../_ui/app-shell";
 
 export default async function AdminProtectedLayout({
   children,
@@ -9,5 +10,5 @@ export default async function AdminProtectedLayout({
   const admin = await getSessionAdmin();
   if (!admin) redirect("/admin/login");
 
-  return <>{children}</>;
+  return <AppShell email={admin.email ?? ""}>{children}</AppShell>;
 }

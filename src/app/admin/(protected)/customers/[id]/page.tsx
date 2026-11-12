@@ -1,16 +1,34 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CalendarClock, Mail, MessageCircle, Phone, Plus, Receipt } from "lucide-react";
 import { getAdminDb } from "@/lib/firebase/admin";
-import type { CustomerRecord } from "@/types/customer";
-import type { ProductRecord } from "@/types/product";
-import type { PaymentRecord } from "@/types/payment";
-import type { ReceiptRecord } from "@/types/receipt";
-import { ThemeToggle } from "../../../theme-toggle";
-import { IssueReceiptButton } from "../../payments/issue-receipt-button";
-import { ReceiptPdfButton } from "../../payments/receipt-pdf-button";
-import { VoidReceiptButton } from "../../payments/void-receipt-button";
-import { WhatsappButton } from "../../payments/whatsapp-button";
-import { CustomerActions } from "./customer-actions";
+import {
+  getPayments,
+  getProducts,
+  getReceiptsById,
+  getSubscriptions,
+  toCustomer,
+} from "@/lib/admin/data";
+import {
+  dueState,
+  formatCurrency,
+  formatDate,
+  formatRelativeDay,
+  FREQUENCY_LABEL,
+} from "@/lib/admin/format";
+import { getArgentinaTodayISO } from "@/lib/timezone";
+import { buildWhatsappUrl, hasUsablePhone } from "@/lib/whatsapp";
+import { adminButton, ButtonLink } from "../../../_ui/button";
+import { DueBadge } from "../../../_ui/due-badge";
+import { PaymentItem } from "../../../_ui/payment-item";
+import {
+  Avatar,
+  Card,
+  CardHeader,
+  EmptyState,
+  PageHeader,
+  StatusBadge,
+} from "../../../_ui/primitives";
+import { EditCustomerButton } from "./edit-customer-button";
 
 export default async function CustomerDetailPage({
   params,
@@ -18,188 +36,244 @@ export default async function CustomerDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const db = getAdminDb();
-
-  const [customerDoc, productsSnapshot, paymentsSnapshot, receiptsSnapshot] =
+  const [customerDoc, products, payments, subscriptions, receiptsById] =
     await Promise.all([
-      db.collection("customers").doc(id).get(),
-      db.collection("products").orderBy("name").get(),
-      // Filtro simple por customerId (sin orderBy combinado) para no depender
-      // de un índice compuesto; se ordena por fecha en código más abajo.
-      db.collection("payments").where("customerId", "==", id).get(),
-      db.collection("receipts").get(),
+      getAdminDb().collection("customers").doc(id).get(),
+      getProducts(),
+      getPayments(),
+      getSubscriptions(),
+      getReceiptsById(),
     ]);
-
   if (!customerDoc.exists) notFound();
-  const customerData = customerDoc.data()!;
-  const customer: CustomerRecord = {
-    id: customerDoc.id,
-    name: customerData.name,
-    businessName: customerData.businessName ?? undefined,
-    phone: customerData.phone,
-    phoneRaw: customerData.phoneRaw,
-    email: customerData.email ?? undefined,
-    taxId: customerData.taxId ?? undefined,
-    type: customerData.type,
-    status: customerData.status,
-    notes: customerData.notes ?? undefined,
-    productIds: customerData.productIds ?? [],
-    createdAt: customerData.createdAt?.toDate?.().toISOString() ?? "",
-    updatedAt: customerData.updatedAt?.toDate?.().toISOString() ?? "",
-    createdBy: customerData.createdBy,
-    updatedBy: customerData.updatedBy,
-  };
 
-  const products: ProductRecord[] = productsSnapshot.docs
-    .map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        name: data.name,
-        type: data.type,
-        suggestedPrice: data.suggestedPrice ?? null,
-        suggestedFrequency: data.suggestedFrequency ?? null,
-        active: data.active,
-        createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-        updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-      };
-    })
-    .filter((product) => product.active);
+  const customer = toCustomer(customerDoc);
+  const today = getArgentinaTodayISO();
+  const productName = (pid: string) =>
+    products.find((p) => p.id === pid)?.name ?? "Servicio";
 
-  const productName = (productId: string) =>
-    products.find((product) => product.id === productId)?.name ?? productId;
-
-  const payments: PaymentRecord[] = paymentsSnapshot.docs
-    .map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        customerId: data.customerId,
-        productId: data.productId,
-        subscriptionId: data.subscriptionId ?? null,
-        amount: data.amount,
-        concept: data.concept,
-        period: data.period,
-        method: data.method,
-        date: data.date,
-        transferReference: data.transferReference ?? null,
-        notes: data.notes ?? null,
-        status: data.status,
-        receiptId: data.receiptId ?? null,
-        createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-        updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-        createdBy: data.createdBy,
-        updatedBy: data.updatedBy,
-      };
-    })
-    .sort((a, b) => b.date.localeCompare(a.date));
-
-  const receiptsById: Record<string, ReceiptRecord> = {};
-  for (const doc of receiptsSnapshot.docs) {
-    const data = doc.data();
-    const receipt: ReceiptRecord = {
-      id: doc.id,
-      number: data.number,
-      paymentId: data.paymentId,
-      customerSnapshot: data.customerSnapshot,
-      productSnapshot: data.productSnapshot ?? null,
-      subscriptionSnapshot: data.subscriptionSnapshot ?? null,
-      amount: data.amount,
-      concept: data.concept,
-      period: data.period,
-      method: data.method,
-      issuedAt: data.issuedAt?.toDate?.().toISOString() ?? "",
-      issuedBy: data.issuedBy,
-      voided: data.voided,
-      voidedAt: data.voidedAt?.toDate?.().toISOString() ?? null,
-      voidedBy: data.voidedBy ?? null,
-      voidReason: data.voidReason ?? null,
-    };
-    receiptsById[receipt.id] = receipt;
-  }
+  const history = payments.filter((p) => p.customerId === id);
+  const valid = history.filter((p) => p.status !== "anulado");
+  const total = valid.reduce((s, p) => s + p.amount, 0);
+  const lastDate = valid[0]?.date;
+  const subs = subscriptions.filter((s) => s.customerId === id);
+  const contracted = products.filter((p) => customer.productIds.includes(p.id));
+  const canWhatsapp = hasUsablePhone(customer.phone);
 
   return (
-    <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4 pb-16 lg:max-w-3xl">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span className="bg-accent-muted text-accent-bright flex size-10 shrink-0 items-center justify-center rounded-full text-base font-semibold">
-            {customer.name.charAt(0).toUpperCase()}
+    <>
+      <PageHeader
+        title={customer.name}
+        description={
+          <span className="flex flex-wrap items-center gap-2">
+            {customer.businessName ? <span>{customer.businessName}</span> : null}
+            <StatusBadge
+              icon={false}
+              tone={customer.type === "recurrente" ? "accent" : "neutral"}
+            >
+              {customer.type === "recurrente" ? "Recurrente" : "Ocasional"}
+            </StatusBadge>
+            {customer.status === "inactivo" ? (
+              <StatusBadge tone="neutral">Inactivo</StatusBadge>
+            ) : null}
           </span>
-          <div>
-            <h1 className="text-foreground text-lg font-semibold">{customer.name}</h1>
-            <p className="text-foreground-muted text-xs">
-              {customer.businessName ?? "Sin negocio"} · {customer.phoneRaw}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Link href="/admin/customers" className="text-sm underline">
-            Volver
-          </Link>
-        </div>
-      </div>
-
-      <CustomerActions
-        customer={customer}
-        products={products}
-        lastPayment={payments[0]}
+        }
+        backHref="/admin/customers"
+        backLabel="Clientes"
+        actions={
+          <>
+            <EditCustomerButton
+              customer={customer}
+              products={products.filter((p) => p.active)}
+            />
+            <ButtonLink href={`/admin/payments/new?customerId=${customer.id}`}>
+              <Plus className="size-4" aria-hidden />
+              Registrar cobro
+            </ButtonLink>
+          </>
+        }
       />
 
-      <div className="flex flex-col gap-2">
-        <h2 className="text-foreground-muted text-xs font-semibold tracking-wide uppercase">
-          Historial de pagos
-        </h2>
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start">
+        <div className="flex flex-col gap-5">
+          <div className="grid grid-cols-3 gap-3 sm:gap-4">
+            <Stat label="Total cobrado" value={formatCurrency(total)} />
+            <Stat label="Cobros" value={String(valid.length)} />
+            <Stat
+              label="Último cobro"
+              value={lastDate ? formatDate(lastDate, false) : "—"}
+            />
+          </div>
 
-        {payments.length === 0 && (
-          <p className="text-foreground-muted text-sm">
-            Este cliente todavía no tiene pagos registrados.
-          </p>
-        )}
+          {subs.length > 0 ? (
+            <Card className="overflow-hidden">
+              <CardHeader
+                title="Abonos"
+                description="Cobros periódicos de este cliente"
+              />
+              <ul className="divide-border mt-3 divide-y">
+                {subs.map((sub) => {
+                  const state = dueState(sub, today);
+                  return (
+                    <li key={sub.id} className="flex items-center gap-3 px-5 py-3.5">
+                      <span className="bg-accent-muted text-accent-bright flex size-10 shrink-0 items-center justify-center rounded-xl">
+                        <CalendarClock className="size-5" aria-hidden />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-foreground truncate text-sm font-medium">
+                          {productName(sub.productId)}
+                        </p>
+                        <p className="text-foreground-muted truncate text-[13px]">
+                          {formatCurrency(sub.amount)} · {FREQUENCY_LABEL[sub.frequency]}{" "}
+                          · vence {formatRelativeDay(sub.nextDueDate, today)}
+                        </p>
+                      </div>
+                      <DueBadge state={state} />
+                      {state === "vencida" || state === "proxima" ? (
+                        <ButtonLink
+                          href={`/admin/payments/new?subscriptionId=${sub.id}`}
+                          size="sm"
+                          variant="secondary"
+                        >
+                          Cobrar
+                        </ButtonLink>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+          ) : null}
 
-        {payments.map((payment) => {
-          const receipt = payment.receiptId ? receiptsById[payment.receiptId] : undefined;
-          return (
-            <div
-              key={payment.id}
-              className="border-border bg-background-subtle flex flex-col gap-2 rounded-lg border p-4"
-            >
-              <p className="text-sm">
-                <strong>{productName(payment.productId)}</strong> — $
-                {payment.amount.toLocaleString("es-AR")} — {payment.period}
+          <Card className="overflow-hidden">
+            <CardHeader title="Historial de cobros" />
+            {history.length === 0 ? (
+              <EmptyState
+                icon={Receipt}
+                title="Sin cobros todavía"
+                description="Cuando le cobres, vas a ver acá cada pago con su comprobante."
+                action={
+                  <ButtonLink href={`/admin/payments/new?customerId=${customer.id}`}>
+                    Registrar cobro
+                  </ButtonLink>
+                }
+              />
+            ) : (
+              <div className="divide-border mt-3 divide-y">
+                {history.map((payment) => (
+                  <PaymentItem
+                    key={payment.id}
+                    payment={payment}
+                    receipt={
+                      payment.receiptId ? receiptsById[payment.receiptId] : undefined
+                    }
+                    customerName={customer.name}
+                    productName={productName(payment.productId)}
+                    showCustomer={false}
+                  />
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+
+        <Card className="p-5 lg:sticky lg:top-10">
+          <div className="flex items-center gap-3">
+            <Avatar name={customer.name} size="lg" />
+            <div className="min-w-0">
+              <p className="text-foreground truncate font-semibold">{customer.name}</p>
+              <p className="text-foreground-muted truncate text-[13px]">
+                Cliente desde{" "}
+                {customer.createdAt ? formatDate(customer.createdAt.slice(0, 10)) : "—"}
               </p>
-              <p className="text-foreground-muted text-xs">
-                {payment.concept} · {payment.method} · {payment.date} · estado:{" "}
-                {payment.status}
-              </p>
-
-              {payment.status === "registrado" && (
-                <IssueReceiptButton paymentId={payment.id} />
-              )}
-
-              {receipt && !receipt.voided && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-semibold">
-                    Comprobante {receipt.number}
-                  </span>
-                  <ReceiptPdfButton receipt={receipt} />
-                  <WhatsappButton receipt={receipt} />
-                  <VoidReceiptButton receiptId={receipt.id} />
-                </div>
-              )}
-
-              {receipt?.voided && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs font-semibold text-[#d03b3b]">
-                    Comprobante {receipt.number} anulado — {receipt.voidReason}
-                  </span>
-                  <ReceiptPdfButton receipt={receipt} />
-                </div>
-              )}
             </div>
-          );
-        })}
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <a
+              href={`tel:${customer.phoneRaw}`}
+              className={adminButton({ variant: "secondary", size: "sm" })}
+              aria-label={`Llamar a ${customer.name}`}
+            >
+              <Phone className="size-4" aria-hidden />
+              Llamar
+            </a>
+            {canWhatsapp ? (
+              <a
+                href={buildWhatsappUrl(
+                  customer.phone,
+                  `Hola ${customer.name.split(" ")[0]}!`,
+                )}
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex h-9 items-center justify-center gap-2 rounded-xl bg-[#128c4a] px-3 text-[13px] font-medium text-white hover:bg-[#0f7a40]"
+              >
+                <MessageCircle className="size-4" aria-hidden />
+                WhatsApp
+              </a>
+            ) : null}
+          </div>
+
+          <dl className="border-border mt-5 flex flex-col gap-3.5 border-t pt-5 text-[13px]">
+            <Info label="Teléfono">{customer.phoneRaw || "—"}</Info>
+            <Info label="Correo">
+              {customer.email ? (
+                <a
+                  href={`mailto:${customer.email}`}
+                  className="text-accent-bright inline-flex items-center gap-1 hover:underline"
+                >
+                  <Mail className="size-3.5" aria-hidden />
+                  {customer.email}
+                </a>
+              ) : (
+                "—"
+              )}
+            </Info>
+            <Info label="CUIT / DNI">{customer.taxId || "—"}</Info>
+            <Info label="Servicios">
+              {contracted.length ? (
+                <span className="flex flex-wrap gap-1.5">
+                  {contracted.map((p) => (
+                    <StatusBadge key={p.id} tone="neutral" icon={false}>
+                      {p.name}
+                    </StatusBadge>
+                  ))}
+                </span>
+              ) : (
+                "—"
+              )}
+            </Info>
+            {customer.notes ? <Info label="Notas">{customer.notes}</Info> : null}
+          </dl>
+          {!canWhatsapp ? (
+            <p className="text-status-warning bg-status-warning/10 mt-4 rounded-xl p-3 text-[12px]">
+              El teléfono no es válido para WhatsApp. Editá el cliente para poder enviarle
+              comprobantes.
+            </p>
+          ) : null}
+        </Card>
       </div>
+    </>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <Card className="p-4 sm:p-5">
+      <p className="text-foreground-muted text-[12px] font-medium sm:text-[13px]">
+        {label}
+      </p>
+      <p className="text-foreground mt-1 truncate text-lg font-semibold tracking-tight sm:text-2xl">
+        {value}
+      </p>
+    </Card>
+  );
+}
+
+function Info({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <dt className="text-foreground-muted text-[12px]">{label}</dt>
+      <dd className="text-foreground mt-0.5 break-words">{children}</dd>
     </div>
   );
 }

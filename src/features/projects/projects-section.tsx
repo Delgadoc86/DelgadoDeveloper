@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ProjectCard } from "@/features/projects/components/project-card";
 import { OtherProjectsList } from "@/features/projects/components/other-projects-list";
-import { featuredProjects } from "@/features/projects/data/projects";
+import { projects } from "@/features/projects/data/projects";
 
 export function ProjectsSection() {
   return (
@@ -19,7 +19,7 @@ export function ProjectsSection() {
         />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
-          {featuredProjects.map((project, index) => (
+          {projects.map((project, index) => (
             <FadeIn key={project.slug} delay={index * 0.05} className="h-full">
               <ProjectCard project={project} />
             </FadeIn>

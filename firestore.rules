@@ -19,12 +19,6 @@ service cloud.firestore {
       allow write: if false;
     }
 
-    // Solo el admin lee/escribe. El público nunca toca esta colección desde
-    // el cliente: /descargar/[slug] la consulta server-side con Admin SDK
-    // (que ignora estas reglas), así que no hace falta ningún acceso público.
-    match /apps/{slug} {
-      allow read, write: if isAdmin();
-    }
 
     // Clientes y catálogo de productos: datos internos, solo el admin.
     match /customers/{customerId} {

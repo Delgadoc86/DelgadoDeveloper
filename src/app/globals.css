@@ -14,6 +14,22 @@
   --accent-bright: #9c93f7;
   --accent-foreground: #ffffff;
   --accent-muted: rgba(124, 111, 240, 0.14);
+
+  /* Panel /admin — tokens de datos (validados con la skill dataviz contra
+     el fondo de tarjeta de cada tema). Serie principal = violeta de marca,
+     ajustado en oscuro (#8a80f2) para entrar en la banda de luminosidad. */
+  --surface-sunken: #121317;
+  --chart-1: #8a80f2;
+  --chart-1-wash: rgba(138, 128, 242, 0.14);
+  --chart-grid: #2b2c31;
+  --method-1: #3987e5;
+  --method-2: #d95926;
+  --method-3: #199e70;
+  --method-4: #c98500;
+  /* Paleta de estado: fija, siempre con ícono + texto, nunca solo color. */
+  --status-good: #22b04b;
+  --status-warning: #e5a20f;
+  --status-critical: #e5534b;
 }
 
 @theme inline {
@@ -26,6 +42,12 @@
   --color-accent-bright: var(--accent-bright);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent-muted: var(--accent-muted);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-chart-1: var(--chart-1);
+  --color-chart-grid: var(--chart-grid);
+  --color-status-good: var(--status-good);
+  --color-status-warning: var(--status-warning);
+  --color-status-critical: var(--status-critical);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -40,15 +62,26 @@ html {
 /* Modo claro, acotado al panel /admin (ver src/app/admin/theme-shell.tsx).
    El resto del sitio sigue siendo dark-only a proposito. */
 [data-theme="light"] {
-  --background: #eef0f4;
+  --background: #f4f5f8;
   --background-subtle: #ffffff;
-  --foreground: #16171b;
-  --foreground-muted: #6b6f76;
-  --border: #e1e3e8;
+  --foreground: #111318;
+  --foreground-muted: #5f6470;
+  --border: #e3e5ea;
   --accent: #7c6ff0;
-  --accent-bright: #6152d9;
+  --accent-bright: #5b4cd1;
   --accent-foreground: #ffffff;
-  --accent-muted: rgba(124, 111, 240, 0.12);
+  --accent-muted: rgba(124, 111, 240, 0.1);
+  --surface-sunken: #f7f8fa;
+  --chart-1: #7c6ff0;
+  --chart-1-wash: rgba(124, 111, 240, 0.1);
+  --chart-grid: #eceef2;
+  --method-1: #2a78d6;
+  --method-2: #eb6834;
+  --method-3: #1baf7a;
+  --method-4: #eda100;
+  --status-good: #0c8f2c;
+  --status-warning: #9e6700;
+  --status-critical: #d03b3b;
   color-scheme: light;
   background-image: none;
 }

@@ -27,7 +27,7 @@ export async function POST(
   const auditLogRef = db.collection("auditLogs").doc();
 
   try {
-    const receiptNumber = await db.runTransaction(async (tx) => {
+    const receipt = await db.runTransaction(async (tx) => {
       const paymentSnap = await tx.get(paymentRef);
       if (!paymentSnap.exists) {
         throw new Error("PAYMENT_NOT_FOUND");
@@ -83,7 +83,7 @@ export async function POST(
 
       tx.set(counterRef, { year, lastNumber: nextSequence }, { merge: true });
 
-      tx.set(receiptRef, {
+      const receiptData = {
         number,
         paymentId,
         customerSnapshot: {
@@ -99,6 +99,10 @@ export async function POST(
         concept: payment.concept,
         period: payment.period,
         method: payment.method,
+      };
+
+      tx.set(receiptRef, {
+        ...receiptData,
         issuedAt: FieldValue.serverTimestamp(),
         issuedBy: result.admin.uid,
         voided: false,
@@ -137,13 +141,26 @@ export async function POST(
         details: { paymentId, number, amount: payment.amount },
       });
 
-      return number;
+      return receiptData;
     });
 
+    // Se devuelve el comprobante completo para que el panel pueda ofrecer
+    // PDF y WhatsApp en el momento, sin volver a leerlo de Firestore.
+    // issuedAt es aproximado (el real es el serverTimestamp guardado).
     return NextResponse.json({
       ok: true,
       receiptId: receiptRef.id,
-      number: receiptNumber,
+      number: receipt.number,
+      receipt: {
+        ...receipt,
+        id: receiptRef.id,
+        issuedAt: new Date().toISOString(),
+        issuedBy: result.admin.uid,
+        voided: false,
+        voidedAt: null,
+        voidedBy: null,
+        voidReason: null,
+      },
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "";

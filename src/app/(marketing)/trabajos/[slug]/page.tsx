@@ -21,7 +21,6 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ContactCta } from "@/features/contact-cta/contact-cta";
-import { DownloadButton } from "@/features/projects/components/download-button";
 import { OfficialSiteButton } from "@/features/projects/components/official-site-button";
 import { ChallengeSection } from "@/features/projects/components/case-study/challenge-section";
 import { ClosingCta } from "@/features/projects/components/case-study/closing-cta";
@@ -29,7 +28,7 @@ import { FeatureGroups } from "@/features/projects/components/case-study/feature
 import { MetricsGrid } from "@/features/projects/components/case-study/metrics-grid";
 import { PerformanceSection } from "@/features/projects/components/case-study/performance-section";
 import { SolutionBlocks } from "@/features/projects/components/case-study/solution-blocks";
-import { featuredProjects, projects } from "@/features/projects/data/projects";
+import { projects } from "@/features/projects/data/projects";
 import { buildBreadcrumbJsonLd, buildProjectJsonLd } from "@/lib/seo";
 import { siteConfig } from "@/config/site.config";
 import type { Project } from "@/types/project";
@@ -64,11 +63,6 @@ export async function generateMetadata({ params }: ProjectPageProps): Promise<Me
     alternates: {
       canonical: `/trabajos/${project.slug}`,
     },
-    // Fichas que no se promocionan (ver `featuredProjects`) siguen accesibles
-    // por link directo, pero no se indexan.
-    robots: featuredProjects.some((item) => item.slug === project.slug)
-      ? undefined
-      : { index: false, follow: true },
     // Next.js no mezcla `openGraph`/`twitter` en profundidad entre layout y
     // page: si el objeto se define acá, reemplaza al del root layout entero
     // en vez de combinarse campo a campo. Por eso se repiten `type`, `locale`
@@ -153,7 +147,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
               {project.tagline}
             </p>
 
-            {(project.links.official ?? project.links.download ?? project.links.demo) ? (
+            {(project.links.official ?? project.links.demo) ? (
               <div className="mt-8 flex flex-wrap gap-4">
                 {project.links.official ? (
                   <OfficialSiteButton
@@ -161,39 +155,16 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
                     analyticsId={project.slug}
                   />
                 ) : null}
-                {project.links.download ? (
-                  <DownloadButton
-                    href={project.links.download}
-                    analyticsId={project.analyticsId ?? project.slug}
-                  />
-                ) : null}
                 {project.links.demo ? (
                   <Button
                     href={project.links.demo}
-                    variant={
-                      project.links.official || project.links.download
-                        ? "secondary"
-                        : "primary"
-                    }
+                    variant={project.links.official ? "secondary" : "primary"}
                   >
                     {project.links.demoLabel ?? "Ver demo"}
                     <ArrowUpRight className="size-4" aria-hidden />
                   </Button>
                 ) : null}
               </div>
-            ) : null}
-
-            {project.links.download && project.legalTermsUrl ? (
-              <p className="text-foreground-muted mt-4 text-xs">
-                Al descargar, aceptás los{" "}
-                <Link
-                  href={project.legalTermsUrl}
-                  className="text-accent-bright underline underline-offset-2"
-                >
-                  Términos de descarga y prueba
-                </Link>{" "}
-                de {project.name}.
-              </p>
             ) : null}
           </FadeIn>
         </Container>

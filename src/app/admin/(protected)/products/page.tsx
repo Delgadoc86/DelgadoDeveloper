@@ -1,43 +1,23 @@
-import Link from "next/link";
-import { getAdminDb } from "@/lib/firebase/admin";
-import type { ProductRecord } from "@/types/product";
-import { ProductForm } from "./product-form";
-import { ThemeToggle } from "../../theme-toggle";
+import { getPayments, getProducts } from "@/lib/admin/data";
+import { PageHeader } from "../../_ui/primitives";
+import { ProductsView } from "./products-view";
 
 export default async function AdminProductsPage() {
-  const snapshot = await getAdminDb().collection("products").orderBy("name").get();
+  const [products, payments] = await Promise.all([getProducts(), getPayments()]);
 
-  const products: ProductRecord[] = snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      name: data.name,
-      type: data.type,
-      suggestedPrice: data.suggestedPrice ?? null,
-      suggestedFrequency: data.suggestedFrequency ?? null,
-      active: data.active,
-      createdAt: data.createdAt?.toDate?.().toISOString() ?? "",
-      updatedAt: data.updatedAt?.toDate?.().toISOString() ?? "",
-    };
-  });
+  const usage: Record<string, number> = {};
+  for (const payment of payments) {
+    if (payment.status !== "anulado")
+      usage[payment.productId] = (usage[payment.productId] ?? 0) + 1;
+  }
 
   return (
-    <div className="mx-auto mt-16 flex w-full max-w-lg flex-col gap-6 px-4 lg:max-w-3xl">
-      <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Productos y servicios</h1>
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          <Link href="/admin" className="text-sm underline">
-            Volver
-          </Link>
-        </div>
-      </div>
-
-      <ProductForm />
-
-      {products.map((product) => (
-        <ProductForm key={product.id} product={product} />
-      ))}
-    </div>
+    <>
+      <PageHeader
+        title="Servicios"
+        description="Lo que cobrás, con precio sugerido para completar cobros más rápido."
+      />
+      <ProductsView products={products} usage={usage} />
+    </>
   );
 }

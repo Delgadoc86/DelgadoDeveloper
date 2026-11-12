@@ -12,7 +12,7 @@ import { siteConfig } from "@/config/site.config";
 import { socialLinks } from "@/constants/social-links";
 import { buildContactWhatsappUrl } from "@/lib/contact";
 import { mainNav } from "@/constants/nav";
-import { featuredProjects } from "@/features/projects/data/projects";
+import { projects } from "@/features/projects/data/projects";
 import { products } from "@/features/products/data/products";
 
 const socialIcons = [
@@ -64,7 +64,7 @@ export function Footer() {
                   </Link>
                 </li>
               ))}
-              {[...products, ...featuredProjects].map((item) => (
+              {[...products, ...projects].map((item) => (
                 <li key={item.slug}>
                   <Link
                     href={`/trabajos/${item.slug}`}

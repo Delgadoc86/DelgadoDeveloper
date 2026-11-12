@@ -8,9 +8,7 @@ interface ProjectCardProps {
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const ctaLabel =
-    project.caseStudy?.cardCtaLabel ??
-    (project.links.download ? "Conocé más y descargá" : "Ver trabajo");
+  const ctaLabel = project.caseStudy?.cardCtaLabel ?? "Ver trabajo";
 
   return (
     <Link

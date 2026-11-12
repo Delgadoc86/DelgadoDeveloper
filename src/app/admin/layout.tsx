@@ -8,7 +8,8 @@ export const metadata: Metadata = {
 
 // Evita el flash del tema incorrecto: aplica la preferencia guardada antes
 // de que React hidrate, leyendo el mismo localStorage que usa AdminThemeShell.
-const themeInitScript = `try{var t=localStorage.getItem("admin-theme");if(t==="light"){document.getElementById("admin-theme-root").setAttribute("data-theme","light");}}catch(e){}`;
+// El panel arranca en claro; solo se pasa a oscuro si se eligió explícitamente.
+const themeInitScript = `try{var t=localStorage.getItem("admin-theme");if(t==="dark"){document.getElementById("admin-theme-root").setAttribute("data-theme","dark");}}catch(e){}`;
 
 export default function AdminLayout({
   children,

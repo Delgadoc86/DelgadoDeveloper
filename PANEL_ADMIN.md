@@ -1,10 +1,11 @@
 # DelgadoDev Gestión — Panel de administración
 
-Panel privado en `/admin` para gestionar los productos de DelgadoDev: enlaces
-de descarga de apps, clientes, productos/servicios, suscripciones, pagos y
-comprobantes. Backend en un proyecto Firebase separado (`delgadodev-gestion`,
-cuenta `delgadodev86@gmail.com`), independiente del Firebase de PresuPDF, QREvento,
-Mi Almacén o cualquier catálogo. Hasta 2026-11 era `delgadodevgestion`; ver
+Panel privado en `/admin` para cobrar y dejar constancia: clientes, cobros con
+comprobante (PDF y WhatsApp), abonos periódicos con vencimientos, catálogo de
+servicios y un dashboard de ingresos. El comprobante **no es una factura**: es la
+constancia que se le da al cliente cuando la pide. Backend en un proyecto Firebase
+separado (`delgadodev-gestion`, cuenta `delgadodev86@gmail.com`), independiente del
+Firebase de PresuPDF, QREvento o cualquier catálogo. Hasta 2026-11 era `delgadodevgestion`; ver
 "Migración de proyecto Firebase (2026-11-12)" más abajo.
 
 Ver [`ROADMAP_DELGADODEV_GESTION.md`](ROADMAP_DELGADODEV_GESTION.md) para el
@@ -40,112 +41,103 @@ admin):
    recrear el acceso, no los datos. Si lo que se pierde es **el proyecto entero**,
    los datos solo se recuperan desde un backup (ver la migración de 2026-11-12).
 
+## Diseño del panel (rediseño 2026-11-12)
+
+- **Mobile-first, tema claro por defecto** con opción de oscuro (se guarda en el
+  navegador, `localStorage["admin-theme"]`). En el celular: barra superior + barra
+  inferior tipo app (Inicio, Clientes, **+** Registrar cobro, Cobros, Más). En PC:
+  barra lateral con todas las secciones y el botón "Registrar cobro".
+- **Kit propio en `src/app/admin/_ui/`** (sin dependencias nuevas): botones,
+  tarjetas, campos, badges de estado (siempre ícono + texto), panel deslizable
+  (`Sheet`: hoja inferior en el celular, diálogo en PC), fila de cobro expandible y
+  acciones de comprobante reutilizables.
+- **Gráficos en SVG hechos a mano** (`_ui/charts/`): tendencia de 12 meses con
+  tooltip y navegación por teclado, ranking por servicio y barra segmentada de
+  medios de pago. Paleta validada (skill de dataviz) contra el fondo de cada tema:
+  tokens `--chart-*`, `--method-*` y `--status-*` en `globals.css`.
+- **Datos centralizados** en `src/lib/admin/data.ts` (lectura y mapeo de Firestore)
+  y formatos/etiquetas en `src/lib/admin/format.ts` (moneda, fechas y meses en
+  castellano, estado de vencimiento).
+- Los meses se eligen con un selector propio en castellano (no `<input type="month">`,
+  que depende del idioma del navegador).
+
 ## Guías de uso
 
-### Cambiar el enlace/versión de una APK
+### Registrar un cobro y mandar el comprobante (flujo principal)
 
-`/admin` → "Aplicaciones" (o `/admin/apps` directo). Cada app (`presufacil`,
-`mi-almacen`) tiene su propio formulario: nombre, versión, enlace de Google
-Drive (tiene que ser `https://`), estado (`draft` / `published` / `paused`) y
-plataforma. Al guardar, el cambio es inmediato — la web pública lee el enlace
-desde Firestore en cada click de descarga (`/descargar/[slug]`), sin
-necesidad de redeploy.
+Botón **+** (celular) o **Registrar cobro** (PC) → `/admin/payments/new`:
 
-- `published`: el botón público descarga normalmente.
-- `paused` o `draft`: `/descargar/[slug]` devuelve 404 (no revela el motivo).
+1. **Cliente**: buscador por nombre, negocio o teléfono. Si no existe, "Crear
+   cliente" ahí mismo (nombre + teléfono). Al elegirlo se prellenan servicio,
+   importe, concepto y medio de pago con su **último cobro**.
+2. Si el cliente tiene abonos, aparece "¿Es el pago de un abono?": al marcarlo se
+   completan servicio, importe y concepto.
+3. Importe, servicio, período que paga, concepto (lo que figura en el comprobante),
+   medio de pago, fecha y N.º de operación (opcional).
+4. Con **Emitir comprobante** activado (por defecto), al guardar se registra el
+   cobro **y** se emite el comprobante en el mismo paso. La pantalla de éxito
+   ofrece **Enviar por WhatsApp** (en el celular abre el menú de compartir con el
+   PDF adjunto; en PC descarga el PDF y abre WhatsApp Web con el mensaje armado) y
+   **PDF**.
 
-**Nota (rebranding 2026-08-06):** la marca pública de "presufacil" pasó a
-llamarse "PresuPDF" y su URL de descarga pública es `/descargar/presupdf`. El
-**id interno** del documento de Firestore (el encabezado gris que ves arriba
-de cada formulario en "Aplicaciones") sigue llamándose `presufacil` a
-propósito — no se renombró para no perder el historial. Eso es distinto del
-campo **"Nombre"** del formulario (el que se guarda en `name` y es lo que
-verían clientes/reportes si se mostrara en algún lado): ese sí hay que
-editarlo a mano para que diga "PresuPDF" — no se actualiza solo por cambiar
-el id. Lo mismo aplica al producto/servicio homónimo en "Productos" (usado en
-suscripciones, pagos y comprobantes): su campo "Nombre" también hay que
-pasarlo a "PresuPDF" si todavía dice "PresuFácil".
-`descargar/[slug]/route.ts` traduce `presupdf` → `presufacil` antes
-de consultar Firestore. Si algún día se agrega otra app cuyo slug público
-difiera de su id interno, sumarla a ese mismo mapa.
+Si el cobro está atado a un abono, al emitir el comprobante el próximo vencimiento
+se corre solo (30/180/365 días corridos). Para llegar con datos ya cargados se usan
+`?customerId=` y `?subscriptionId=` (los botones "Registrar cobro" de la ficha del
+cliente y "Cobrar" de Vencimientos).
 
-**Nota (separación de sitios, 2026-09-08):** `https://www.presupdf.com.ar` pasó a ser el
-único sitio oficial de descarga de PresuPDF — `delgadodev.com.ar/trabajos/presupdf` ya no
-ofrece un botón de descarga, solo un link "Visitar sitio oficial" hacia ese dominio. Por
-eso `/descargar/presupdf` y `/descargar/presufacil` ahora son redirects 308 a
-`https://www.presupdf.com.ar/descargar` definidos en `next.config.ts` — **ya no llegan a
-este route handler ni consultan Firestore**. El documento `apps/presufacil` y su
-`downloadUrl` de Google Drive no se tocaron: siguen existiendo como infraestructura
-histórica y este formulario del panel sigue funcionando igual, solo que ya no hay ningún
-botón público en DelgadoDev que use ese enlace. Mi Almacén no cambió: sigue distribuyéndose
-igual que antes por este mismo flujo.
+### Cobros
 
-### Dar de alta un cliente
+`/admin/payments`: buscador (cliente, concepto o N.º de comprobante), filtro por mes
+y por estado con contadores (**Sin comprobante**, Emitidos, Anulados) y lista
+agrupada por mes con su total. Cada fila se expande para ver el detalle y las
+acciones: emitir comprobante (si falta), WhatsApp, PDF y **Anular** (pide motivo; el
+comprobante queda anulado y no se puede revertir).
 
-`/admin/customers` → "Nuevo cliente", o desde el dashboard → "Nuevo cliente"
-(abre el formulario directo). Campos: nombre, negocio, teléfono (se normaliza
-solo para WhatsApp), correo, CUIT/DNI opcional, tipo (recurrente/ocasional),
-servicios contratados (checkboxes contra el catálogo de productos) y notas.
+### Clientes
 
-También se puede dar de alta un cliente ocasional **desde el mismo formulario
-de un pago nuevo** (botón "+ Nuevo cliente ocasional"), sin salir de esa
-pantalla.
+`/admin/customers`: lista con total cobrado y último cobro de cada uno, filtros
+(Activos, Recurrentes, Ocasionales, Inactivos) y alta en panel deslizable. La ficha
+(`/admin/customers/[id]`) muestra métricas, abonos con botón "Cobrar", historial de
+cobros con sus comprobantes y datos de contacto (llamar / WhatsApp). El teléfono
+tiene que ser válido para poder enviar comprobantes por WhatsApp.
 
-Un cliente nunca se borra — solo se desactiva (`status: "inactivo"`) editándolo.
+### Vencimientos (abonos)
 
-### Registrar un pago y emitir el comprobante
+`/admin/subscriptions`: ingreso recurrente mensual (equivalente mensual de los
+abonos activos), lo vencido, lo que vence en 7 días y los abonos agrupados por
+urgencia. "Cobrar" lleva al flujo de cobro con el abono ya vinculado. Estados
+editables: activo, pausado o cancelado. Se eliminó el botón "renovar" (y su API) que
+corría la fecha sin registrar el pago: ahora el vencimiento avanza solo al emitir
+el comprobante.
 
-`/admin/payments` → "Nuevo pago" (o el acceso rápido del dashboard). Elegís
-cliente, producto, suscripción opcional, importe, concepto, período, medio de
-pago, fecha, referencia de transferencia y observaciones. El pago queda en
-estado `registrado` — **todavía no es un comprobante** y se puede editar.
+### Servicios
 
-Cuando esté listo, click en **"Emitir comprobante"**. Eso dispara una
-transacción atómica que:
-
-1. Incrementa el contador anual y genera el número (`DD-2026-0001`).
-2. Congela una copia de los datos del cliente en el comprobante (si editás el
-   cliente después, el comprobante ya emitido no cambia).
-3. Marca el pago como `emitido` (deja de poder editarse).
-4. Si el pago está vinculado a una suscripción, avanza su próximo vencimiento.
-5. Deja un registro en `auditLogs`.
-
-Con el comprobante ya emitido podés **descargar el PDF** o **enviarlo por
-WhatsApp** (arma el mensaje automático y, si el navegador lo soporta —
-Android/Chrome mobile —, comparte el PDF directo al selector de apps; en
-escritorio descarga el PDF y abre WhatsApp Web con el mensaje, para adjuntarlo
-a mano).
-
-### Anular un comprobante
-
-Solo se puede **anular**, nunca editar ni borrar un comprobante ya emitido.
-Botón "Anular comprobante" en el pago correspondiente → pide un motivo
-obligatorio → marca el comprobante como anulado (con quién y cuándo) y el
-pago pasa a estado `anulado`. Queda registrado en `auditLogs`.
-
-### Suscripciones y vencimientos
-
-`/admin/subscriptions`: alta/edición de suscripciones (cliente, producto,
-importe, frecuencia, próximo vencimiento, estado). El botón "Registrar pago
-(avanza vencimiento)" es un atajo manual para marcar el período como pagado
-sin pasar por el flujo completo de pagos — calcula el próximo vencimiento en
-el servidor. Cuando un pago real se vincula a una suscripción y se emite su
-comprobante, esto pasa automáticamente (ver arriba).
+`/admin/products` (en el celular, dentro de **Más**): catálogo con tipo, frecuencia
+habitual y precio sugerido, que se usa para prellenar cobros y abonos. Desactivar un
+servicio lo saca de los formularios sin borrar su historial.
 
 ### Dashboard
 
-`/admin` muestra: ingresos del mes (con variación vs. el mes anterior),
-cantidad de pagos, clientes activos, suscripciones activas, próximos
-vencimientos (7 días) y pagos vencidos, filtrables por período y producto.
-Los tres accesos rápidos de arriba llevan directo a los formularios de alta
-de pago, cliente o al listado de aplicaciones.
+`/admin`, filtrable por mes y servicio: ingresos del mes con variación contra el mes
+anterior y tendencia de 12 meses, **Por cobrar** (vencidos y próximos 7 días, con
+acceso directo a cobrar), cobros del mes, ticket promedio, cobros **sin
+comprobante** (acceso directo para emitirlos), clientes activos, ingresos por
+servicio, medios de pago y últimos cobros. Los ingresos suman todo cobro no anulado
+del período, tenga o no comprobante.
+
+### Descargas de APK (eliminadas 2026-11-12)
+
+Mi Almacén y la versión Android de PresuPDF se discontinuaron. Se eliminaron la
+sección "Aplicaciones", `/api/admin/apps`, la ruta `/descargar/[slug]`, la colección
+`apps` y los productos de catálogo de esas apps. Los links viejos `/descargar/*`,
+`/trabajos/mi-almacen` y `/legal/mi-almacen/*` redirigen (308) al sitio de PresuPDF
+o al home, definidos en `next.config.ts`.
 
 ## Estructura de Firestore
 
 | Colección            | Campos principales                                                                                                                                                        | Relaciones                                               |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
 | `adminUsers/{uid}`   | `email`, `displayName`, `role`                                                                                                                                            | —                                                        |
-| `apps/{slug}`        | `name`, `version`, `downloadUrl`, `status`, `platform`, `updatedAt`, `updatedBy`                                                                                          | —                                                        |
 | `customers/{id}`     | `name`, `businessName`, `phone`, `phoneRaw`, `email`, `taxId`, `type`, `status`, `notes`, `productIds[]`                                                                  | `productIds` → `products`                                |
 | `products/{id}`      | `name`, `type`, `suggestedPrice`, `suggestedFrequency`, `active`                                                                                                          | —                                                        |
 | `subscriptions/{id}` | `customerId`, `productId`, `amount`, `frequency`, `nextDueDate`, `status`, `lastPaymentAt`                                                                                | → `customers`, → `products`                              |

@@ -25,13 +25,6 @@ export const stackGroups = [
   {
     category: "Deploy & Herramientas",
     description: "Control de versiones, despliegue y medición del producto.",
-    items: [
-      "Vercel",
-      "GitHub",
-      "EAS Build",
-      "SEO técnico",
-      "Generación de PDF",
-      "Google Analytics",
-    ],
+    items: ["Vercel", "GitHub", "SEO técnico", "Generación de PDF", "Google Analytics"],
   },
 ];

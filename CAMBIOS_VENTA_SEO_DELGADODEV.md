@@ -58,6 +58,10 @@ enlazan al otro caso, al home (`#productos`, `#trabajos`) y al contacto.
 
 ## Mi Almacén
 
+> **Actualización 2026-11-12:** Mi Almacén se discontinuó por completo: la ficha,
+> sus páginas legales y la descarga del APK se eliminaron y redirigen al portfolio (ver
+> `PANEL_ADMIN.md`). Lo que sigue describe el estado intermedio.
+
 Sale del home, el footer y el sitemap, y su ficha pasa a `noindex`. La página
 `/trabajos/mi-almacen` **se conserva**: de ella dependen la descarga del APK y sus páginas
 legales. Ver `HIDDEN_PROJECT_SLUGS` / `featuredProjects` en `projects.ts`.
@@ -76,7 +80,7 @@ legales. Ver `HIDDEN_PROJECT_SLUGS` / `featuredProjects` en `projects.ts`.
   `areaServed` Mendoza, `founder` y `sameAs` (GitHub, LinkedIn, Instagram, TikTok,
   presupdf.com.ar y qrevento.com.ar); `SoftwareApplication` en cada caso; `BreadcrumbList`.
   El autor de los casos es la marca, no una persona.
-- **robots.txt** bloquea `/admin`, `/api/` y `/descargar/`. **sitemap.xml** suma los dos casos
+- **robots.txt** bloquea `/admin` y `/api/` (`/descargar/` se eliminó después). **sitemap.xml** suma los dos casos
   nuevos y excluye Mi Almacén.
 - **Bug corregido:** el title de DecideSer repetía "| DelgadoDev | DelgadoDev".
 - Palabras clave usadas de forma natural en el texto visible: desarrollo web Mendoza,

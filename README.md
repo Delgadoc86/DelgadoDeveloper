@@ -38,8 +38,6 @@ src/
     api/admin/              # Route Handlers del panel (apps, customers, products,
                             # subscriptions, payments, receipts) — todos exigen sesión
     api/auth/               # /session (login) y /logout
-    descargar/[slug]/      # Redirect público y estable a la descarga de cada app,
-                            # resuelto contra Firestore (ver PANEL_ADMIN.md)
                          # sitemap, robots, manifest, iconos, OG image quedan a nivel raíz
   components/
     ui/                 # Componentes genéricos sin lógica de negocio (Button, Badge, CvButton...)
@@ -50,7 +48,7 @@ src/
                          # proceso, proyectos, stack, about, contacto)
     products/             # Productos propios destacados (PresuPDF, QREvento): datos,
                            # tarjetas, página de caso y marcos CSS de PC/teléfono
-    projects/data/        # projects.ts (DecideSer, Catálogo Autos, Mi Almacén oculto) +
+    projects/data/        # projects.ts (DecideSer, Catálogo Autos) +
                            # other-projects.ts (sitios sin caso de estudio)
     projects/components/  # ProjectCard, DownloadButton (tracking de clic por producto),
                            # OtherProjectsList
@@ -127,9 +125,9 @@ cookies (Ley 25.326 / buenas prácticas RGPD).
 El sitio vende servicios como empresa: no muestra stack técnico, formación ni CV de cara al
 cliente (ver `CAMBIOS_VENTA_SEO_DELGADODEV.md`, sección "Sin stack ni señales de CV").
 
-Mi Almacén se distribuye como APK fuera de Google Play: tiene un botón "Descargar APK" en
-su página (enlace a Google Drive) y un evento de Google Analytics propio por clic
-(`download_click_mi_almacen`).
+Las descargas de APK (Mi Almacén y la versión Android de PresuPDF) se discontinuaron el
+2026-11-12: ya no hay rutas de descarga ni páginas de Mi Almacén, y los links viejos
+redirigen (ver `next.config.ts` y `PANEL_ADMIN.md`).
 
 **PresuPDF (2026-09-08): DelgadoDev dejó de distribuir la descarga.** El sitio oficial
 `https://www.presupdf.com.ar` es ahora la única fuente de descarga, términos, privacidad y
@@ -166,43 +164,3 @@ publicado con ese nombre exacto, así que los botones están activos en todas la
 **Pendiente:**
 
 - Galería de screenshots adicionales por proyecto (más allá de la portada) — marcados como `[PENDIENTE: ...]` en `src/features/projects/data/projects.ts`.
-
-## Camino a Google Play (cuando termine la etapa de prueba)
-
-Hoy Mi Almacén se distribuye fuera de Google Play (APK por Google Drive). Publicarla en la
-store exige más que lo que ya tenemos. Ya existen **borradores** de las páginas que hacen
-falta, marcados con un aviso visible "Documento en preparación" y
-`robots: { index: false }` (no los indexa Google todavía) hasta que se completen y
-tengan revisión:
-
-| Página                        | Ruta                                | Qué falta antes de activarla                                                                                        |
-| ----------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Privacidad de Mi Almacén      | `/legal/mi-almacen/privacidad`      | Completar `[PENDIENTE]` de retención de datos y revisión legal.                                                     |
-| Eliminar cuenta — Mi Almacén  | `/legal/mi-almacen/eliminar-cuenta` | Construir la opción de borrado **dentro de la app** (Google la exige además de esta página web) y confirmar plazos. |
-| Términos de Uso de Mi Almacén | `/legal/mi-almacen/terminos-de-uso` | Definir condiciones de suspensión de cuenta y revisión legal.                                                       |
-
-PresuPDF ya no tiene páginas legales en este repo — viven únicamente en
-`https://www.presupdf.com.ar`, así que su camino a Google Play (si aplica) se gestiona
-del lado del sitio oficial, no acá.
-
-Estas páginas no están linkeadas desde ningún lado del sitio (a propósito, para que
-ningún visitante se las cruce por accidente) — solo se accede escribiendo la URL
-directamente, para revisarlas vos. Google tampoco las indexa (`robots: { index: false }`).
-
-Para activarlas cuando estén listas: completar los `[PENDIENTE]`, sacar
-`<DraftNotice />` y el `robots: { index: false }` de cada `page.tsx`, y agregar el link
-correspondiente en "Documentos relacionados" dentro de cada
-`/legal/[producto]/terminos-descarga`.
-
-**Esto NO cubre todo lo que pide Play Store.** Lo siguiente se completa directo en
-Play Console al momento de subir cada app, no en el sitio web:
-
-- Formulario de **Seguridad de los datos** (data safety).
-- Clasificación de contenido y público objetivo.
-- Usuario de prueba para que el equipo de revisión de Google acceda a la app.
-- Declaración de anuncios (no aplica, no hay ads).
-
-**Futuro (fuera de alcance de esta v1):**
-
-- Blog/artículos técnicos — la arquitectura de `features/` ya lo deja preparado sin romper nada al agregarlo.
-- Internacionalización (ES/EN), si se busca alcance internacional.

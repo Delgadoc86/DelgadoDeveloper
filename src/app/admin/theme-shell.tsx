@@ -31,11 +31,11 @@ function subscribe(callback: () => void) {
 }
 
 function getSnapshot(): Theme {
-  return window.localStorage.getItem(STORAGE_KEY) === "light" ? "light" : "dark";
+  return window.localStorage.getItem(STORAGE_KEY) === "dark" ? "dark" : "light";
 }
 
 function getServerSnapshot(): Theme {
-  return "dark";
+  return "light";
 }
 
 export function AdminThemeShell({ children }: { children: React.ReactNode }) {
@@ -50,7 +50,7 @@ export function AdminThemeShell({ children }: { children: React.ReactNode }) {
   }, [theme]);
 
   function toggle() {
-    const next: Theme = getSnapshot() === "dark" ? "light" : "dark";
+    const next: Theme = getSnapshot() === "light" ? "dark" : "light";
     window.localStorage.setItem(STORAGE_KEY, next);
     window.dispatchEvent(new Event(THEME_EVENT));
   }
@@ -60,7 +60,7 @@ export function AdminThemeShell({ children }: { children: React.ReactNode }) {
       <div
         id="admin-theme-root"
         ref={rootRef}
-        data-theme="dark"
+        data-theme="light"
         className="bg-background text-foreground min-h-dvh"
       >
         {children}

@@ -2,165 +2,149 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { ProductRecord } from "@/types/product";
-import { PRODUCT_FREQUENCIES, PRODUCT_TYPES } from "@/types/product";
+import type { ProductFrequency, ProductRecord, ProductType } from "@/types/product";
+import { PRODUCT_TYPES } from "@/types/product";
+import { FREQUENCY_LABEL, PRODUCT_TYPE_LABEL } from "@/lib/admin/format";
+import { Button } from "../../_ui/button";
+import { Field, Input, Select, Switch } from "../../_ui/fields";
+import { InlineAlert } from "../../_ui/primitives";
 
-export function ProductForm({ product }: { product?: ProductRecord }) {
+/** Alta y edición de servicios del catálogo. Pensado para usarse en un <Sheet>. */
+export function ProductForm({
+  product,
+  onDone,
+}: {
+  product?: ProductRecord;
+  onDone?: () => void;
+}) {
   const router = useRouter();
   const isEditing = Boolean(product);
 
   const [name, setName] = useState(product?.name ?? "");
-  const [type, setType] = useState(product?.type ?? PRODUCT_TYPES[0]);
-  const [suggestedPrice, setSuggestedPrice] = useState(
+  const [type, setType] = useState<ProductType>(product?.type ?? "servicio");
+  const [price, setPrice] = useState(
     product?.suggestedPrice != null ? String(product.suggestedPrice) : "",
   );
-  const [suggestedFrequency, setSuggestedFrequency] = useState(
+  const [frequency, setFrequency] = useState<ProductFrequency | "">(
     product?.suggestedFrequency ?? "",
   );
   const [active, setActive] = useState(product?.active ?? true);
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "ok" | "error"; text: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    setFeedback(null);
-
-    const payload = {
-      name,
-      type,
-      suggestedPrice: suggestedPrice ? Number(suggestedPrice) : null,
-      suggestedFrequency: suggestedFrequency || null,
-      active,
-    };
-
+    setError(null);
     try {
       const response = await fetch(
         isEditing ? `/api/admin/products/${product!.id}` : "/api/admin/products",
         {
           method: isEditing ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            name,
+            type,
+            suggestedPrice: price ? Number(price.replace(",", ".")) : null,
+            suggestedFrequency: frequency || null,
+            active,
+          }),
         },
       );
       const data = await response.json();
-
       if (!response.ok) {
-        setFeedback({ type: "error", text: data.error ?? "No se pudo guardar" });
+        setError(data.error ?? "No se pudo guardar");
         return;
       }
-
-      setFeedback({ type: "ok", text: isEditing ? "Guardado" : "Producto creado" });
-      if (!isEditing) {
-        setName("");
-        setSuggestedPrice("");
-        setSuggestedFrequency("");
-      }
       router.refresh();
+      onDone?.();
     } catch {
-      setFeedback({ type: "error", text: "Error de red al guardar" });
+      setError("Error de red al guardar");
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
-    >
-      <h2 className="font-semibold">{isEditing ? product!.name : "Nuevo producto"}</h2>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Nombre
-        <input
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-          required
-          className="border-border bg-background-subtle rounded border px-3 py-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Tipo
-        <select
-          value={type}
-          onChange={(event) =>
-            setType(event.target.value as (typeof PRODUCT_TYPES)[number])
-          }
-          className="border-border bg-background-subtle rounded border px-3 py-2"
-        >
-          {PRODUCT_TYPES.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Precio sugerido (ARS)
-        <input
-          type="number"
-          min="0"
-          step="0.01"
-          value={suggestedPrice}
-          onChange={(event) => setSuggestedPrice(event.target.value)}
-          className="border-border bg-background-subtle rounded border px-3 py-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Frecuencia sugerida
-        <select
-          value={suggestedFrequency}
-          onChange={(event) =>
-            setSuggestedFrequency(
-              event.target.value as (typeof PRODUCT_FREQUENCIES)[number] | "",
-            )
-          }
-          className="border-border bg-background-subtle rounded border px-3 py-2"
-        >
-          <option value="">Sin definir</option>
-          {PRODUCT_FREQUENCIES.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      {isEditing && (
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={active}
-            onChange={(event) => setActive(event.target.checked)}
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-1">
+      <Field label="Nombre del servicio">
+        {(id) => (
+          <Input
+            id={id}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ej.: Mantenimiento web"
+            required
           />
-          Activo
-        </label>
-      )}
-
-      {feedback && (
-        <p
-          role="alert"
-          className={
-            feedback.type === "ok" ? "text-sm text-[#0ca30c]" : "text-sm text-[#d03b3b]"
-          }
-        >
-          {feedback.text}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={saving}
-        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
+        )}
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Tipo">
+          {(id) => (
+            <Select
+              id={id}
+              value={type}
+              onChange={(e) => setType(e.target.value as ProductType)}
+            >
+              {PRODUCT_TYPES.map((value) => (
+                <option key={value} value={value}>
+                  {PRODUCT_TYPE_LABEL[value]}
+                </option>
+              ))}
+            </Select>
+          )}
+        </Field>
+        <Field label="Frecuencia habitual" optional>
+          {(id) => (
+            <Select
+              id={id}
+              value={frequency}
+              onChange={(e) => setFrequency(e.target.value as ProductFrequency | "")}
+            >
+              <option value="">Sin definir</option>
+              {(["mensual", "semestral", "anual", "unico"] as const).map((value) => (
+                <option key={value} value={value}>
+                  {FREQUENCY_LABEL[value]}
+                </option>
+              ))}
+            </Select>
+          )}
+        </Field>
+      </div>
+      <Field
+        label="Precio sugerido"
+        optional
+        hint="Se completa solo al registrar un cobro."
       >
-        {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Crear producto"}
-      </button>
+        {(id) => (
+          <div className="relative">
+            <span className="text-foreground-muted pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
+              $
+            </span>
+            <Input
+              id={id}
+              inputMode="decimal"
+              value={price}
+              onChange={(e) => setPrice(e.target.value.replace(/[^\d.,]/g, ""))}
+              className="pl-8 tabular-nums"
+            />
+          </div>
+        )}
+      </Field>
+      {isEditing ? (
+        <div className="border-border rounded-xl border p-3.5">
+          <Switch
+            checked={active}
+            onChange={setActive}
+            label="Disponible"
+            description="Si lo desactivás, deja de aparecer al registrar cobros."
+          />
+        </div>
+      ) : null}
+      {error ? <InlineAlert tone="critical">{error}</InlineAlert> : null}
+      <Button type="submit" size="lg" loading={saving} className="w-full">
+        {isEditing ? "Guardar cambios" : "Crear servicio"}
+      </Button>
     </form>
   );
 }

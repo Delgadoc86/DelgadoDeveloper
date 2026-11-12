@@ -33,19 +33,29 @@ const nextConfig: NextConfig = {
         destination: "/trabajos/:slug",
         permanent: true,
       },
-      // PresuPDF.com.ar es el único sitio oficial de descarga: estas dos
-      // rutas ya no deben resolver Firestore ni pasar por Google Drive,
-      // sino ir directo al sitio oficial. Se apunta a la URL externa final
-      // en ambas (en vez de encadenar presufacil -> presupdf -> externo)
-      // para evitar un salto de redirect extra.
+      // Las descargas de APK (Mi Almacén y la versión Android de PresuPDF)
+      // se discontinuaron en 2026-11: cualquier link viejo a /descargar/*
+      // va al sitio oficial de PresuPDF o al home, en vez de dar 404.
       {
-        source: "/descargar/presufacil",
-        destination: "https://www.presupdf.com.ar/descargar",
+        source: "/descargar/:slug(presufacil|presupdf)",
+        destination: "https://www.presupdf.com.ar",
         permanent: true,
       },
       {
-        source: "/descargar/presupdf",
-        destination: "https://www.presupdf.com.ar/descargar",
+        source: "/descargar/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      // Mi Almacén se discontinuó: su ficha y sus páginas legales redirigen
+      // al portfolio para no dejar URLs rotas ya compartidas.
+      {
+        source: "/trabajos/mi-almacen",
+        destination: "/#trabajos",
+        permanent: true,
+      },
+      {
+        source: "/legal/mi-almacen/:path*",
+        destination: "/",
         permanent: true,
       },
       // Legales históricos de PresuFácil/PresuPDF: los términos y la

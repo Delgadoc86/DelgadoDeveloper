@@ -2,21 +2,29 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import type { SubscriptionRecord, SubscriptionStatus } from "@/types/subscription";
-import { SUBSCRIPTION_FREQUENCIES, SUBSCRIPTION_STATUSES } from "@/types/subscription";
+import type {
+  SubscriptionFrequency,
+  SubscriptionRecord,
+  SubscriptionStatus,
+} from "@/types/subscription";
 import type { CustomerRecord } from "@/types/customer";
 import type { ProductRecord } from "@/types/product";
+import { getArgentinaTodayISO } from "@/lib/timezone";
+import { Button } from "../../_ui/button";
+import { Field, Input, Segmented, Select } from "../../_ui/fields";
+import { InlineAlert } from "../../_ui/primitives";
 
+/** Alta y edición de abonos (suscripciones). Pensado para usarse en un <Sheet>. */
 export function SubscriptionForm({
   subscription,
   customers,
   products,
-  onCreated,
+  onDone,
 }: {
   subscription?: SubscriptionRecord;
   customers: CustomerRecord[];
   products: ProductRecord[];
-  onCreated?: () => void;
+  onDone?: () => void;
 }) {
   const router = useRouter();
   const isEditing = Boolean(subscription);
@@ -28,32 +36,28 @@ export function SubscriptionForm({
     subscription?.productId ?? products[0]?.id ?? "",
   );
   const [amount, setAmount] = useState(subscription ? String(subscription.amount) : "");
-  const [frequency, setFrequency] = useState(
-    subscription?.frequency ?? SUBSCRIPTION_FREQUENCIES[0],
+  const [frequency, setFrequency] = useState<SubscriptionFrequency>(
+    subscription?.frequency ?? "mensual",
   );
-  const [nextDueDate, setNextDueDate] = useState(subscription?.nextDueDate ?? "");
+  const [nextDueDate, setNextDueDate] = useState(
+    subscription?.nextDueDate ?? getArgentinaTodayISO(),
+  );
   const [status, setStatus] = useState<SubscriptionStatus>(
     subscription?.status ?? "activa",
   );
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "ok" | "error"; text: string } | null>(
-    null,
-  );
+  const [error, setError] = useState<string | null>(null);
+
+  function selectProduct(id: string) {
+    setProductId(id);
+    const product = products.find((p) => p.id === id);
+    if (!amount && product?.suggestedPrice) setAmount(String(product.suggestedPrice));
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setSaving(true);
-    setFeedback(null);
-
-    const payload = {
-      customerId,
-      productId,
-      amount: Number(amount),
-      frequency,
-      nextDueDate,
-      status,
-    };
-
+    setError(null);
     try {
       const response = await fetch(
         isEditing
@@ -62,155 +66,152 @@ export function SubscriptionForm({
         {
           method: isEditing ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            customerId,
+            productId,
+            amount: Number(amount.replace(",", ".")),
+            frequency,
+            nextDueDate,
+            status,
+          }),
         },
       );
       const data = await response.json();
-
       if (!response.ok) {
-        setFeedback({ type: "error", text: data.error ?? "No se pudo guardar" });
+        setError(data.error ?? "No se pudo guardar");
         return;
       }
-
-      setFeedback({ type: "ok", text: isEditing ? "Guardado" : "Suscripción creada" });
-      if (!isEditing) {
-        setAmount("");
-        setNextDueDate("");
-        onCreated?.();
-      }
       router.refresh();
+      onDone?.();
     } catch {
-      setFeedback({ type: "error", text: "Error de red al guardar" });
+      setError("Error de red al guardar");
     } finally {
       setSaving(false);
     }
   }
 
+  if (!isEditing && customers.length === 0) {
+    return (
+      <p className="text-foreground-muted pb-2 text-sm">
+        Primero cargá al menos un cliente para poder crearle un abono.
+      </p>
+    );
+  }
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border-border bg-background-subtle flex flex-col gap-3 rounded-lg border p-4"
-    >
-      <h2 className="font-semibold">
-        {isEditing
-          ? `${customers.find((c) => c.id === subscription!.customerId)?.name ?? "Cliente"} — ${
-              products.find((p) => p.id === subscription!.productId)?.name ?? "Producto"
-            }`
-          : "Nueva suscripción"}
-      </h2>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-1">
+      {!isEditing ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Cliente">
+            {(id) => (
+              <Select
+                id={id}
+                value={customerId}
+                onChange={(e) => setCustomerId(e.target.value)}
+                required
+              >
+                {customers.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+          <Field label="Servicio">
+            {(id) => (
+              <Select
+                id={id}
+                value={productId}
+                onChange={(e) => selectProduct(e.target.value)}
+                required
+              >
+                {products.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </Select>
+            )}
+          </Field>
+        </div>
+      ) : null}
 
-      {!isEditing && (
-        <>
-          <label className="flex flex-col gap-1 text-sm">
-            Cliente
-            <select
-              value={customerId}
-              onChange={(event) => setCustomerId(event.target.value)}
-              required
-              className="border-border bg-background-subtle rounded border px-3 py-2"
-            >
-              {customers.map((customer) => (
-                <option key={customer.id} value={customer.id}>
-                  {customer.name}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className="flex flex-col gap-1 text-sm">
-            Producto
-            <select
-              value={productId}
-              onChange={(event) => setProductId(event.target.value)}
-              required
-              className="border-border bg-background-subtle rounded border px-3 py-2"
-            >
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        </>
-      )}
-
-      <label className="flex flex-col gap-1 text-sm">
-        Importe acordado (ARS)
-        <input
-          type="number"
-          min="0.01"
-          step="0.01"
-          value={amount}
-          onChange={(event) => setAmount(event.target.value)}
-          required
-          className="border-border bg-background-subtle rounded border px-3 py-2"
-        />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Frecuencia
-        <select
+      <div className="flex flex-col gap-1.5">
+        <span className="text-foreground text-[13px] font-medium">Frecuencia</span>
+        <Segmented
+          label="Frecuencia"
           value={frequency}
-          onChange={(event) =>
-            setFrequency(event.target.value as (typeof SUBSCRIPTION_FREQUENCIES)[number])
-          }
-          className="border-border bg-background-subtle rounded border px-3 py-2"
-        >
-          {SUBSCRIPTION_FREQUENCIES.map((value) => (
-            <option key={value} value={value}>
-              {value}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        Próximo vencimiento
-        <input
-          type="date"
-          value={nextDueDate}
-          onChange={(event) => setNextDueDate(event.target.value)}
-          required
-          className="border-border bg-background-subtle rounded border px-3 py-2"
+          onChange={setFrequency}
+          className="w-full [&>button]:flex-1"
+          options={[
+            { value: "mensual", label: "Mensual" },
+            { value: "semestral", label: "Semestral" },
+            { value: "anual", label: "Anual" },
+          ]}
         />
-      </label>
+      </div>
 
-      {isEditing && (
-        <label className="flex flex-col gap-1 text-sm">
-          Estado
-          <select
-            value={status}
-            onChange={(event) => setStatus(event.target.value as SubscriptionStatus)}
-            className="border-border bg-background-subtle rounded border px-3 py-2"
-          >
-            {SUBSCRIPTION_STATUSES.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </label>
-      )}
-
-      {feedback && (
-        <p
-          role="alert"
-          className={
-            feedback.type === "ok" ? "text-sm text-[#0ca30c]" : "text-sm text-[#d03b3b]"
-          }
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Importe">
+          {(id) => (
+            <div className="relative">
+              <span className="text-foreground-muted pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2">
+                $
+              </span>
+              <Input
+                id={id}
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value.replace(/[^\d.,]/g, ""))}
+                className="pl-8 tabular-nums"
+                required
+              />
+            </div>
+          )}
+        </Field>
+        <Field
+          label="Próximo vencimiento"
+          hint="Se corre solo cada vez que emitís el comprobante."
         >
-          {feedback.text}
-        </p>
-      )}
+          {(id) => (
+            <Input
+              id={id}
+              type="date"
+              value={nextDueDate}
+              onChange={(e) => setNextDueDate(e.target.value)}
+              required
+            />
+          )}
+        </Field>
+      </div>
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="bg-accent text-accent-foreground hover:bg-accent/90 rounded px-4 py-2 text-sm font-medium disabled:opacity-60"
-      >
-        {saving ? "Guardando..." : isEditing ? "Guardar cambios" : "Crear suscripción"}
-      </button>
+      {isEditing ? (
+        <div className="flex flex-col gap-1.5">
+          <span className="text-foreground text-[13px] font-medium">Estado</span>
+          <Segmented
+            label="Estado"
+            value={
+              status === "activa" || status === "pausada" || status === "cancelada"
+                ? status
+                : "activa"
+            }
+            onChange={setStatus}
+            className="w-full [&>button]:flex-1"
+            options={[
+              { value: "activa", label: "Activo" },
+              { value: "pausada", label: "Pausado" },
+              { value: "cancelada", label: "Cancelado" },
+            ]}
+          />
+        </div>
+      ) : null}
+
+      {error ? <InlineAlert tone="critical">{error}</InlineAlert> : null}
+
+      <Button type="submit" size="lg" loading={saving} className="w-full">
+        {isEditing ? "Guardar cambios" : "Crear abono"}
+      </Button>
     </form>
   );
 }
